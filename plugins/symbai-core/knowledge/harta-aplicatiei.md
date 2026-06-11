@@ -109,7 +109,7 @@
   - Tab **Plan Sală Live** — Tab Plan Sală Live — vizualizare sală cu mese și ocupare în timp real
   - Tab **Listă Rezervări** — Tab Listă Rezervări — toate rezervările, calendar, confirmare, anulare
   - Tab **Analiză Rezervări** — Tab Analiză — timpi rotație, rată ocupare, ore de vârf
-  - Tab **Configurare Rezervări** — Tab Configurare — setări rezervări online, intervale, capacitate, politici anulare
+- **Configurare Rezervări** (`/reservations/config`) — Regulile sistemului de rezervări — activare, fereastră de timp, persoane min/max, inventar și zone, controlul fluxului (pacing, câți clienți pot sosi per interval) și câmpurile formularului
 ## PLAN SALĂ & BUCĂTĂRIE
 
 - **Plan Sală** (`/floorplan`) — Editor vizual plan sală — mese, zone, configurare layout, aranjament, harta mese
@@ -409,5 +409,49 @@
 - **Documentație API** (`/api-docs`) — Documentație API publice Symbai pentru integratori externi
 - **Integrări Externe** (`/integrations`) — Hub integrări externe — listă conectate, status, configurare per categorie
 - **Evenimente CRM** (`/events`) — Listă evenimente (rezervări tip eveniment cu coordonator, meniu, produse) — diferit de Facebook Events. Acces din CRM.
-- **Abonamente** (`/subscriptions`) — Abonamentele CLIENȚILOR cu livrări recurente — KPI MRR/ARR/ARPU/churn/LTV, listă abonați, pauză/reactivare/anulare, livrările și plățile fiecărui abonament. (Abonamentul tău la platforma Symbai se vede în Setări → Module & Facturare și în portalul Hub.)
+- **Abonamente** (`/subscriptions`) — Abonamentele clienților cu livrări recurente — KPI MRR/ARR/ARPU/churn/LTV, listă abonați cu filtre pe status (activ, trial, pauză, restant, anulat), pauză/reactivare/anulare, livrările și evenimentele de plată ale fiecărui abonament. Pentru abonamentul tău la platforma Symbai vezi Setări → Module & Facturare sau portalul Hub.
 - **Recomandări Symbai** (`/symbai-recommendations`) — Recomandări AI pentru îmbunătățiri operaționale — pe baza datelor proprii (vânzări, stocuri, comenzi) plus benchmark industrie
+## PAGINI ADIȚIONALE (2)
+
+- **Zone Livrare** (`/deliveries/zones`) — Zonele de livrare pe hartă, per locație — desen liber sau localități cu contur automat, taxă de livrare, valoare minimă comandă, prag de livrare gratuită, ore limită și capacitate maximă pe zi
+- **Flotă Livrări** (`/deliveries/fleet`) — Flota proprie — vehicule (tip, capacitate, status), livratori (bifezi nominal cine e livrator), schimburi cu km la plecare/sosire și livratori activi cu poziție live
+- **Dispecerat Livrări** (`/deliveries/dispatch`) — Ecranul operatorului pentru livrările cu flotă proprie — kanban pe statusuri plus hartă cu comenzi și livratori, asignare manuală, drag-and-drop pe livrator sau sugestie automată după zonă/distanță/capacitate
+- **Mission Control Dispecerat** (`/dispatch/mission-control`) — Consola avansată de dispecerat — KPI-urile zilei, alerte live cu confirmare, hartă live, recomandări top livratori cu scor și motive, countdown SLA per comandă, comandă rapidă creată de operator și trimitere la curier extern cu cotații
+- **Setări Dispecerat** (`/dispatch/settings`) — SLA promis și praguri de alertă (fără livrator, livrator inactiv, blocat în bucătărie), auto-asignare cu prag de scor, batching comenzi, motor de rutare, viteză medie, curieri externi activați și tracking public (poziție livrator, SMS cu ETA)
+- **Analiză Dispecerat** (`/dispatch/analytics`) — KPI livrări pe 1/7/30/90 zile — livrate, eșuate, timp mediu, breșe SLA, alerte pe tip, top livratori și jurnalul de audit al acțiunilor de dispecerat
+- **Livrări Eșuate** (`/deliveries/failed`) — Livrările marcate eșuate cu motiv (client absent, adresă greșită, refuzată, produs lipsă) — re-livrare, reprogramare la o oră anume, anulare definitivă, statistici per motiv și export CSV
+- **Închideri de Zi Livratori** (`/deliveries/day-closures`) — Registrul închiderilor de zi ale livratorilor — km, cash încasat, card, combustibil, livrări reușite/eșuate, semnat/nesemnat
+- **Cheltuieli Vehicule** (`/deliveries/vehicle-expenses`) — Raport pe vehicul din schimburile închise — km, litri, RON carburant, RON/km, consum L/100km, bonuri de carburant legate de schimb, export CSV
+- **Aplicația Livratorului** (`/livrator`) — PWA-ul curierului — tura și livrările zilei, pornire livrare cu navigare (Google Maps/Waze), încasare cash/card, semnătură destinatar, poză dovadă, bonuri combustibil și închiderea de zi; funcționează și offline
+- **Revizuire Mapări AI** (`/inventory/ai-review`) — Toate liniile din facturile fără recepție într-un singur loc — verificare și aprobare centralizată a mapărilor propuse de AI, editare mapare, spargere linie în sub-linii sau absorbție în alte linii
+- **Reguli de Mapare** (`/inventory/mapping-rules`) — Regulile de mapare învățate de sistem — specifice unui furnizor (prioritate maximă) și generale valabile la orice furnizor, cu ștergere în masă
+- **Calitate Inbox Facturi** (`/inventory/inbox-quality`) — Igiena intrărilor — mapări cu încredere scăzută, NIR-uri ciornă mai vechi de 7 zile, facturi eFactura fără NIR, anomalii de preț și conflicte între reguli de mapare
+- **Dispute Inventar** (`/inventory/disputes`) — Diferențele constatate la recepție, clasificate — dispute cu furnizorul, corecții OCR, variații de livrare
+- **Inventar Multi-Sursă** (`/inventory/msi`) — Pentru vânzări online cu mai multe depozite — reguli de alocare automată pe surse, rezervări cu termen, backorder/preorder, expediții împărțite și vizibilitate storefront
+- **Unifică Duplicate** (`/automations`) — Detectează produsele duplicate din catalog (nume identic sau aproape identic) și le unește inteligent — supraviețuiește produsul cu vânzări și loc în meniu, stocul se adună, rețeta se preia; cu sugestii automate de unire și previzualizare de impact
+- **Leagă Rețetarul (import Excel)** (`/recipe-mapping`) — Import rețetar din Excel — fiecare ingredient se mapează la un produs existent (potrivire exactă, similară sau cu AI); conflictele de unitate de măsură blochează importul până le rezolvi
+- **Centru Meniu** (`/menu/center`) — Panou pentru manageri — ce produse sunt indisponibile (86) acum cu motiv și cine le-a marcat, câte produse nu au fotografie sau alergeni, căutare cu marcare 86 rapidă și alias-uri de căutare
+- **Meniu din PDF** (`/menu/import-pdf`) — Import meniu din PDF sau poze cu AI — extrage produsele, prețurile, pozele și designul paginilor (reconstruit pentru Meniu Fizic), cu propunere editabilă înainte de import
+- **Poze Bulk Meniu** (`/menu/pricing/bulk-photos`) — Urci multe poze deodată (drag and drop) și AI sugerează automat produsul potrivit din meniu pentru fiecare poză; tu confirmi sau schimbi
+- **Mese Servite** (`/finance/served-meals`) — Registrul meselor servite — vânzări la preț fix fără rețetă cunoscută (meniu de eveniment); statusuri Ciornă / Cost de stabilit / Cost stabilit, costul se leagă ulterior printr-o fișă de ieșire de tip consum sau din evenimentul asociat
+- **Raport Beneficii Personal** (`/reports/staff-benefits`) — Ce au consumat angajații pe beneficii (mâncare/băutură personal) — grupat pe angajat, regulă, produs sau zi, cu export CSV
+- **Reparații Date** (`/settings/repair`) — Unelte 1-click de igienizare a datelor, sigure și cu previzualizare înainte de aplicare — reconciliere comenzi, curățare produse fantomă, unificare categorii duplicate, legarea rețetelor de produse, corectare unități de măsură neconvertibile și conturi greșite
+- **Setări P&L** (`/settings/pnl-categories`) — Categoriile raportului de profit și pierdere — template-uri pe industrie (creează seturi întregi de KPI cu un click), categorii pe secțiuni (Venituri, COGS, Personal, OPEX), grupări de venituri, definițiile și pragurile KPI-urilor
+- **Beneficii Personal (setări)** (`/settings/staff-benefits`) — Regulile de mâncare/băutură pentru angajați — cine primește, la ce produse, ce valoare (gratuit, reducere procent, sumă fixă, preț special sau buget zilnic/săptămânal/lunar), aplicatori separați de beneficiari și buget per angajat
+- **Marketing & Engagement (setări)** (`/settings/marketing`) — URL-urile publice de review (Google, TripAdvisor, Facebook) și configurarea WiFi-ului de marketing prin serverul local
+- **Contexte QR dinamice** (`/settings/qr-contexts`) — Contexte pentru codurile QR (Terasă, Piscină, Cameră hotel, Eveniment privat) — cheie URL, nume, imagine, culoare, masă implicită, cu preset-uri de pornire rapidă
+- **Câmpuri Personalizate** (`/settings/custom-fields`) — Câmpuri suplimentare pe deals, contacte, proiecte etc. — cheie tehnică, etichetă, tip (inclusiv listă cu opțiuni), obligatoriu sau nu
+- **Traduceri & Valute** (`/translations`) — Traduceri pe entități cu progres per limbă, limbi active, valute cu sincronizare cursuri ECB/BNR sau curs manual și reguli de taxe pe țară
+- **Echipamente & Zone Producție** (`/production/equipment-zones`) — Configurarea zonelor de producție, a echipamentelor din fiecare zonă și a capacităților per rețetă — max per lot, timp de ciclu, timp de pregătire
+- **Scanner Containere** (`/production/scanner`) — Scanezi QR-ul unui container cu camera sau cu cititorul de coduri — pornești/finalizezi operația, avansezi etapa, semnalezi probleme QC, împarți sau unești containere, printezi eticheta
+- **Follow-up Clienți** (`/customer-followup`) — Funnel de clienți, Next Best Action (sugestii zilnice cu scor — sună, trimite ofertă, cere recenzie), coadă de sarcini, playbooks automate (confirmare, reminder, mulțumire plus feedback, re-angajare) și timeline per client
+- **Punte Symbai Supplier** (`/integrations/symbai-supplier`) — Conectarea POS-ului la platforma Symbai Supplier printr-un wizard în 3 pași (furnizorul acceptă cererea) — apoi vezi entitățile sincronizate, jurnalul de sincronizare și erorile
+- **Cvent (RFP-uri)** (`/integrations/cvent`) — Cereri de ofertă pentru evenimente din rețeaua Cvent — RFP-uri, oferte, șabloane, reguli auto, locații și conturi Cvent; vizibilă doar cu integrarea Cvent activată
+- **Configurare Email** (`/email-setup`) — Starea trimiterii de email-uri — câte branduri au SMTP configurat, secretul de dezabonare și webhooks pentru furnizori externi
+- **Loguri Email** (`/email-logs`) — Toate trimiterile de email, individuale sau pe loturi per campanie — pentru a vedea exact ce a plecat și cu ce status
+- **Promoții Website** (`/website/promotions`) — Bannerele vizuale ale site-ului (banner inline, bandă antet/subsol, modal) cu țintă pagină internă, produs sau URL extern — NU reduc prețul pe notă; pentru reduceri reale folosește Oferte & Promoții din meniu
+- **Playbook Restaurant (campanii)** (`/playbook-restaurant`) — Wizard de campanii publicitare în 3 pași (brand și template, locații și conținut, buget și programare) cu sugestii Sym pe baza promoțiilor și meniului existent
+- **Observabilitate** (`/observability`) — Starea tehnică a sistemului — monitorizarea erorilor, sănătatea integrărilor (rată de eroare, ultimul succes/ultima eroare) și timpii de răspuns pe cele mai folosite rute
+- **Instalare Print Agent** (`/onboarding/print-agent`) — Ghid pas-cu-pas în 8 pași — adaugi PC-ul ca dispozitiv, generezi tokenul, instalezi Print Agent, adaugi imprimantele de rețea, configurezi casa de marcat fiscală, testezi sistemul și configurezi alertele
+- **Meniu Public (portal clienți)** (`/portal/menu`) — Meniul digital așa cum îl văd clienții pe platforma clienților — căutare, filtre dietetice, alergeni și poze
+- **Portal Furnizor (public)** (`/supplier-portal`) — Pagina publică unde furnizorul se autentifică cu ID-ul de furnizor și parola și își gestionează comenzile primite, produsele, catalogul și chat-ul — trimite-i linkul furnizorului tău

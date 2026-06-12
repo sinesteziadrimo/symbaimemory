@@ -9,7 +9,7 @@ Modelul de permisiuni al tokenului:
 
 Fiecare apel e înregistrat în jurnalul de activitate al instanței (auditabil de proprietar). Rezultatele lungi sunt trunchiate la 80.000 de caractere. Parametrii marcați cu `*` sunt obligatorii.
 
-**TOTAL: 229 tool-uri unice** — Citire 80 · Analiză dedicată 5 · SQL 3 · Scriere per modul 137 · Speciale 4 — gaseste_in_aplicatie + trimite_ticket_symbai + 2 de citire social (cele 2 de scriere social sunt numărate la modulul marketing_social).
+**TOTAL: 232 tool-uri unice** — Citire 80 · Analiză dedicată 5 · SQL 3 · Scriere per modul 139 · Speciale 5 — gaseste_in_aplicatie + trimite_ticket_symbai + verifica_integrare + 2 de citire social (cele 4 de scriere social/integrări sunt numărate la modulul marketing_social).
 
 ## Citire (fără permisiune de modul) — 80 tool-uri
 
@@ -230,9 +230,11 @@ Workflow obligatoriu în 3 pași, SELECT-only (INSERT/UPDATE/DELETE refuzate), p
 - create_customer — Creează un client în baza de date (fidelizare, rezervări, istoric comenzi) (parametri cheie: brandId*, firstName*, lastName, email, phone, birthDate, notes, loyaltyPoints, …)
 - create_game_reservation — Creează o rezervare de joc: jucători, copii/adulți, contact, exclusivitate, preț (parametri cheie: gameId*, date*, startTime*, endTime*, partySize*, contactName*, childrenCount, adultsCount, …)
 
-### marketing_social — Marketing & Social Media — 2 tool-uri
+### marketing_social — Marketing & Social Media — 4 tool-uri
 - schedule_social_post — Creează și programează o postare social media (Facebook, Instagram, TikTok, YouTube, LinkedIn, Google Business); cu scheduledAt în viitor se publică AUTOMAT la ora respectivă, fără scheduledAt rămâne draft (parametri cheie: brandId*, content*, platforms*, scheduledAt [ISO 8601], mediaUrls, postType [post|story|reel|carousel], firstComment)
 - cancel_social_post — Anulează o postare programată sau draft (și failed/retry_pending); nu poate anula postări deja publicate (parametri cheie: postId*)
+- genereaza_link_conectare — Generează link-ul OAuth de conectare pentru o platformă socială sau pentru contul de reclame Meta; utilizatorul îl deschide în browserul lui și aprobă, tokenul ajunge direct pe server (nu prin chat), link valabil ~10 minute; Instagram NU are link separat — vezi conecteaza_instagram_din_facebook (parametri cheie: platforma* [facebook|tiktok|youtube|linkedin|google_business|meta_ads], brandId)
+- conecteaza_instagram_din_facebook — Leagă contul Instagram Business folosind pagina de Facebook deja conectată — execută legarea direct, fără link separat; cere cont IG de tip Business/Creator asociat paginii FB (parametri cheie: brandId)
 
 ### financiar — Financiar & Contabilitate — 6 tool-uri
 - create_expense — Înregistrează o cheltuială (chirie, utilități, reparații, diverse) pentru evidența financiară și P&L (parametri cheie: brandId*, category*, amount*, description, date, recurring, recurrenceInterval, supplierId, …)
@@ -295,14 +297,17 @@ Workflow obligatoriu în 3 pași, SELECT-only (INSERT/UPDATE/DELETE refuzate), p
 - update_game_pricing — Adaugă sau modifică prețul unui joc (parametri cheie: gameId*, type*, pricePerSession*, pricingId, pricePerPerson, label)
 - set_game_date_override — Setează o excepție de dată pentru un joc: închis, program custom, capacitate diferită (parametri cheie: gameId*, date*, closed, customOpen, customClose, maxCapacityOverride, slotDurationOverride, prepTimeOverride, …)
 
-## Tools speciale — 6 tool-uri
+## Tools speciale — 9 tool-uri
 
 - gaseste_in_aplicatie — [read] Găsește o pagină/funcție în aplicația Symbai după ce vrea utilizatorul („unde văd rapoartele", „cum ajung la setări imprimante"); întoarce pagina + LINK direct (pe subdomeniul tenantului *.symbai.app) + cum ajungi acolo; caută în harta de navigare a aplicației, max 5 potriviri (parametri cheie: intrebare*)
+- verifica_integrare — [read] Verifică starea integrării cu un serviciu extern: meta (Facebook + Instagram + cont reclame), facebook, instagram, tiktok, youtube, linkedin, google_business; întoarce checklist structurat — credențiale, cont conectat, token valid (testat LIVE pe API-ul platformei), permisiuni lipsă, cont reclame — cu link unde se rezolvă fiecare lipsă; de rulat ÎNAINTE și DUPĂ fiecare pas de conectare (parametri cheie: serviciu [default meta], brandId)
 - trimite_ticket_symbai — [mereu disponibil] Trimite un ticket către ECHIPA SYMBAI: problemă tehnică, reclamație, sugestie de îmbunătățire sau cerere de suport; întoarce o referință (SYM-00042); cu emailContact utilizatorul e anunțat la răspuns/rezolvare; la sugestii folosește dedupeKey (slug stabil) — retrimiterea aceleiași idei se adaugă la ticketul existent; ticketele NU pot fi citite înapoi prin conexiune (parametri cheie: tip* [problema|reclamatie|sugestie|suport], titlu*, descriere*, emailContact, numeUtilizator, dedupeKey)
 - list_social_accounts — [read] Listează conturile social media conectate (Facebook, Instagram, TikTok etc.) per brand, fără tokenuri de acces; de folosit înainte de a programa o postare (parametri cheie: brandId)
 - list_social_posts — [read] Listează postările social media (draft, programate, publicate) cu status și data programării (parametri cheie: brandId, status [draft|scheduled|publishing|published|failed|cancelled], limit [default 25, max 100])
 - schedule_social_post — [write: marketing_social] vezi secțiunea „marketing_social" de mai sus (parametri cheie: brandId*, content*, platforms*, scheduledAt, mediaUrls, postType, firstComment)
 - cancel_social_post — [write: marketing_social] vezi secțiunea „marketing_social" de mai sus (parametri cheie: postId*)
+- genereaza_link_conectare — [write: marketing_social] vezi secțiunea „marketing_social" de mai sus (parametri cheie: platforma*, brandId)
+- conecteaza_instagram_din_facebook — [write: marketing_social] vezi secțiunea „marketing_social" de mai sus (parametri cheie: brandId)
 
 Reguli generale ale conexiunii: începe sesiunile cu `list_brands` + `list_locations` (multe tool-uri cer brandId/locationId); pentru cifre folosește rapoartele dedicate ÎNAINTE de SQL; pentru investigații („cine a făcut X") folosește `jurnal_activitate`. Sume în RON, TVA România 0/11/21%, fus orar Europe/Bucharest.
 

@@ -22,7 +22,7 @@ Sau din terminal:
 claude plugin marketplace add sinesteziadrimo/symbaimemory
 ```
 
-Apoi, din portalul tău Symbai Hub → **Acces AI**, copiază comanda de conectare (`claude mcp add ...`) ca să legi asistentul la datele instanței tale.
+Apoi, din portalul tău Symbai Hub → **Acces AI**, ia instrucțiunile de conectare la datele instanței tale — fie mesajul de lipit în chat (aplicația Claude Desktop, fără terminal), fie comanda pentru terminal (`claude mcp add --transport http --scope user symbai ...`). Dacă ceva nu merge la conectare, spune-i asistentului „conectează-mă la Symbai" — skill-ul `conecteaza-symbai` îl ghidează (inclusiv la eroarea „Some MCP servers could not be loaded").
 
 ## Actualizare
 

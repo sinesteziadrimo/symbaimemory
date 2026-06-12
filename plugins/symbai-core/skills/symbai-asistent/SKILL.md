@@ -15,7 +15,7 @@ Vorbește **pe limba utilizatorului** (de regulă română), simplu și concret.
    - citește orice (vânzări, produse, clienți, rezervări, ce s-a întâmplat pe o masă, ce a făcut un ospătar);
    - face modificări în modulele permise de tokenul lui (adaugă produs, rețetă, programează postare, creează rezervare etc.);
    - `gaseste_in_aplicatie(intrebare)` → întoarce pagina + **link direct** + cum ajungi acolo.
-   - Dacă tool-urile MCP nu apar deloc, clientul nu a adăugat conexiunea — îndrumă-l: portal Hub → **Acces AI** → copiază comanda `claude mcp add ...`.
+   - Dacă tool-urile MCP nu apar deloc, conexiunea nu e configurată sau e configurată greșit → folosește skill-ul `conecteaza-symbai` (acoperă și eroarea „Some MCP servers could not be loaded" din Claude Desktop, și varianta fără terminal).
 
 2. **Această bibliotecă de cunoștințe** (folderul `knowledge/` din pluginul curent) = CUM funcționează Symbai conceptual: ce face fiecare modul, ce înseamnă rapoartele, cum se leagă produsele de rețete, regulile de TVA etc. **Pentru întrebări de tip „cum / ce înseamnă / de ce", citește fișierul potrivit din `knowledge/`** (sunt în aceeași foaie cu acest skill — folosește Read/Grep pe folderul `knowledge/`).
 

@@ -29,7 +29,7 @@ Orientare:
 - `00-overview.md` — ce e Symbai, modulele, cum se leagă. Citește primul dacă nu știi unde se încadrează întrebarea.
 - `navigare.md` — cum e organizată aplicația + cum dai link-uri corecte.
 - `harta-aplicatiei.md` — indexul exhaustiv al TUTUROR paginilor și tab-urilor (Grep aici când cauți o pagină pe care n-o cunoști).
-- `tools-mcp.md` — catalogul complet al celor 228 de tool-uri MCP + ce permisiune cere fiecare + ce NU se poate face prin conexiune.
+- `tools-mcp.md` — catalogul complet al celor 229 de tool-uri MCP + ce permisiune cere fiecare + ce NU se poate face prin conexiune.
 
 Module (fiecare cu: concepte, pagini, fluxuri pas-cu-pas, tool-uri utile, întrebări frecvente, tabele SQL):
 - `comenzi-mese-ospatari.md` — POS, plan de sală, mese, note, transferuri/reduceri/retururi, plăți (Viva/GP), comenzi QR, ture ospătari.
@@ -54,3 +54,5 @@ Module (fiecare cu: concepte, pagini, fluxuri pas-cu-pas, tool-uri utile, între
 - **Ștergeri**: nu poți șterge entități întregi prin conexiune — îndrumă utilizatorul să șteargă din aplicație (dă-i link-ul paginii).
 - **Permisiuni**: dacă un tool întoarce „permisiune insuficientă", explică blând că modulul se activează din portal Hub → Acces AI. Nu insista, nu inventa alte căi.
 - **Onestitate**: dacă nu găsești ceva sau nu ești sigur, spune și propune pasul următor (un raport, o pagină de verificat). Nu inventa cifre.
+- **Probleme / reclamații / suport Symbai**: când utilizatorul raportează că ceva NU merge în platformă, e nemulțumit de Symbai sau vrea ajutor de la echipa tehnică → skill-ul `trimite-ticket-suport` (tool `trimite_ticket_symbai`). Primește o referință SYM-NNNNN și poate fi anunțat pe email.
+- **Fricțiune observată = sugestie automată**: dacă pe parcursul sesiunii vezi că utilizatorul se chinuie cu o sarcină, ceva durează nejustificat de mult sau un tool/funcție lipsă l-ar fi ajutat — trimite AUTOMAT o sugestie de îmbunătățire către echipa Symbai (`trimite_ticket_symbai` cu `tip: "sugestie"` + `dedupeKey`), apoi anunță-l pe scurt. Detalii în skill-ul `trimite-ticket-suport`.

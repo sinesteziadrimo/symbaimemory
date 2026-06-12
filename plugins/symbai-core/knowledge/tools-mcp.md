@@ -9,7 +9,7 @@ Modelul de permisiuni al tokenului:
 
 Fiecare apel e înregistrat în jurnalul de activitate al instanței (auditabil de proprietar). Rezultatele lungi sunt trunchiate la 80.000 de caractere. Parametrii marcați cu `*` sunt obligatorii.
 
-**TOTAL: 228 tool-uri unice** — Citire 80 · Analiză dedicată 5 · SQL 3 · Scriere per modul 137 · Speciale 3 — gaseste_in_aplicatie + 2 de citire social (cele 2 de scriere social sunt numărate la modulul marketing_social).
+**TOTAL: 229 tool-uri unice** — Citire 80 · Analiză dedicată 5 · SQL 3 · Scriere per modul 137 · Speciale 4 — gaseste_in_aplicatie + trimite_ticket_symbai + 2 de citire social (cele 2 de scriere social sunt numărate la modulul marketing_social).
 
 ## Citire (fără permisiune de modul) — 80 tool-uri
 
@@ -295,9 +295,10 @@ Workflow obligatoriu în 3 pași, SELECT-only (INSERT/UPDATE/DELETE refuzate), p
 - update_game_pricing — Adaugă sau modifică prețul unui joc (parametri cheie: gameId*, type*, pricePerSession*, pricingId, pricePerPerson, label)
 - set_game_date_override — Setează o excepție de dată pentru un joc: închis, program custom, capacitate diferită (parametri cheie: gameId*, date*, closed, customOpen, customClose, maxCapacityOverride, slotDurationOverride, prepTimeOverride, …)
 
-## Tools speciale — 5 tool-uri
+## Tools speciale — 6 tool-uri
 
 - gaseste_in_aplicatie — [read] Găsește o pagină/funcție în aplicația Symbai după ce vrea utilizatorul („unde văd rapoartele", „cum ajung la setări imprimante"); întoarce pagina + LINK direct (pe subdomeniul tenantului *.symbai.app) + cum ajungi acolo; caută în harta de navigare a aplicației, max 5 potriviri (parametri cheie: intrebare*)
+- trimite_ticket_symbai — [mereu disponibil] Trimite un ticket către ECHIPA SYMBAI: problemă tehnică, reclamație, sugestie de îmbunătățire sau cerere de suport; întoarce o referință (SYM-00042); cu emailContact utilizatorul e anunțat la răspuns/rezolvare; la sugestii folosește dedupeKey (slug stabil) — retrimiterea aceleiași idei se adaugă la ticketul existent; ticketele NU pot fi citite înapoi prin conexiune (parametri cheie: tip* [problema|reclamatie|sugestie|suport], titlu*, descriere*, emailContact, numeUtilizator, dedupeKey)
 - list_social_accounts — [read] Listează conturile social media conectate (Facebook, Instagram, TikTok etc.) per brand, fără tokenuri de acces; de folosit înainte de a programa o postare (parametri cheie: brandId)
 - list_social_posts — [read] Listează postările social media (draft, programate, publicate) cu status și data programării (parametri cheie: brandId, status [draft|scheduled|publishing|published|failed|cancelled], limit [default 25, max 100])
 - schedule_social_post — [write: marketing_social] vezi secțiunea „marketing_social" de mai sus (parametri cheie: brandId*, content*, platforms*, scheduledAt, mediaUrls, postType, firstComment)

@@ -2,11 +2,21 @@
 
 > Cum citești, înțelegi și modifici meniul fizic tipăribil (`/menu/physical`) prin conexiune. Fluxul complet + finalizarea produselor: skill-ul `meniu-fizic` + `meniu-fizic-pricing.md`. Acest fișier = grammar-ul config-ului (ce poți schimba și cum).
 
+## Găsește meniul fizic potrivit + navighează (CERCETARE ÎNTÂI)
+
+Clientul zice „du-te la meniul fizic de la Berărescu" / „aranjează meniul de print". NU sări la editare — întâi află EXACT pe ce lucrezi. Modelul real e pe 3 niveluri: **un BRAND are mai multe MENIURI, iar un meniu are unul sau mai multe DESIGNURI**.
+
+1. **Nume brand/locație → brandId**: `list_brands` (+ `list_locations` dacă clientul a numit o LOCAȚIE — locația aparține unui brand). Potrivește numele („Berărescu") → `brandId`. Meniurile fizice sunt legate de BRAND.
+2. **Meniurile brandului**: `list_menus(brandId)` → toate meniurile + `id` + `name`. Un brand are deseori mai multe (ex. Berărescu, brand 63: „Meniu Berarescu" = id 76, „Meniu Berarescu print bauturi" = 116, „Meniu Berarescu print mancare" = 119). **Cel „de print"** se recunoaște după nume (conține „print"/„tipar"/„fizic"). Dacă-s mai multe candidate → **listează-le și întreabă clientul pe care** (băuturi? mâncare? general?).
+3. **Designurile meniului ales** (un meniu poate avea mai multe): `execute_sql_query("SELECT id, name, is_default FROM menu_display_configs WHERE profile_type = 'physical-menu-<menuId>' ORDER BY id")`, unde `<menuId>` = id-ul meniului de la pasul 2 (ex. `physical-menu-116`). Fiecare rând = un DESIGN (ex. „Design 1", „Design 2"). **`id`-ul rândului = `configId`-ul pe care îl editezi** cu `update_menu_display_config`. Dacă-s mai multe designuri → **arată-i-le clientului (eventual screenshot) și întreabă în care** lucrezi. Atenție la duplicate (pot exista 2× „Design 2"). Un `physical-menu-X` fără meniu corespondent în `list_menus` = config orfan (meniul a fost șters) → ignoră-l.
+4. **Navighează**: URL direct **`/menu/physical`** (designer full-screen) SAU pagina `/menu` → tab „Meniu Fizic" — ambele deschid ACELAȘI designer. Link live: `gaseste_in_aplicatie("meniu fizic")`. ⚠ **Brandul + meniul + designul se aleg din dropdown-urile din capul paginii, NU din URL** — nu există deep-link cu `?brand=`/`?config=`. Selecția se ține minte în browser (localStorage) per brand+meniu. Deci fluxul real: deschizi `/menu/physical` → din cele 3 dropdown-uri alegi brandul (Berărescu) → meniul (cel de print) → designul.
+5. **Design / meniu NOU**: un DESIGN nou la un meniu existent se face DOAR în pagină — butonul **„Designuri"** → „design nou" sau „duplică" unul existent (NU prin MCP: `create_menu_display_config` nu acceptă `physical-menu-*`). Un MENIU fizic nou de tot → creează întâi meniul (din `/menu/pricing` / tool-uri meniu), apoi adaugi un design pe el. Ghidează clientul pas cu pas.
+
 ## Cum funcționează (mecanica reală)
 
 Meniul fizic e un **config JSON** salvat în tabela `menu_display_configs` (un rând per meniu, `profile_type = "physical-menu-<menuId>"`, `is_default`). Tu îl manipulezi așa:
 
-1. **Citește config-ul COMPLET**: `execute_sql_query("SELECT id, name, profile_type, config FROM menu_display_configs WHERE profile_type LIKE 'physical-menu-%'")` → alegi meniul → ai obiectul `config` (tot PhysicalMenuConfig). (Metadata și prin `list_entities("menu_display_configs")`.)
+1. **Identifică designul** (vezi secțiunea „Găsește meniul fizic potrivit" de mai sus: brand → meniu → design) ca să ai `configId`-ul corect. Apoi **citește config-ul COMPLET** al ACELUI design: `execute_sql_query("SELECT id, name, profile_type, config FROM menu_display_configs WHERE id = <configId>")` → ai obiectul `config` (tot PhysicalMenuConfig). (Pentru a vedea toate designurile unui meniu: `... WHERE profile_type = 'physical-menu-<menuId>'`. NU folosi `LIKE 'physical-menu-%'` decât ca să listezi designurile TUTUROR meniurilor — pentru editare îți trebuie un `id` exact.)
 2. **Modifică JSON-ul în memorie** — schimbi câmpurile dorite (vezi harta de mai jos).
 3. **Scrie ÎNAPOI config-ul ÎNTREG**: `update_menu_display_config({ configId: <id-ul din SELECT>, config: <obiectul complet modificat> })`. ⚠ **`configId` e OBLIGATORIU** = `id`-ul rândului din `menu_display_configs` (cel din SELECT-ul de la pasul 1, ex. 54 pentru „Design 3"). ⚠ **Update-ul face REPLACE, NU merge** — câmpul `config` e „configurarea completă"; dacă omiți câmpuri din el, le PIERZI. Deci mereu: citește tot → modifică → scrie tot. Permisiune: modulul **`setari`**.
 4. **Uită-te la rezultat** (vision) și iterează (vezi „Bucla de vision").

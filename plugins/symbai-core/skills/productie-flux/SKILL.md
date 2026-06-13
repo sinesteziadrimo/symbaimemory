@@ -24,7 +24,7 @@ Producția funcționează **diferit** după cât de complex e clientul. De aceea
 
 | Clientul e… | Trimite-l pe traseul… | Citește knowledge-ul |
 |---|---|---|
-| Restaurant, bucătărie centrală, catering, evenimente (mod simplu / restaurant & evenimente) | **Restaurant** — loturi simple; consumul se face la finalizarea din aplicație | `knowledge/productie-restaurant.md` |
+| Restaurant, bucătărie centrală, catering, evenimente (mod simplu / restaurant & evenimente) | **Restaurant** — un lot = un pas: `exec_complete_batch` finalizează + consumă + creează produsul finit | `knowledge/productie-restaurant.md` |
 | Fabrică alimentară / nealimentară (mod fabrică) | **Fabrică** — flux pe operații, stații, MPS, trasabilitate, QC, B2B | `knowledge/productie-fabrica.md` |
 | Nu e clar / e la limită | Întreabă userul „restaurant sau fabrică?", apoi rutează | după răspuns |
 
@@ -33,14 +33,14 @@ Fișierele de cunoștințe conțin pașii detaliați, paginile reale și tool-ur
 ## Cele două trasee, pe scurt (ca să rutezi corect)
 
 ### Traseul Restaurant (simplu / restaurant & evenimente)
-Pe pagina **Producție** (`/productie-evenimente`) faci un lot dintr-o rețetă. ⚠ **CHEIE**: auto-consumul (scădere ingrediente FEFO + lot nou de produs finit + cost) se declanșează DOAR la finalizarea **din aplicație** (butonul „Finalizează" pe pagină). Tool-ul MCP `exec_complete_batch` doar **marchează** lotul finalizat (status + cantitate reală) — **NU mișcă singur stocul**.
+Pe pagina **Producție** (`/productie-evenimente`) faci un lot dintr-o rețetă. La finalizare (`exec_complete_batch`) sistemul consumă automat ingredientele (FEFO + loturi alocate explicit) și creează lotul de produs finit cu cost — totul dintr-un singur apel prin conexiune.
 
 Bucla de lucru tipică:
 - **Citește**: `list_recipes` (rețeta-țintă), `exec_list_batches` (loturi recente), `get_semipreparate_stock` / `get_stock_levels` (stoc).
-- **Acționează**: `exec_create_batch` (necesită `recipeId`, `plannedQty`; NU furniza `flowVersionId` — asta e pentru fabrică) → opțional `exec_start_batch` (necesită `batchId`). Pentru **finalizarea cu consum**, ghidează userul să apese „Finalizează" pe pagina Producție (sau o faci tu din aplicație) — acolo se declanșează consumul + lotul de produs finit. `exec_complete_batch` prin MCP doar setează statusul.
+- **Acționează**: `exec_create_batch` (necesită `recipeId`, `plannedQty`; NU furniza `flowVersionId` — asta e pentru fabrică) → opțional `exec_start_batch` (`batchId`) → `exec_complete_batch` (`batchId`; dă `actualOutputQty` = randamentul real pentru cost corect) — acesta consumă ingredientele + creează lotul de produs finit, dintr-un pas.
 - **Verifică**: `exec_get_batch_progress` (necesită `batchId`) + stocul (`get_semipreparate_stock` / `get_stock_levels`) ca să confirmi că ingredientele au scăzut și semipreparatul a intrat.
 
-⚠ Dacă vrei consum 100% prin conexiune (fără click în aplicație): atașează lotului un flux tehnologic și folosește motorul shop-floor (`exec_declare_consumption` + `exec_declare_output` + `exec_complete_operation` — acestea POSTEAZĂ documentele de inventar prin MCP). Pentru un restaurant simplu însă, finalizarea din pagină e mai ușoară. NU furniza `flowVersionId` decât dacă vrei explicit calea shop-floor (atunci `exec_complete_batch` e blocat).
+⚠ NU furniza `flowVersionId` la `exec_create_batch` în restaurant — un lot cu flux tehnologic atașat NU se finalizează cu `exec_complete_batch` (e blocat), ci pe stații (shop-floor). Pentru restaurant simplu, fără flux, `exec_complete_batch` face tot (consum + produs finit) dintr-un pas.
 
 NU-l duci pe restaurant prin operații/stații/MPS — nici nu le vede în meniu.
 
@@ -60,7 +60,7 @@ Detaliile complete (proiectare flux, MPS, B2B, QC, recall) sunt în `knowledge/p
 ## Concepte comune ambelor trasee (le explici la fel oricui)
 
 - **FEFO** — „expiră primul, iese primul". La consum, sistemul ia **întâi loturile alocate/scanate explicit** de operator, **apoi restul după data de expirare**. Exemplu: dacă operatorul a scanat Lotul 5, sistemul ia întâi Lotul 5, apoi (din ce rămâne) lotul care expiră cel mai devreme. Abaterea de la FEFO cere permisiune specială și motiv.
-- **Genealogie** — fiecare lot de ieșire e legat de loturile de intrare din care a fost făcut. Mergi `exec_trace_lot_origin` (necesită `lotId`) înapoi (din ce materii prime / furnizori) și `exec_trace_lot_destination` (necesită `lotId`) înainte (unde a ajuns un lot) — baza oricărui **recall**. ⚠ Genealogia bogată se scrie în motorul shop-floor. La finalizarea simplă **din aplicație** se mișcă stocul (consum + lot nou) + genealogie de bază; tool-ul MCP `exec_complete_batch` NU mișcă singur stocul (doar setează statusul).
+- **Genealogie** — fiecare lot de ieșire e legat de loturile de intrare din care a fost făcut. Mergi `exec_trace_lot_origin` (necesită `lotId`) înapoi (din ce materii prime / furnizori) și `exec_trace_lot_destination` (necesită `lotId`) înainte (unde a ajuns un lot) — baza oricărui **recall**. ⚠ Genealogia bogată (cu containere QR + predări între stații) se scrie în motorul shop-floor. La finalizarea simplă (`exec_complete_batch`) se mișcă stocul (consum + lot nou) + genealogie de bază.
 - **Numărul de lot NU e unic** — se poate repeta. Identificatorul fizic unic e **codul QR al containerului**, nu numărul lotului.
 - **Container public** — oricine scanează eticheta QR vede pagina publică `/c/:codQR` (locație, istoric, trasabilitate), fără cont. Util pentru inspectori/clienți; ai grijă că e vizibilă oricui are eticheta.
 - **Consumul e definitiv** — după finalizare, lotul consumat și genealogia sunt fixe. O șarjă cu probleme NU se „anulează ca să recuperezi ingredientele"; faci un **lot de retușare (rework)** nou. Oprirea/anularea nu reface stocul deja consumat.
@@ -76,7 +76,7 @@ Detaliile complete (proiectare flux, MPS, B2B, QC, recall) sunt în `knowledge/p
 ## Reguli de aur
 
 - **Nu inventa NIMIC** — nici cantități, nici pierderi, nici valori QC, nici randamente, nici tool-uri sau câmpuri. Ce lipsește, întrebi sau lași gol.
-- **Întâi detectează modul, apoi rutează.** Nu da pași de fabrică unui restaurant și invers — confuzia e cauza #1 de „nu văd pagina" și de „nu se aplică". Dacă lotul e creat cu flowVersionId, trebuie shop-floor. Fără flux, finalizarea cu consum se face din aplicație (`exec_complete_batch` prin MCP doar marchează statusul, nu mișcă stocul).
+- **Întâi detectează modul, apoi rutează.** Nu da pași de fabrică unui restaurant și invers — confuzia e cauza #1 de „nu văd pagina" și de „nu se aplică". Dacă lotul e creat cu flowVersionId, trebuie shop-floor. Fără flux, `exec_complete_batch` finalizează + consumă + creează produsul finit, dintr-un pas.
 - **Permisiuni**: pentru scrieri ai nevoie de modulul `productie` pe token (calitate și execuție incluse), `retete` pentru rețetele-suport, `setari` pentru HACCP. „Permisiune insuficientă" → explică activarea din **Hub → Acces AI**.
 - **Ce NU se poate prin conexiune**: ștergerea de entități întregi, crearea/modificarea operațiilor de flux și acțiunile fizice pe containere (scanare/split/merge/predări) se fac **din aplicație** — trimite userul acolo.
 
@@ -85,7 +85,7 @@ Detaliile complete (proiectare flux, MPS, B2B, QC, recall) sunt în `knowledge/p
 | Cererea userului | Ce faci |
 |---|---|
 | „Cum produc X / vreau să fac producție" | Pasul 0: detectează modul → rutează la knowledge-ul potrivit. |
-| „Fac o maioneză / un semipreparat" (restaurant) | `exec_create_batch` (`recipeId`, `plannedQty`) → finalizezi din pagina Producție (buton „Finalizează") pentru consum → verifici stocul. `exec_complete_batch` (MCP) doar marchează statusul, NU mișcă stocul. |
+| „Fac o maioneză / un semipreparat" (restaurant) | `exec_create_batch` (`recipeId`, `plannedQty`) → `exec_complete_batch` (`batchId`, `actualOutputQty` = cât a ieșit) → verifici stocul. Consumă + creează produsul finit dintr-un pas. |
 | „Pornește un lot / un lot nou" | Restaurant: `exec_create_batch` → `exec_start_batch`. Fabrică: la fel, dar cu `flowVersionId` → operator lucrează pe stație. |
 | „Operațiile pentru produsul Y / fă-mi fluxul" | Doar **fabrică** → `knowledge/productie-fabrica.md` (proiectare flux, `/fluxuri-tehnologice` sau `/ai-flow-builder`). |
 | „Operatorul declară consumul / output-ul" | Fabrică: `exec_declare_consumption` (`operationExecutionId`, `items`) → `exec_declare_output` (`operationExecutionId`, `qtyGood`). Sau backflush cu `exec_complete_operation`. |
@@ -100,7 +100,7 @@ Detaliile complete (proiectare flux, MPS, B2B, QC, recall) sunt în `knowledge/p
 
 ## Legături
 
-- `knowledge/productie-restaurant.md` — traseul restaurant (simplu): rețete semipreparate, loturi, finalizare cu consum din aplicație, evenimente, stoc semipreparate.
+- `knowledge/productie-restaurant.md` — traseul restaurant (simplu): rețete semipreparate, loturi, finalizare cu consum prin `exec_complete_batch`, evenimente, stoc semipreparate.
 - `knowledge/productie-fabrica.md` — traseul fabrică: proiectare flux, execuție pe stații, MPS/MRP, containere QR, genealogie/recall, QC, HACCP, B2B.
 - `knowledge/produse-meniu-retete.md` — rețete și tipuri de produs (baza oricărei producții).
 - `knowledge/stocuri-inventar-furnizori.md` — recepții/NIR și loturile de materii prime care alimentează producția.

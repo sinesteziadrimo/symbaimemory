@@ -75,18 +75,18 @@ Butoane: **„Adaugă Lot Producție"** (peste tot) și **„Adaugă Eveniment"*
 - `exec_start_batch` (params: `batchId`) — pornești producția (status → început, marchează ora de start).
 - `exec_stop_batch` (params: `batchId`, `reason`) — pauză (status → pauză).
 - `exec_resume_batch` (params: `batchId`) — reiei din pauză.
-- `exec_complete_batch` (params: `batchId`*, `actualQty`) — **marchează lotul ca finalizat** (status + cantitate reală). ⚠ ATENȚIE: tool-ul MCP doar SETEAZĂ statusul — **NU scade singur ingredientele și NU creează lotul de produs finit**. Auto-consumul (scădere FEFO + lot nou + cost) rulează DOAR la finalizarea **din pagina Producție** (butonul „Finalizează"). Deci: ori finalizezi din aplicație, ori ghidezi userul s-o facă. Vezi „Ce se întâmplă la finalizare" mai jos.
+- `exec_complete_batch` (params: `batchId`*, `actualQty`, `actualOutputQty`, `storageType`) — **finalizează lotul ȘI postează inventarul**: consumă ingredientele (loturi alocate explicit + FEFO) și creează lotul de produs finit cu cost + genealogie. `actualQty` = cantitatea/turele reale; `actualOutputQty` = randamentul REAL (kg/buc produs finit) → costul se împarte la el (cost corect, nu pe nr. de ture). Vezi „Ce se întâmplă la finalizare" mai jos.
 - `exec_reschedule_batch` (params: `batchId`*, `newDate`*, `reason`) — muți lotul pe altă zi.
 - `exec_update_batch` (params: `batchId`*, plus `status`, `plannedQty`, `actualQty`, `notes`, `assignedTo`, `scheduledDate`…) — ajustezi orice câmp al lotului.
 
-**Ce se întâmplă când finalizezi DIN APLICAȚIE** (butonul „Finalizează" pe pagina Producție — acolo se declanșează consumul; `exec_complete_batch` prin MCP NU face pașii 2-5, doar setează statusul):
+**Ce se întâmplă la finalizare** (prin `exec_complete_batch` sau butonul „Finalizează" din pagină — ambele consumă ingredientele și creează produsul finit):
 1. Cantitatea reală se înregistrează (dacă o declari, ACEA cantitate; altfel cea planificată).
 2. Ingredientele se scad din stoc conform rețetei, scalate cu cantitatea produsă și luând în calcul unitățile rețetei vs. stocului.
 3. Scăderea merge automat după FEFO (loturile care expiră primul) — sau din lotul alocat explicit, dacă a fost scanat unul.
 4. Produsul finit intră pe stoc ca lot nou, cu cost/porție = cost total ingrediente / cantitate ieșită.
 5. Dacă tipul de păstrare e `congelat`, lotul finalizat e marcat ca înghețat.
 
-> 💡 Vrei consum 100% prin conexiune (fără click în aplicație)? Atașează lotului un flux tehnologic și folosește calea shop-floor (`exec_declare_consumption` + `exec_declare_output` + `exec_complete_operation`) — acestea POSTEAZĂ documentele de inventar prin MCP. Pentru un restaurant simplu, finalizarea din pagină e mai ușoară.
+> 💡 Tot fluxul de restaurant merge prin conexiune: `exec_complete_batch` face consumul + lotul de produs finit dintr-un singur apel. Dacă lotul are un flux tehnologic atașat (`flowVersionId`), finalizarea simplă e blocată — atunci se folosește calea shop-floor (vezi `productie-fabrica.md`). Pentru un restaurant simplu, NU atașa flux.
 
 ### 4. Verifici rezultatul
 - `exec_get_batch_progress` (params: `batchId`*) — statusul lotului: pași, cantități, % completare, ingrediente consumate, output.
@@ -107,8 +107,8 @@ Semipreparatul finalizat e acum un produs pe stoc. Îl legi de un produs/prepara
 | „Câte kg de carne/cartofi îmi trebuie pentru 200 de porții?" | `run_bom_explosion` (recipeId, quantity) — listă materii prime, fără să miști stoc. |
 | „Pune în producție 5 oale de ciorbă pentru mâine" | `exec_create_batch` (recipeId, plannedQty=5, scheduledDate). |
 | „Am început să gătesc lotul" | `exec_start_batch` (batchId). |
-| „Gata, am terminat lotul" | Finalizează din pagina Producție (buton „Finalizează") → se consumă ingredientele + intră semipreparatul pe stoc. `exec_complete_batch` (MCP) doar marchează statusul, NU mișcă stocul. |
-| „Au ieșit doar 45 de porții, nu 50" | `exec_complete_batch` cu `actualQty=45` (sau `exec_update_batch` actualQty înainte de finalizare). |
+| „Gata, am terminat lotul" | `exec_complete_batch` (batchId) → consumă ingredientele + intră semipreparatul pe stoc. Dă `actualOutputQty` pentru randamentul real (cost corect). |
+| „Au ieșit doar 45 de porții, nu 50" | `exec_complete_batch` cu `actualOutputQty=45` — randamentul real intră pe stoc și costul se împarte la 45. |
 | „Pune lotul pe pauză / reia-l" | `exec_stop_batch` (cu reason) / `exec_resume_batch`. |
 | „Mută producția de mâine pe joi" | `exec_reschedule_batch` (batchId, newDate, reason). |
 | „Ce semipreparate am pe stoc acum?" | `get_semipreparate_stock`. |

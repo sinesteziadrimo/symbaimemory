@@ -23,18 +23,17 @@ Modul fabrică transformă Symbai într-un mini-MES/ERP de producție: planifici
 Symbai are **două căi independente** de a consuma materii prime și a produce loturi. NU sunt reconciliate între ele — alegi una per produs/proces.
 
 ### Motor 1 — Finalizare lot (batch completion, „simplu")
-- Creezi un lot, îl pornești, îl finalizezi **din aplicație** (pagina Producție → „Finalizează"). La finalizarea din aplicație sistemul **consumă automat** ingredientele după rețetă (FEFO + loturi alocate explicit), creează lotul de produs finit și mișcă stocul.
-- ⚠ Tool-ul MCP `exec_complete_batch` doar **marchează** lotul finalizat (status + `actualQty`) — **NU declanșează singur consumul/output-ul prin conexiune**. Auto-consumul rulează la finalizarea DIN APLICAȚIE. Pentru consum 100% prin MCP → folosește Motor 2 (shop-floor: `exec_declare_consumption` / `exec_declare_output` / `exec_complete_operation`, care POSTEAZĂ documentele de inventar).
+- Creezi un lot, îl pornești, îl finalizezi. La finalizare (prin `exec_complete_batch` sau butonul din pagină) sistemul **consumă automat** ingredientele după rețetă (FEFO + loturi alocate explicit), creează lotul de produs finit cu cost + genealogie și mișcă stocul — dintr-un singur pas.
 - Folosit pentru producție directă, fără pași pe stații separate.
-- Tool-uri (creare/ciclu): `exec_create_batch` → `exec_start_batch` → (finalizare din aplicație pentru consum) / `exec_complete_batch` (marchează statusul).
-- ⚠ În modul fabrică, finalizarea simplă e **blocată** dacă lotul are un flux tehnologic atașat (flowVersionId) — atunci trebuie să mergi pe motorul shop-floor.
+- Tool-uri: `exec_create_batch` → `exec_start_batch` → `exec_complete_batch` (params: `batchId`, `actualQty`, `actualOutputQty` = randament real → cost ÷ kg, `storageType`).
+- ⚠ În modul fabrică, finalizarea simplă (`exec_complete_batch`) e **blocată** dacă lotul are un flux tehnologic atașat (flowVersionId) — atunci trebuie să mergi pe motorul shop-floor.
 
 ### Motor 2 — Comenzi de lucru pe stații (shop-floor, „flux tehnologic")
 - Lotul trece prin **operații** definite în fluxul tehnologic (ex: Cântărire → Frământare → Coacere → Ambalare). Operatorul, de pe tabletă, pornește operația, declară consumul (alege/scanează lotul de materie primă), declară producția (bun/rebut/de retușat) și finalizează operația. La finalizare se creează automat containere cu QR și **genealogie completă**.
 - Folosit pentru procese industriale cu mai multe stații, predări între operatori, QC pe operație.
 - Tool-uri: `exec_start_operation` → `exec_declare_consumption` → `exec_declare_output` → `exec_complete_operation` (cu predare automată dacă e configurat).
 
-**Diferența cheie de trasabilitate**: motorul shop-floor scrie automat **genealogia** (legături lot intrare→lot ieșire) și creează containere cu QR. Motorul simplu (finalizare DIN APLICAȚIE) mișcă corect stocul, dar nu construiește graful de genealogie la fel de bogat (iar `exec_complete_batch` prin MCP nu mișcă singur stocul). Pentru recall industrial complet și consum prin conexiune, folosește fluxul shop-floor.
+**Diferența cheie de trasabilitate**: motorul shop-floor scrie automat **genealogia** (legături lot intrare→lot ieșire) și creează containere cu QR. Motorul simplu mișcă corect stocul + genealogie de bază, dar nu construiește graful la fel de bogat. Pentru recall industrial complet (cu containere QR + predări între stații), folosește fluxul shop-floor.
 
 ## Lot de producție — ciclu de viață
 Stările unui lot: **planificat (planned) → pornit (started) → în lucru (in_progress) → pauză (paused) → finalizat (completed)** sau **anulat (cancelled)**.
@@ -46,7 +45,7 @@ Stările unui lot: **planificat (planned) → pornit (started) → în lucru (in
 4. **(opțional) Pauză/reluare**: `exec_stop_batch` (`batchId`, `reason`) / `exec_resume_batch` (`batchId`).
 5. **Reprogramare**: `exec_reschedule_batch` (`batchId`, `newDate` YYYY-MM-DD, `reason`).
 6. **Actualizare câmpuri**: `exec_update_batch` (`batchId` + orice din: `status`, `plannedQty`, `actualQty`, `notes`, `assignedTo`, `zoneId`, `equipmentId`, `scheduledDate`, `qcStatus` pending/passed/failed/blocked).
-7. **Finalizare** (motor simplu): din aplicație („Finalizează") ca să se declanșeze consumul + output-ul; `exec_complete_batch` (`batchId`, `actualQty`) prin MCP doar marchează statusul (vezi Motor 1).
+7. **Finalizare** (motor simplu): `exec_complete_batch` (`batchId`, `actualQty`, `actualOutputQty` = randament real pentru cost, `storageType`) — consumă ingredientele + creează lotul de produs finit + genealogie. Blocat dacă lotul are flux (vezi Motor 1 → shop-floor).
 8. **Verifică**: `exec_get_batch_progress` (`batchId`) → toate operațiile, cantitățile, % completare, angajatul activ, pasul următor.
 
 ⚠ **Anularea/oprirea NU reface stocul** deja consumat. Pentru o șarjă cu probleme se folosește rework (șarjă „fiică" nouă cu propriul consum); lotul original rămâne în istoric.
@@ -194,7 +193,7 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 | „Activează modul fabrică / nu mai văd Producție" | Setări → General → Domenii de Activitate → bifează „Fabrică alimentară". Explică: pagina simplă „Producție" dispare, în loc apar `/production` + `/planificare-mps`. |
 | „Câte loturi am azi/luna asta + cantități" | `exec_list_batches` (`status`, `dateFrom`, `dateTo`). |
 | „Pornește producția pentru rețeta X, 200 kg" | `exec_create_batch` (`recipeId`, `plannedQty`=200) → `exec_start_batch`. |
-| „Am terminat lotul, am obținut 195 kg" | Lot simplu fără flux: finalizează din aplicație („Finalizează", actualQty=195) pt consum; `exec_complete_batch` (MCP) doar marchează statusul. Lot cu flux: finalizezi prin operații (`exec_complete_operation`). |
+| „Am terminat lotul, am obținut 195 kg" | Lot simplu fără flux: `exec_complete_batch` (`batchId`, `actualOutputQty`=195) → consum + lot de produs finit (cost ÷ 195). Lot cu flux: finalizezi prin operații (`exec_complete_operation`). |
 | „Pune lotul pe pauză / reia-l" | `exec_stop_batch` (`reason`) / `exec_resume_batch`. |
 | „Mută lotul pe altă zi" | `exec_reschedule_batch` (`batchId`, `newDate`, `reason`). |
 | „Vreau să văd unde e lotul" | `exec_get_batch_progress` (`batchId`) sau `exec_get_batch_stages`. |

@@ -34,7 +34,7 @@ Schimbarea cea mai importantă față de vechiul model: o listă cu o **ȚINTĂ*
 - aici **construiești** listele: titlu, țintă (rol/tură/raion/locație) SAU pe nume SAU liberă, recurență, oră-limită, dovadă, verificare;
 - ai panoul **„Cine va vedea asta și când"** — preview live cu angajații care vor primi lista azi (cea mai utilă verificare: confirmă ținta înainte să salvezi);
 - ai **dashboard-ul** per listă: 4 cifre colorate (De făcut / În lucru / Gata / Întârziate) + progres;
-- salvezi ca **șablon** și **pornești din șablon** (clonezi); poți porni de la preset-uri RO (Deschidere Bar, Închidere Bucătărie, Curățenie zilnică, HACCP).
+- salvezi ca **șablon** și **pornești din șablon** (clonezi) — îți construiești propriile șabloane (ex. Deschidere Bar, Închidere Bucătărie, Curățenie zilnică) o dată și le refolosești; nu există preset-uri gata făcute.
 
 **Angajatul — `/my-tasks` (Sarcinile Mele)**:
 - tabul **„Astăzi"**: feed unic ordonat **Întârziate → Azi → Următoarele** (nu o listă plată);
@@ -85,7 +85,7 @@ Cel mai rapid: deschide panoul **„Cine va vedea asta și când"** pe listă (s
 
 ## Tool-uri MCP pentru sarcini
 
-> **⚠ Notă deploy**: tool-urile MCP dedicate sarcinilor (`create_task_list`, `create_task`, `bulk_create_tasks` extinse + cele noi de mai jos) ajung LIVE pe conexiune **abia după deploy-ul nexuspos**. Până atunci, lucrezi pe sarcini **prin interfață** (paginile de mai sus, eventual cu extensia Chrome) și citești starea prin **SQL read-only**. Verifică la conectare ce tool-uri apar — modelul e fail-closed: ce nu e în listă, nu se poate apela încă.
+> **⚠ Notă deploy**: tool-urile **noi** de mai jos (țintire rol+tură+raion, recurență, dovadă + citire/finalizare) ajung LIVE pe conexiune **abia după deploy-ul nexuspos (≥ v19.2.121)**. Tool-urile **de bază** `create_task_list` / `create_task` / `bulk_create_tasks` (listă/sarcină SIMPLĂ — titlu, prioritate, responsabil, dată — fără țintă/recurență/dovadă) există deja dinainte. Până la deploy, pentru modelul complet lucrezi **prin interfață** (paginile de mai sus, eventual cu extensia Chrome) și citești starea prin **SQL read-only**. Verifică la conectare ce tool-uri apar — modelul e fail-closed: ce nu e în listă, nu se poate apela încă.
 
 Citire (după deploy):
 - `list_task_lists` — listele de sarcini ale brandului/locației (cu țintă, recurență, culoare).
@@ -94,17 +94,15 @@ Citire (după deploy):
 - `get_my_tasks` — feed-ul unui angajat pe o zi (Întârziate / Azi / Următoarele / Generale / Finalizate azi), cu motivul vizibilității per sarcină.
 
 Scriere — modulul **personal** pe token (după deploy):
-- `create_task_list` — listă nouă cu **țintă** (rol/tură/raion/locație), recurență, oră-limită, culoare, șablon da/nu.
+- **`create_targeted_task_list`** — listă nouă cu **țintă** (`targetRoleId`/`targetShift`/`targetSection`/`locationId`), recurență, oră-limită, culoare, șablon da/nu. ⚠ ACESTA e tool-ul pentru modelul nou — **NU** `create_task_list` (cel de bază, fără țintă).
 - `update_task_list` — modifică ținta/recurența/ora/culoarea/activ.
 - `clone_task_list` — clonează o listă (cu sarcinile-șablon) — pentru șabloane / duplicare.
-- `create_task` — sarcină într-o listă, cu oră-limită, dovadă, verificare, estimare; pentru liste recurente = sarcină-șablon.
+- **`create_targeted_task`** — sarcină într-o listă, cu oră-limită, dovadă (`requiresProof`), verificare, estimare; în liste recurente = sarcină-șablon. ⚠ Folosește acesta (NU `create_task` de bază) când vrei dovadă/recurență.
 - `update_task` — modifică o sarcină.
-- `complete_task` — bifează (cu poză/notă/număr/semnătură, după dovada cerută); poate și de-bifa.
+- `complete_task` — bifează (cu poză/notă/număr/semnătură, după dovada cerută); poate și de-bifa (`uncomplete`).
 - `assign_task` — pune sarcina pe o persoană anume.
-- `bulk_create_tasks` — mai multe sarcini într-o listă deodată.
-- `seed_task_templates` — populează preset-urile RO de HORECA (Deschidere Bar, Închidere Bucătărie, Curățenie zilnică, HACCP).
 
-Până la deploy, tool-urile vechi `create_task_list` / `create_task` / `bulk_create_tasks` există deja, dar fără câmpurile noi de țintă/recurență/dovadă — pentru modelul complet folosește interfața.
+Tool-urile de bază `create_task_list` / `create_task` / `bulk_create_tasks` rămân utile pentru liste/sarcini simple (fără țintă/dovadă). Pentru **șabloane** nu există un tool de „preset-uri gata făcute": îți construiești propria listă bună o dată, o salvezi ca șablon (`isTemplate`) și o refolosești cu `clone_task_list`.
 
 ## Exemple SQL (read-only)
 

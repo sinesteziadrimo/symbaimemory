@@ -18,8 +18,8 @@ Citește întâi `knowledge/tasks-sarcini.md` (model nou: țintă rol+tură+raio
 ## Recipe 1 — Creează o listă pe rol+tură+raion cu recurență
 
 1. Context: `list_brands` + `list_locations` (ai nevoie de brandId/locationId). Rolul-țintă: `list_entities(entityType:"roles", brandId)` pentru roleId.
-2. `create_task_list` cu: `title`, `targetRoleId` (gol = orice rol), `targetShift` (`any`|morning|afternoon|evening|night), `targetSection` (raion; gol = orice), `locationId`, `recurrence` (none|daily|weekdays|weekly|monthly), `recurrenceDays` (weekly: „mon,thu”; monthly: „15”), `dueTime` („11:00”), `color`.
-3. Adaugi sarcinile: `bulk_create_tasks(taskListId, tasks:[…])` sau `create_task` per sarcină. La cele care cer dovadă pune `requiresProof` (none|photo|note|photo_note|number|signature); la cele critice `requiresVerification:true`; opțional `dueTime` (suprascrie lista), `estimatedMinutes`.
+2. `create_targeted_task_list` cu: `title`, `targetRoleId` (gol = orice rol), `targetShift` (`any`|morning|afternoon|evening|night), `targetSection` (raion; gol = orice), `locationId`, `recurrence` (none|daily|weekdays|weekly|monthly), `recurrenceDays` (weekly: „mon,thu”; monthly: „15”), `dueTime` („11:00”), `color`.
+3. Adaugi sarcinile cu `create_targeted_task` per sarcină (suportă dovadă/verificare/oră-limită; în liste recurente devine sarcină-șablon). `bulk_create_tasks` e doar pentru titluri simple, FĂRĂ aceste câmpuri. La cele care cer dovadă pune `requiresProof` (none|photo|note|photo_note|number|signature); la cele critice `requiresVerification:true`; opțional `dueTime` (suprascrie lista), `estimatedMinutes`.
 4. **Verifică audience** (Recipe 2). Apoi confirmă userului ce ai făcut + link la `/staff?tab=tasks`.
 
 ## Recipe 2 — Verifică cine vede lista (audience)
@@ -30,13 +30,13 @@ Citește întâi `knowledge/tasks-sarcini.md` (model nou: țintă rol+tură+raio
 
 ## Recipe 3 — Atribuire pe nume / sarcină liberă
 
-- **Pe nume**: `assign_task(taskId, employeeId)` sau `create_task(... assignedTo: employeeId)` → o vede doar el („Atribuit ție”).
+- **Pe nume**: `assign_task(taskId, employeeId)` sau `create_targeted_task(... assignedTo: employeeId)` → o vede doar el („Atribuit ție”).
 - **Liberă (general / up-for-grabs)**: listă FĂRĂ țintă (rol gol + tură `any` + raion gol) și sarcină fără `assignedTo` → apare la „Generale”, o poate prelua oricine.
 
 ## Recipe 4 — Șabloane (clonează)
 
 - Salvează o listă bună ca șablon (`isTemplate:true`), apoi `clone_task_list(id, title?, isTemplate?)` ca să refolosești la altă locație/ocazie (sarcinile-șablon se copiază).
-- Pornire rapidă RO: `seed_task_templates` populează preset-uri HORECA (Deschidere Bar, Închidere Bucătărie, Curățenie zilnică, HACCP).
+- Nu există preset-uri gata făcute: construiești o listă bună o dată (ex. „Deschidere Bar"), o salvezi ca șablon (`isTemplate`) și o clonezi pentru alte locații/ocazii.
 - Recurența folosește tot sarcini-șablon: instanțele zilei se generează automat pe cloud (nu retroactiv).
 
 ## Recipe 5 — Marchează cu dovadă / verificare

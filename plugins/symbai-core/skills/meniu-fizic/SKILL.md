@@ -18,7 +18,7 @@ Userul vrea un meniu fizic (tipăribil) care arată profesionist. Tu îl constru
 
 **Faza B — Alegeți tema.** Arată-i userului 2-3 teme potrivite (din cele 13; `bistro-navy` = cea mai echilibrată, ca „Design 2"). ⚠ Tema se APLICĂ în aplicație (gramatica eroi/decor/repaginare e engine-side) — userul apasă tema, sau tu prin Chrome apeși „Aplică tema"; pentru fiecare candidată fă screenshot și întreabă-l care-i place. După ce alegeți, citești config-ul rezultat.
 
-**Faza C — Rearanjează pagină-cu-pagină (grafician senior).** Pentru fiecare pagină: screenshot → judeci (coloane/pagini goale? poze prea mici/mari? echilibru? ordine? un erou pe pagină? text înghesuit?) → editezi config prin `update_menu_display_config` (mărime poze via `photoColFrac`/`spanColumns`, mutare produse via `pageAssignments`, fonturi, fundal, elemente freeform, evidențiere featured, spacing, umplere coloane goale) → refresh → screenshot → repetă. Respectă formatul (A3 broșură → multiplu de 4 auto). Confirmă deciziile estetice mari.
+**Faza C — Rearanjează pagină-cu-pagină (grafician senior).** Pentru fiecare pagină: screenshot → judeci (coloane/pagini goale? poze prea mici/mari? echilibru? ordine? un erou pe pagină? text înghesuit?) → editezi config prin `update_menu_display_config` (mărime poze via `photoColFrac`/`spanColumns`, mutare produse via `pageAssignments`, fonturi, fundal, elemente freeform, evidențiere featured, spacing, umplere coloane goale) → refresh → screenshot → repetă. Respectă formatul (A3 broșură → multiplu de 4 auto). Confirmă deciziile estetice mari. **Rețete exacte** (ce câmp / ce tool, la ce nivel) → în `meniu-fizic-design.md`: „Poziție, ordine & coloane" (reordonare în categorie · mutare între categorii · pe ce coloană ajunge), „Editează ORICE pe un produs — catalog vs design + cele 3 niveluri" (cascada item→pagină→global) și „Cheatsheet: ce-ți cere userul → ce faci".
 
 **Faza D — Finalizare.** Arată-i userului meniul final (screenshot-uri), spune-i ce-ai aranjat, și cum îl printează (export PDF din pagină / `gaseste_in_aplicatie("export meniu fizic")`).
 
@@ -32,6 +32,7 @@ Userul vrea un meniu fizic (tipăribil) care arată profesionist. Tu îl constru
 - **Nu inventa** poze/prețuri/descrieri. Ce lipsește → întrebi sau ghidezi userul.
 
 ## Legături
+- Reordonare/mutare produse, control coloane, edit per-produs, cascadă pe 3 niveluri (global/pagină/produs), cheatsheet de cereri → `meniu-fizic-design.md` (secțiunile „Poziție, ordine & coloane" + „Editează ORICE pe un produs" + „Cheatsheet: ce-ți cere userul → ce faci").
 - Finalizare produse înainte de design → `meniu-fizic-pricing.md`; produse/rețete în general → skill-ul `adauga-produs-reteta`.
 - Import meniu de pe Excel/site/PDF → skill-urile `importa-date` / `adauga-produs-reteta` (meniu din PDF: pagina `/menu/import-pdf`).
 - E pasul 28 din onboarding („Meniu fizic") — vezi `onboarding/harta-pasi-wizard.md`.

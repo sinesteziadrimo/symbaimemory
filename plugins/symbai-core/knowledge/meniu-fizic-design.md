@@ -67,6 +67,127 @@ Tu (Claude extern) vezi paginile prin **extensia Chrome**: deschizi `/menu/physi
 - `coverTitle`/`coverSubtitle`/`coverImageUrl`/`coverImageFullBleed`/`coverImageFit`/`coverImageZoom`/`coverImageOffsetX/Y`/`coverLogoZoom`/`coverTitleFontScale`...
 - `showQrCode`/`qrCodeDynamicCode`/`qrCodeSizeMm`/`qrCodePosition`/`qrCodeFgColor`/`qrCodeBgColor`/`qrCodeCaption`.
 
+## Poziție, ordine & coloane (reordonare în categorie · mutare între categorii · pe ce coloană ajunge)
+
+> Două straturi diferite, NU le confunda: **CATALOG** (meniul digital — `update_menu_item`, persistă în tot ecosistemul) vs **CONFIG-vizual al designului fizic** (`config` din `menu_display_configs`, scris ÎNTREG cu `update_menu_display_config({configId, config})`). **Meniul fizic se randează din CONFIG**, nu din catalog: ce vezi pe pagină vine din `config.categories[].items[]`. Catalogul îl finalizezi ÎNAINTE de design (vezi `meniu-fizic-pricing.md`); după ce ești în design, lucrezi în CONFIG.
+
+### 1) Reordonează un produs ÎN cadrul categoriei (cel mai sigur)
+Cheia = câmpul `sortOrder` pe item, în `config.categories[].items[]`. Produsele se afișează în ordinea crescătoare a lui `sortOrder` (citire stânga→dreapta, sus→jos), apoi engine-ul le distribuie pe coloane/pagini.
+- **Pași**: citește config-ul ÎNTREG → găsește categoria în `config.categories[]` (după `categoryId`) → în `items[]` ei schimbă `sortOrder` (ex. ca să-l pui PRIMUL: `sortOrder` mai mic decât toate; al doilea: între primul și al treilea) → rescrie config-ul ÎNTREG.
+- **Normalizează ca să eviți ambiguități**: când rearanjezi, renumerotează TOATE items din categorie 0,1,2,3… în ordinea dorită (nu lăsa două items cu același `sortOrder`; `sortOrder` lipsă = tratat ca 0 = ordine de scriere). La nevoie de inserare la mijloc fără renumerotare, valoarea poate fi fracționară (ex. 1.5), dar prefer renumerotarea curată.
+- **Recalc?** NU e nevoie de recalc/repaginare pentru reordonare în categorie — engine-ul aplică noua ordine la randare. Reordonarea pe aceeași pagină nu mută produse pe alte pagini.
+- **CATALOG vs CONFIG**: dacă vrei ca ordinea să fie aceeași și în meniul DIGITAL (POS/site), setează și `update_menu_item({brandId, menuItemId, sortOrder})`. Pentru DESIGNUL fizic în sine, `sortOrder` din config conduce randarea.
+
+### 2) Mută un produs ÎN altă categorie
+Apartenența la categorie în designul fizic este **structurală**: produsul stă fizic în `items[]`-ul categoriei lui (`config.categories[]`, identificată prin `categoryId`). Item-ul NU are un câmp „categorie" — categoria e dată de array-ul în care se află.
+- **În DESIGNUL fizic (config)**: scoate obiectul item (cel cu `productId`-ul țintă) din `items[]` al categoriei VECHI → adaugă-l în `items[]` al categoriei NOI → renumerotează `sortOrder` în ambele categorii → rescrie config-ul ÎNTREG. Dacă în config există `pageAssignments` (distribuție fixată manual), trebuie actualizat coerent și acolo (vezi „Mutare & ordine produse/pagini"), altfel produsul poate să nu apară pe nicio pagină. Cel mai sigur: după o mutare de categorie, **lasă `pageAssignments = null`** (engine repaginază automat).
+- **În CATALOG (meniul digital, opțional dar recomandat pentru coerență)**: `update_menu_item({brandId, menuItemId, menuCategoryId: <id-ul categoriei noi>})` — schimbă categoria produsului în meniul digital (se oglindește și pe produs). `menuCategoryId` îl iei din `list_menu_categories(brandId)`.
+- **Categorie NOUĂ ca destinație**: dacă nu există, creează-o întâi cu `create_menu_category({name, brandId, parentId?, sortOrder?, color?})`, apoi adaugă produsul. ⚠ **Redenumirea / reordonarea categoriilor NU se pot prin MCP** — se fac în aplicație (`/menu/pricing`, vezi golul din `meniu-fizic-pricing.md`).
+- **Recalc?** O mutare între categorii schimbă paginarea → dacă lași `pageAssignments=null`, recalcul automat; dacă ai distribuție fixată, ori o actualizezi tu coerent, ori o resetezi la `null`, ori folosești „Recalculează și optimizează" din pagină.
+
+### 3) Pe ce coloană ajunge un produs
+⚠ **Nu există fixare absolută pe coloană** — nu poți spune „produsul X mereu pe coloana 2". Nu există câmp de tip „columnIndex"/„forceColumn". Coloana e DINAMICĂ: rezultă din ordinea de citire + modul de distribuție + lățimea produsului. Pârghiile REALE:
+- **Ordinea (`sortOrder`)**: cine vine primul în ordine ocupă prima poziție liberă. La distribuția pe „număr egal de produse", primele N produse cad pe prima coloană, următoarele N pe a doua etc. → mărind/micșorând `sortOrder` muți produsul mai la dreapta/stânga.
+- **Modul de distribuție** `columnDistribution`: `"balanced"` (implicit — engine-ul echilibrează ÎNĂLȚIMILE coloanelor, deci un produs cu poză mare poate „sări" pe coloana următoare chiar cu `sortOrder` mic) vs `"count"` (împarte produsele în număr egal pe coloană, ignorând înălțimea — mai predictibil pentru „prima jumătate stânga, a doua dreapta"). Se setează **global** (`config.columnDistribution`) și/sau **per pagină** (`config.pageOverrides[absIdx].columnDistribution`, override pe global).
+- **Lățimea produsului** `spanColumns` (per item, 1..N): produsul se întinde pe K coloane adiacente (masonry), restul curg în jur. Pe o pagină cu 2 coloane, `spanColumns:2` îl face pe toată lățimea. Valoarea se taie automat („clamp") la numărul de coloane al paginii (span 3 pe pagină cu 2 col → tratat ca 2, fără eroare). Ignorat pe pagini cu o singură coloană.
+- **Numărul de coloane** `columns`: global (`config.columns`) sau per pagină (`config.pageOverrides[absIdx].columns`, override). Mai multe coloane = coloane mai înguste, produse mai mici.
+- **Despărțitor vizual între coloane** `columnDivider`: `"none"|"thin"|"thick"|"dashed"` (global sau per pagină) — estetic, nu schimbă distribuția.
+- **Rețetă „mut produsul pe coloana din dreapta"**: (a) treci pagina pe `columnDistribution:"count"` (predictibil) → (b) ajustează `sortOrder` ca produsul să cadă în a doua jumătate a listei (pe pagină cu 2 col, în jumătatea care merge pe coloana 2) → rescrie config → verifică prin vision → corectează `sortOrder` dacă a aterizat greșit. Dacă vrei doar să umpli un gol pe coloană, e mai simplu `spanColumns` pe un produs vecin.
+- **Offset pur vizual** `dragX`/`dragY` (px) pe item = deplasare cu transform, SUPRAPUNE peste vecini și NU rezervă spațiu în layout — NU controlează pe ce coloană e logic produsul; folosește-l doar pentru micro-ajustări, nu pentru a muta între coloane.
+
+### Recapitulare „ce câmp / ce strat"
+| Vreau să… | Strat | Tool / câmp |
+|---|---|---|
+| reordonez produs în categorie (design fizic) | CONFIG | `config.categories[].items[].sortOrder` → `update_menu_display_config` |
+| reordonez produs în categorie (și în meniul digital) | CATALOG | `update_menu_item({sortOrder})` |
+| mut produs în altă categorie (design fizic) | CONFIG | mut obiectul item între `categories[].items[]` (+ reset `pageAssignments=null`) |
+| mut produs în altă categorie (meniul digital) | CATALOG | `update_menu_item({menuCategoryId})` |
+| influențez pe ce coloană cade | CONFIG | `sortOrder` + `columnDistribution` (`count`/`balanced`) + `spanColumns` + `columns` |
+| umplu un gol pe coloană | CONFIG | `spanColumns` 1→2+ pe un produs vecin |
+| despart vizual coloanele | CONFIG | `columnDivider` (global / per pagină) |
+
+## Editează ORICE pe un produs — catalog vs design + cele 3 niveluri (cascadă)
+
+> Două întrebări de pus de fiecare dată: **(1) E date sau e aspect?** Date (nume/preț/descriere/gramaj/categorie/alergeni/poză produs) = **CATALOG** prin `update_menu_item`/`update_product`/`set_product_*`. Aspect (culori/mărimi/poză-în-design/span/offset/featured) = **CONFIG** prin `update_menu_display_config`. **(2) La ce nivel?** Global (tot meniul), per pagină, sau per produs.
+
+### Catalog (date live) vs Config-vizual (aspect)
+| Domeniu | CATALOG (meniul digital — se vede peste tot) | CONFIG-vizual (doar designul fizic) |
+|---|---|---|
+| Nume afișat | `update_menu_item({name})` | suprascriere doar-în-design: `item.customName` |
+| Descriere | `update_menu_item({description})` / pe fișă `update_product({description})` | `item.customDescription` |
+| Preț | `update_menu_item({price})` / masă `apply_menu_prices`/`bulk_update_menu_item_prices` | `item.customPrice` (doar afișaj fizic) |
+| Gramaj | `update_menu_item({gramaj})` / `update_product({weight})` | `item.customGramaj` |
+| Categorie | `update_menu_item({menuCategoryId})` | structural în `categories[].items[]` |
+| Alergeni (date) | `set_product_allergens({productId, allergenIds})` (+`create_allergen`) | iconițe/etichete în design: `item.allergenIcons[]`, `item.showAllergenLabels` |
+| Poză (sursă) | `set_product_image({productId, imageUrl, gallery?})` | poză aleasă pt acest design: `item.customImageUrl` (+`item.imageOverride=true` ca să nu fie suprascrisă la reload) |
+| Mărime/formă/poziție poză | — | `item.photoColFrac`/`photoWidthCustomPx`/`photoSize`, `photoAspectRatio`/`photoMaskShape`/`photoZoom`/`photoOffset*` |
+| Culori/fonturi/mărimi text | — | `item.titleColor`/`priceColor`/`...FontFamily`/`...SizeCustomPx` |
+
+Regula: `update_menu_item`/`update_product` ating TOATE meniurile/canalele (POS, site, KDS). Câmpurile `custom*` din config ating DOAR acest design fizic (snapshot local). Pentru un nume/preț valabil peste tot → catalog. Pentru „doar pe afișul ăsta scrie altfel" → `custom*` în config. ⚠ `productId` din config = `menu_items.id` (NU products.id; vânzările/galeria folosesc products.id — la nevoie de catalog pornind din config, se face conversia internă).
+
+### Cele 3 niveluri & cum „bate" unul pe altul (cascadă)
+Un câmp se poate seta la 3 niveluri; cel mai SPECIFIC câștigă:
+
+**PRODUS (item)** ⟶ **PAGINĂ (`pageOverrides[absIdx]`)** ⟶ **GLOBAL (`config`)** ⟶ fallback implicit
+
+- **Culoare** (titlu/preț/gramaj/descriere/titlu-categorie): `item.titleColor` ?? `pageOverrides[i].titleColor` ?? `config.titleColor` ?? culoarea de text a paletei (`textColor`). Ca un titlu să REVINĂ la paletă, **golește** `titleColor` la nivelele de sus.
+- **Mărime text**: `item.titleSizeCustomPx` ?? `pageOverrides[i].titleSizeCustomPx` ?? `config.titleSizeCustomPx` ?? presetul (`titleSize`/`titleSizeGlobal` small/medium/large). ⚠ Presetul `titleSize` pe item e implicit „medium" — un „medium" pus la creare NU bate page override (ca butoanele Mic/Mediu/Mare pe pagină să funcționeze); doar „small"/„large" explicit pe item bat pagina.
+- **Poză (mărime/layout)**: `item.photoColFrac`/`photoWidthCustomPx`/`photoSize`/`photoLayout` ?? `pageOverrides[i].*` ?? `config.*`/`photoSizeGlobal`.
+- **Coloane / distribuție / spațiere**: `pageOverrides[i].columns`/`columnDistribution`/`itemSpacing` ?? `config.columns`/`columnDistribution`/`itemSpacing`. (Acestea NU se setează per item — coloana e dată de pagină/global; pe item ai doar `spanColumns`.)
+- **Vizibilitate sub-elemente** (poză/descriere/gramaj/alergeni): `item.showPhoto`/`showDescription`/`showGramaj`/`showAllergens` ?? `pageOverrides[i].showPhotos`/… ?? `config.showPhotosGlobal`/`showDescriptionsGlobal`/…
+- **Container card** (fundal/chenar/colț/umbră): `item.containerBackgroundColor`/`containerBorderColor`/`containerBorderWidthPx`/`containerBorderRadiusPx`/`containerShadow` ?? `pageOverrides[i].container*` ?? `config.container*` ?? transparent.
+- **Poziția gramajului**: `item.gramajPosition` ?? `pageOverrides[i].gramajPosition` ?? `config.gramajPosition` ?? `"inline"`.
+
+**Implicații practice:**
+- „Toate titlurile cu altă culoare" → setează la GLOBAL (`config.titleColor`) și **golește** orice `titleColor` per-item/per-pagină care l-ar suprascrie (altfel cele cu override rămân pe vechi).
+- „Doar titlul lui X roșu" / „doar poza lui X mai mare" → setează DOAR pe item (`item.titleColor`, `item.photoColFrac`).
+- „Pe pagina asta totul cu alt font/3 coloane" → setează pe `pageOverrides[absIdx]` (`titleFontFamily`/`columns`).
+
+### Câmpuri editabile PER PRODUS (item) — pe grupe
+Toate sunt în `config.categories[].items[]`, opționale (lipsă = moștenește pagina/global). Le scrii prin `update_menu_display_config` (read-modify-write ÎNTREG).
+- **Identitate/date afișate (override local)**: `customName`, `customDescription`, `customPrice`, `customGramaj`, `customImageUrl` (+`imageOverride`).
+- **Ordine & lățime**: `sortOrder` (poziție în categorie), `spanColumns` (1..N coloane).
+- **Text — mărime**: `titleSize`/`titleSizeCustomPx`, `descriptionSize`/`descriptionSizeCustomPx`, `gramajSize`/`gramajSizeCustomPx`, `priceSize`/`priceSizeCustomPx`, `titleLineHeight`/`descriptionLineHeight`.
+- **Text — culoare/font**: `titleColor`/`descriptionColor`/`priceColor`/`gramajColor`, `*FontFamily`, `*LetterSpacing`, `*Opacity`.
+- **Poză**: `photoColFrac` SAU `photoWidthCustomPx`/`photoHeightCustomPx` SAU `photoSize`; `photoLayout`, `photoAspectRatio`/`photoAspectNum`, `photoMaskShape`, `photoBorderRadiusPx`, `photoShadow`, `photoOpacity`, `photoRotation`, `photoZoom`, `photoOffsetTop`/`photoOffsetLeft`, `photoFrameOffsetX`/`photoFrameOffsetY`. ⚠ La `photoWidthCustomPx`, ȘTERGE `photoColFrac`/`photoAspectNum`/`photoRole`.
+- **Offset-uri layout** (px logice = mm×2.8): `offsetTop`/`offsetBottom`/`offsetLeft`/`offsetRight`, `titleOffsetTop`/`titleOffsetLeft`, `priceOffsetTop`/`priceOffsetLeft`, `gramajOffsetTop`/`gramajOffsetLeft`, `descriptionOffset*`; gap-uri `photoTextGapPx`/`nameToPriceGapPx`/`priceGramajGapPx`. Offset pur vizual: `dragX`/`dragY` (suprapune, nu rezervă spațiu).
+- **Vizibilitate**: `visible`, `showPhoto`, `showDescription`, `showGramaj`, `showAllergens`, `showAllergenLabels`, `showInNutritionalEndPage`, `showInAllergensEndPage`.
+- **Container card**: `containerBackgroundColor`, `containerPaddingPx`, `containerBorderColor`, `containerBorderWidthPx`, `containerBorderRadiusPx`, `containerShadow`.
+- **Evidențiere (featured)**: `featuredStyle` (none/box/ribbon/card/underline/gold-gradient/neon-glow/embossed/badge-corner/double-border/line-accent) + `featuredAccentColor`/`featuredBorderWidthPx`/`featuredGlowIntensity`/`featuredCornerRadius`/`featuredBadgeText`/`featuredBgOpacity`/`featuredPaddingPx`.
+- **Marcaje**: `badges[]` (etichete cu stil), `spicyLevel` (0–3), `allergenIcons[]`, `customSpicyIcon`, `courseNumber`, `originalPrice` (preț tăiat), `gramajPosition`.
+- **Stare**: `locked`, `editMode` (product/subelement/lock), `groupId` (grupare).
+
+### Gotchas cascadă (durabile)
+- Cel mai specific câștigă; un override la nivel item/pagină BLOCHEAZĂ schimbarea de la global. Ca să „revină la global/paletă", **golește** câmpul de la nivelul de sus, nu-l rescrie cu altă valoare.
+- `titleSize` pe item e mereu prezent (default „medium"); „medium" auto NU bate page override, dar „small"/„large" explicit DA.
+- `imageOverride=true` protejează `customImageUrl` ales deliberat de auto-refresh la reload — setează-l când pui o poză anume pentru acest design.
+- Sub-niveluri: produsul moștenește și de la CATEGORIE (lock, offset-uri de categorie) — o categorie `locked` blochează toate produsele ei.
+
+## Cheatsheet: ce-ți cere userul → ce faci (anticipare)
+
+> Toate editările de design merg prin read-modify-write ÎNTREG: citește config-ul cu `execute_sql_query("SELECT ... config FROM menu_display_configs WHERE id = <configId>")`, modifică în memorie, rescrie cu `update_menu_display_config({configId, config})`. Verifică prin vision (screenshot) + re-citire, nu prin presupunere.
+
+| Userul zice | Strat / nivel | Ce faci concret |
+|---|---|---|
+| „pune Ciorba prima / a doua în Supe" | CONFIG · item | În `categories[]` (categoria Supe) renumerotează `sortOrder` în `items[]` (primul=0, al doilea=1…); rescrie config. Fără recalc. |
+| „mută Tiramisu la categoria Deserturi" | CONFIG (+CATALOG) · structural | Scoate item-ul Tiramisu din `items[]`-ul categoriei vechi, pune-l în `items[]`-ul Deserturilor, renumerotează `sortOrder`, **resetează `pageAssignments=null`**; rescrie. Opțional, coerență digitală: `update_menu_item({brandId, menuItemId, menuCategoryId: <Deserturi>})`. Dacă „Deserturi" nu există: `create_menu_category` întâi. |
+| „pune X pe coloana din dreapta" | CONFIG · pagină+item | Nu există pin pe coloană. Treci pagina pe `columnDistribution:"count"`, apoi crește `sortOrder`-ul lui X ca să cadă în a doua jumătate; vision → corectează. (Alt: dacă vrei doar să umpli golul, `spanColumns:2` pe un vecin.) |
+| „fă titlul lui X roșu" | CONFIG · item | Pe item-ul X: `titleColor:"#…"`; rescrie. (Doar acest produs.) |
+| „fă poza lui X mai mare" | CONFIG · item | Pe item-ul X: crește `photoColFrac` (ex. 0.4→0.7) SAU `photoWidthCustomPx` (și ȘTERGE `photoColFrac`/`photoAspectNum`/`photoRole`). |
+| „toate titlurile cu altă culoare" | CONFIG · global | Setează `config.titleColor` + **golește** orice `titleColor` per-item/per-pagină (altfel cele cu override rămân pe vechi). Sau, ca să urmeze paleta, golește titleColor peste tot și setează `textColor`. |
+| „pe pagina asta 3 coloane" | CONFIG · pagină | `pageOverrides[absIdx].columns = 3` (absIdx = indexul paginii, 0-based). La nevoie și `pageOverrides[absIdx].columnDistribution`. |
+| „schimbă prețul lui X" (peste tot) | CATALOG | `update_menu_item({brandId, menuItemId, price})`. Multe deodată: `bulk_update_menu_item_prices({brandId, items:[{name,price}]})` (potrivire pe NUME exact) sau `apply_menu_prices`. |
+| „doar pe afiș scrie alt preț/nume la X" | CONFIG · item | `item.customPrice`/`item.customName` (doar designul fizic, nu atinge POS/site). |
+| „schimbă numele afișat al lui X" (peste tot) | CATALOG | `update_menu_item({brandId, menuItemId, name})`. |
+| „adaugă alergeni la X" | CATALOG | `set_product_allergens({productId, allergenIds})` (înlocuiește tot setul — citește întâi; `create_allergen` pentru cei lipsă). Iconițe doar în design: `item.allergenIcons[]`. |
+| „schimbă poza lui X" | CATALOG (+CONFIG) | `set_product_image({productId, imageUrl})` (peste tot). Doar pentru acest design: `item.customImageUrl` + `item.imageOverride=true`. |
+| „evidențiază X / scoate-l în față" | CONFIG · item | `item.featuredStyle` (ex. „box"/„gold-gradient") + `featuredAccentColor`/`featuredBadgeText`. |
+| „pagina asta e goală / are coloană goală" | CONFIG | `spanColumns` 1→2+ pe un produs vecin; sau `photoColFrac` mai mare; sau `itemSpacing:"relaxed"`; sau mută produse (resetează `pageAssignments=null`). Vezi „Pagini/coloane goale". |
+| „redenumește / reordonează categoria" | — (UI) | NU se poate prin MCP. Ghidează userul: `/menu/pricing` (drag pentru ordine, edit pentru nume). `gaseste_in_aplicatie("categorii meniu")`. |
+| „schimbă tema / alt stil de meniu" | app + CONFIG | Tema se aplică în aplicație (engine-side); apoi citești config-ul rezultat și faci fine-tuning prin MCP. Arată-i 2-3 teme (vision). |
+
+Reguli rapide: (1) Date care trebuie să apară peste tot → CATALOG. „Doar pe afiș" → `custom*` în CONFIG. (2) „Toate / global" → setezi global ȘI golești override-urile de jos. „Doar pe pagina asta" → `pageOverrides[absIdx]`. „Doar produsul ăsta" → pe item. (3) Mutările de categorie/pagină → resetează `pageAssignments=null` ca să repagineze automat. (4) Vorbește userului în limbaj de restaurant; lucrează în câmpuri tehnice.
+
 ## Teme — aplică-le în app, fine-tuning prin MCP
 
 Sunt **13 teme** (`bistro-navy` = cea mai bună, ADN-ul „Design 2": navy+crem, Nunito, 2-col, poze mari dreapta, ramă pal groasă; restul: fine-dining text-only, steakhouse, patisserie card, editorial 4-col A3-landscape...).

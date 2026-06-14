@@ -1,6 +1,6 @@
 ---
 name: gestioneaza-reclame
-description: Creează și gestionează reclame plătite Meta (Facebook/Instagram) DIRECT din chat, cu tool-uri — fără click prin wizard. Folosește la „fă o reclamă", „promovează postarea X", „dă boost", „pune reclamă pe Facebook cu 20 de lei pe zi", „pornește/oprește campania", „pune pe pauză reclama", „cum merge reclama", „cât cheltui pe reclame", „campanie publicitară".
+description: Creează și gestionează reclame plătite Meta (Facebook/Instagram) DIRECT din chat, cu tool-uri — fără click prin wizard. Mai multe TIPURI de reclame: boost la o postare, trafic spre site/meniu, mesaje (Messenger), apel telefonic, aprecieri pagină, promovare eveniment. Folosește la „fă o reclamă", „promovează postarea X", „dă boost", „reclamă cu link spre meniu/site", „reclamă să mă sune lumea", „reclamă să primesc mesaje", „promovează evenimentul", „crește pagina", „pune reclamă pe Facebook cu 20 de lei pe zi", „pornește/oprește campania", „pune pe pauză reclama", „cum merge reclama", „cât cheltui pe reclame", „campanie publicitară".
 ---
 
 # Gestionează reclame Meta (boost & campanii) din chat
@@ -20,6 +20,26 @@ Symbai POS are tool-uri MCP dedicate pentru reclame — promovezi o postare în 
    - **`confirm: true`** — pune-l DOAR după ce utilizatorul a aprobat bugetul. Fără el, tool-ul întoarce un rezumat de confirmat (nu cheltuie nimic).
 5. **Confirmă rezultatul**: tool-ul îți spune `campaignId` + status. `pending_review` = a intrat la verificarea Meta = **succes** (de obicei se aprobă în câteva minute–ore). Spune utilizatorului asta + dă-i linkul la Campanii Publicitare.
 6. Dacă vrei să fii sigur că a trecut de verificare mai târziu: `get_ad_campaign_status(campaignId)` — reîmprospătează din Meta și-ți zice dacă e `active`, încă `pending_review`, sau de ce a dat eroare.
+
+## Alte tipuri de reclame (reclame NOI, nu boost de postare)
+
+Pe lângă boost, poți crea reclame de la zero, cu un obiectiv anume. Toate au aceeași logică ca boost-ul: **cer `confirm:true`** după ce utilizatorul aprobă bugetul, respectă plafonul, `dailyBudgetRon` minim 5, `durationDays` opțional (≥2), și accept aceleași opțiuni de țintire (`locations`, `interests`, `ageMin`/`ageMax`/`gender`) + `imageUrl` opțional (URL https către poza reclamei) + `campaignName` opțional. Întorc `campaignId` + status (`pending_review` = succes, a intrat la verificare).
+
+- **`create_traffic_ad`** — trimite clienții pe un link (meniu online, site, pagină de rezervări). Obligatoriu `websiteUrl`. Opțional `headline`, `adText`, `ctaType` (ex. `SHOP_NOW`, `ORDER_NOW`, `SEE_MENU`, `GET_OFFER`; implicit `LEARN_MORE`). Dacă nu dai imagine, Meta folosește previzualizarea linkului.
+- **`create_messages_ad`** — clienții apasă și încep o conversație pe Messenger (întrebări, rezervări, comenzi prin mesaj). Obligatoriu `adText`. Opțional `headline`.
+- **`create_calls_ad`** — buton de apel direct din reclamă (bun pentru rezervări telefonice). Obligatoriu `phoneNumber` (ex. `+40723123456`). Opțional `adText`, `headline`.
+- **`create_page_likes_ad`** — crește numărul de urmăritori ai paginii de Facebook. Obligatoriu `adText`.
+- **`create_event_ad`** — promovează un eveniment de Facebook (petrecere, concert, lansare) ca să vină mai multă lume. Obligatoriu `eventId` (id-ul evenimentului de Facebook). Opțional `headline`, `adText`, `ctaType`. (Reclama folosește automat coperta evenimentului — nu e nevoie de imagine separată.)
+
+**Cum alegi tipul** (după ce vrea clientul):
+- „vreau să ajungă pe meniul/site-ul meu" → `create_traffic_ad`
+- „vreau să mă sune lumea" → `create_calls_ad`
+- „vreau să-mi scrie pe mesaje / să întrebe" → `create_messages_ad`
+- „vreau mai mulți urmăritori pe pagină" → `create_page_likes_ad`
+- „am un eveniment / o petrecere" → `create_event_ad`
+- „promovează postarea asta care merge bine" → `boost_post`
+
+Fluxul e identic: verifică contul (`list_ad_accounts`) → confirmă bugetul + conținutul cu utilizatorul → apelează tool-ul cu `confirm:true` → confirmă rezultatul (`get_ad_campaign_status` dacă vrei să fii sigur că a trecut verificarea).
 
 ## Gestionarea campaniilor existente
 

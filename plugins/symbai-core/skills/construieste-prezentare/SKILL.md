@@ -9,8 +9,21 @@ Clientul Symbai (proprietar/manager) vrea o prezentare cu care să-și vândă P
 
 ## Înainte de orice
 1. Citește **`knowledge/prezentare-vanzare.md`** (anatomia celor 11 etape, mecanicile dinamice răspuns→durere cu 3 niveluri, taburile editorului, Coach Agent, rularea, și **tiparul transferabil** pentru parc/hotel/sală). Pentru **„setează/modifică câmpul X"** (orice câmp, oricât de mic) → **`knowledge/prezentare-vanzare-campuri.md`** = referința EXHAUSTIVĂ a tuturor câmpurilor editabile, tab cu tab, cu opțiunile lor. Pentru contextul CRM (de unde se lansează, lead-uri, fișa de deal): `knowledge/crm-vanzari-pipeline.md`.
-2. **⚠ Web-only, ZERO MCP.** Nu există niciun tool MCP de prezentări. Salvarea se face DOAR în interfața web. Tu poți: (a) **proiecta** tot conținutul (foarte valoros — asta e munca grea), și (b) **ghida sau completa** în pagină cu **extensia Chrome** (`claude-in-chrome`) + user logat. Nu promite „ți-o construiesc prin conexiune".
+2. **⚠ Construcție HIBRIDĂ: MCP + Chrome.** Acum EXISTĂ tool-uri MCP de prezentări (vezi „Tool-uri MCP" mai jos) — prin conexiune poți CLONA un șablon, CITI și MODIFICA o prezentare (titluri de start, temă, ofertă, flux, câmpuri intro, tipologii). Pentru editarea VIZUALĂ fină (slide cu slide, dureri/discovery per opțiune, reveal-uri) + **Preview** + rularea în fața prospectului folosești **extensia Chrome** (`claude-in-chrome`) + user logat. Munca grea de **proiectare** a conținutului rămâne a ta. Regula: **scaffold + meta/temă/ofertă/flux prin MCP (rapid), finisaj vizual + preview în Chrome.**
 3. **Navigare**: construcția în **Setări → CRM → tab «Configurare prezentare»** — `gaseste_in_aplicatie("configurare prezentare")` (sau `/settings/sales-crm?tab=presentation`). Rularea în **Vânzări → CRM → tab «Prezentare»** (`/sales-crm`). ⚠ Paginile CRM cer **loc CRM nominal** (crm_seat) — dacă userul „nu vede CRM-ul", trebuie nominalizat „User CRM" în Setări → Sales CRM → Useri CRM (vezi `rezervari-clienti-evenimente.md`).
+
+## Tool-uri MCP (construcție rapidă prin conexiune)
+
+Șase tool-uri — citirile merg mereu; scrierile cer modulul **Setări & Configurare** pe token:
+
+- **`list_presentation_templates`** — șabloanele de pornit (cheie + titlu + vertical + descriere): `symbai_horeca_2026` (gold standard, cel mai complet), `sala_evenimente`, `catering`, `cursuri_online`, `servicii`, `produse`, `exemplu_simplu`.
+- **`list_presentations(brandId)`** — prezentările salvate pe un brand (id, titlu, versiune flux, nr. slide-uri/intro/oferte).
+- **`get_presentation(brandId, presentationId, section?)`** — citește o prezentare. `section`: `summary` (default) / `intro` / `slides` / `offers` / `theme` / `flow` / `typologies` / `library` / `full`. Citește partea pe care vrei s-o editezi ÎNAINTE de patch. (`full` poate fi mare — preferă secțiuni.)
+- **`create_presentation_from_template(brandId, title, templateKey? | fromPresentationId? + fromBrandId?, introTitle?, introDescription?, vertical?)`** — creează o prezentare nouă, clonând un șablon built-in SAU o prezentare existentă (ex. „v2"). Primești un id nou.
+- **`patch_presentation(brandId, presentationId, patch:{...})`** — modifică top-level (merge superficial): `title, introTitle, introDescription, vertical, theme, offers, flowV2, flowVersion, introFields, slides, typologies, slideRules, autoDeriveRules, libraryOverride, stages, maxPainSlides, maxCalculationSlides, debugMode`. Fiecare cheie ÎNLOCUIEȘTE valoarea (ex. `theme` = obiectul temă întreg). Payload mic — preferat pentru modificări.
+- **`save_presentation(brandId, presentation)`** — UPSERT config COMPLET (construire programatică de la zero / înlocuire integrală). Pentru modificări parțiale preferă `patch_presentation`.
+
+**Flux tipic MCP:** `list_brands` → `list_presentation_templates` → `create_presentation_from_template(...)` → `get_presentation(section:"theme")` → `patch_presentation(patch:{theme, introTitle, offers})` → finisaj + Preview în Chrome.
 
 ## Regula de aur
 
@@ -31,10 +44,14 @@ Pune-i clientului întrebările care-ți dau materia primă. Notează răspunsur
 
 Dacă userul are puține răspunsuri, **propune tu** variante plauzibile pe verticalul lui (folosește tiparul transferabil din `prezentare-vanzare.md`) și cere-i să confirme/corecteze — nu le scrie ca adevăruri.
 
-### Faza B — Alege șablonul + creează prezentarea (în app)
-1. Navighează la **Configurare prezentare** → „**+ Adaugă prezentare**".
-2. Alege șablonul cel mai apropiat de ce vinde: **Sală evenimente**, **Catering**, **Servicii**, **Produse/retail**, **Cursuri online**, sau **Symbai HoReCa 2026** (cel mai complet — bun ca model de structură chiar dacă rescrii tot conținutul). Pentru un **parc de distracții** pornește de la „Sală evenimente" (petreceri/grupuri) și adaptezi.
-3. Completează antetul: nume prezentare, titlu + subtitlu ecran de start (ce vede prospectul), domeniul. Setează **Tema** (tabul Tema): culorile brandului, fonturi — preset „1 click" sau personalizat.
+### Faza B — Creează prezentarea: ÎNTÂI prin MCP (rapid), apoi finisaj în Chrome
+
+**Calea rapidă (MCP):**
+1. `list_brands` → afli `brandId`. `list_presentation_templates` → vezi șabloanele.
+2. `create_presentation_from_template(brandId, title:"...", templateKey:"<cheie>")` — clonează șablonul cel mai apropiat de ce vinde: `symbai_horeca_2026` (cel mai complet — bun ca structură chiar dacă rescrii conținutul), `sala_evenimente`, `catering`, `servicii`, `produse`, `cursuri_online`. Pentru un **parc de distracții** pornește de la `sala_evenimente` și adaptezi. (Sau `fromPresentationId` ca să clonezi o prezentare existentă — ex. faci un „v2".) Primești un id nou.
+3. `patch_presentation(brandId, presentationId, patch:{ introTitle, introDescription, vertical, theme:{...}, offers:[...], flowV2:{...} })` — antet (titlu+subtitlu de start), tema brandului (culori/fonturi), oferta, fluxul. Citește întâi cu `get_presentation(section:"theme"/"offers"/"intro")`.
+
+**Alternativ, în Chrome:** Configurare prezentare → „**+ Adaugă prezentare**" → alegi un șablon din picker → completezi antetul + tabul **Tema**. Folosește calea Chrome când vrei să vezi pe loc rezultatul.
 
 ### Faza C — Construiește materialul, tab cu tab (ordinea poveștii)
 Pentru fiecare tab, intri cu conținutul proiectat în Faza A. Lucrează în ordine — Fluxul leagă totul automat:
@@ -57,7 +74,7 @@ Din **Vânzări → CRM → Prezentare** (sau butonul „Prezentare" de pe un le
 
 ## Reguli (cele care contează)
 - **Poți seta ORICE câmp** pe care ți-l cere userul, oricât de mic — întreaga listă (Intro, Discovery, Dureri, Soluții cu KPI/galerie/tur, conținut bogat 18 blocuri, Tipologii cu axe+reguli, Dovezi cu scoring, Obiecții cu tratări, Calcule 4 tipuri, Oferte cu tiers/addon/plată/automatizări, Flux, Tema, Scoring) e în `knowledge/prezentare-vanzare-campuri.md`. Navighează la tabul potrivit (Chrome) și completează. **Excepție**: câmpurile „legacy" din acea referință NU au control în UI — nu le promite; explică blând și oferă `trimite_ticket_symbai` ca sugestie.
-- **Web-only**: proiectezi conținutul + ghidezi/completezi în pagină (Chrome). Salvarea e în app. Nu inventa tool-uri MCP de prezentare.
+- **Hibrid MCP + Chrome**: scaffold/clonă + meta/temă/ofertă/flux/tipologii prin MCP (rapid, payload mic cu `patch_presentation`); editare vizuală fină per-slide/durere/discovery + **Preview** + rulare în Chrome. Citește cu `get_presentation(section:...)` înainte de a face patch pe acea parte.
 - **Uită-te REAL** (vision Chrome) cât construiești și mai ales în Preview — judeci ca un regizor de pitch, nu pe orb. Dacă extensia nu e conectată, oferă-i s-o conecteze; altfel îi dictezi pas cu pas ce să completeze.
 - **Consultativ, nu features-dump**: ordinea e descoperire → durere → soluție → dovadă → calcul → obiecție → ofertă. Numele soluțiilor = beneficii. Cifre din datele LUI.
 - **Pornește din șablon**, nu de la zero. Cel mai greu (fluxul + mecanica) e deja făcut.

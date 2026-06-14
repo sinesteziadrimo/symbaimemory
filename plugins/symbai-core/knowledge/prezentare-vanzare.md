@@ -2,7 +2,7 @@
 
 > Pentru linkul exact către orice pagină folosește tool-ul `gaseste_in_aplicatie` — el e sursa autoritară de navigare (întoarce link direct pe subdomeniul tenantului).
 
-> ⚠ **Modul EXCLUSIV din interfața web — NU există tool-uri MCP de prezentări.** Nu se creează, nu se editează și nu se rulează nicio prezentare prin conexiune. Tot ce ține de prezentări se face navigând în aplicație (ideal cu extensia Chrome + user logat). Claude poate să PROIECTEZE conținutul (întrebări, dureri, soluții, obiecții, calcule) și să GHIDEZE/COMPLETEZE în pagină, dar nu prin tool-uri.
+> ⚠ **Construcție HIBRIDĂ — tool-uri MCP + interfață web.** Există tool-uri MCP (`list_presentation_templates`, `list_presentations`, `get_presentation`, `create_presentation_from_template`, `patch_presentation`, `save_presentation`) cu care se CLONEAZĂ un șablon și se CITEȘTE/MODIFICĂ o prezentare prin conexiune (titluri de start, temă, ofertă, flux, câmpuri intro, tipologii). Editarea VIZUALĂ fină (slide cu slide, dureri/discovery per opțiune, reveal-uri), **Preview** și RULAREA în fața prospectului se fac în aplicație (ideal cu extensia Chrome + user logat). Claude PROIECTEAZĂ conținutul + scaffold-uiește prin MCP + finisează vizual în pagină. Scrierile MCP cer modulul „Setări & Configurare" pe token.
 
 ## Pe scurt
 
@@ -97,7 +97,7 @@ Metodologia se copiază 1:1 în orice vertical. Pașii:
 
 ## Întrebări frecvente
 
-- **Pot construi prezentarea prin conexiune (cu Claude direct)?** Nu — nu există tool-uri MCP de prezentări. Claude poate să-ți PROIECTEZE conținutul (întrebări, dureri, soluții, obiecții, calcule, oferte, dovezi pentru businessul tău) și să te ghideze / completeze în pagină cu extensia Chrome, dar salvarea se face în interfața web.
+- **Pot construi prezentarea prin conexiune (cu Claude direct)?** Parțial DA — există tool-uri MCP cu care Claude clonează un șablon și setează prin conexiune titlurile, tema, oferta, fluxul, câmpurile intro și tipologiile (`create_presentation_from_template` + `patch_presentation`; citește cu `get_presentation`). Editarea vizuală fină per-slide + Preview + rularea se fac în aplicație (extensia Chrome). În plus, Claude îți PROIECTEAZĂ conținutul (întrebări, dureri, soluții, obiecții, calcule, oferte, dovezi pentru businessul tău).
 - **De unde pornesc cel mai repede?** „+ Adaugă prezentare" → un șablon apropiat de ce vinzi (Sală evenimente / Catering / Servicii / Produse), sau **Symbai HoReCa 2026** ca model de structură — apoi rescrii durerile/soluțiile/ofertele pe businessul tău. Cel mai greu (logica și fluxul) e deja făcut.
 - **Diferența dintre «Configurare prezentare» și tabul «Prezentare» din CRM?** Prima (Setări → CRM) = unde CONSTRUIEȘTI. A doua (Vânzări → CRM) = unde RULEZI în fața prospectului. Le confunzi ușor.
 - **De ce nu apare un slide la rulare?** Cel mai des: e dezactivat din tabul Flux, sau are o condiție „apare doar dacă…" neîndeplinită de răspunsuri, sau durerea legată n-a depășit pragul de intensitate. Testează în Preview pe scenariul potrivit.
@@ -105,7 +105,7 @@ Metodologia se copiază 1:1 în orice vertical. Pașii:
 
 ## Capcane
 
-- **Web-only**: nicio acțiune de prezentare prin MCP. Nu promite clientului „ți-o construiesc eu prin conexiune" — proiectezi conținutul + ghidezi în pagină.
+- **Hibrid MCP + web**: scaffold/clonă + meta/temă/ofertă/flux/tipologii prin MCP (`create_presentation_from_template` + `patch_presentation`); editarea vizuală fină per-slide + Preview + rulare în aplicație (Chrome). Citește cu `get_presentation(section:...)` înainte de patch pe acea parte. Scrierile cer modulul „Setări & Configurare" pe token MCP.
 - **Două locuri ușor de confundat**: construiești în `/settings/sales-crm?tab=presentation`, rulezi în `/sales-crm` → Prezentare.
 - **Întrebări care măgulesc = inutile**: răspunsurile trebuie să permită variantele oneste/jenante („habar n-am") — altfel nu descoperi durerea reală.
 - **Cifre generice resping clienții analitici**: calculele trebuie să folosească datele LUI (din Intro/Discovery), nu estimări de broșură.

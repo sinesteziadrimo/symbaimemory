@@ -9,7 +9,7 @@ Citește întâi `knowledge/personal-hr.md` (modal de tură câmp-cu-câmp, Prog
 
 **Tot ce e scriere cere modulul `personal` pe token.** Context mereu întâi: `list_brands` + `list_locations` (ai nevoie de brandId/locationId). Roluri: `list_entities(entityType:"roles", brandId)`. Stare curentă: `get_staff_overview(brandId, locationId)`.
 
-**⚠ Deploy:** tool-urile de **contracte/salarii/pontaj/concedii** (`*_employee_contract`, `upsert_employee_monthly_salary`, `*_time_entry`, `*_leave_request`) sunt LIVE **abia după deploy-ul nexuspos** — până atunci se fac din interfață. Verifică la conectare ce tool-uri apar; ce nu e în listă, nu se poate apela.
+**Contracte/salarii/pontaj/concedii — tool-uri MCP live:** `create_employee_contract` / `update_employee_contract`, `upsert_employee_monthly_salary`, `create_time_entry` / `update_time_entry`, `create_leave_request` / `update_leave_request`, plus citirile `list_employee_contracts` / `list_leave_requests`. Se apelează direct, nu mai depind de niciun deploy. Detalii pe fiecare la (e).
 
 ## Regula de aur
 
@@ -17,25 +17,31 @@ ID-uri, nu nume (roleId, employeeId, floorConfigId). Caută înainte de a crea (
 
 ## (a) Adaugă angajat + parolă/PIN
 
-1. `create_employee(firstName*, lastName, brandId*, roleId, email, phone, locationId, hireDate, baseSalary, nickname)`. **Prenume + email** sunt obligatorii. Salariul lunar brut calculează automat tariful orar (la 168h/lună). Poreclă = numele afișat peste tot.
-2. **Parola/PIN-ul nu se trimit prin MCP.** Varianta recomandată: din fișa angajatului (în aplicație) → „Copiază link setare parolă" / „Copiază link setare PIN" (valabile 48h) → i le trimiți, și-le alege singur. La nevoie, parola/PIN-ul se pot pune și direct pe fișă.
+1. `create_employee(firstName*, lastName*, brandId*, roleId, email, phone, locationId, hireDate, baseSalary, nickname, pin)`. **Obligatorii: `firstName` + `lastName` + `brandId`** — email-ul NU e obligatoriu. `baseSalary` (lunar brut) calculează automat tariful orar la 168h/lună. Poreclă = numele afișat peste tot.
+   - **⚠ CAPCANĂ confirmată live: angajatul creat prin MCP NU apare în Lista Personal cât timp ești pe unitatea lui.** `create_employee` setează doar `brand_id` singular, dar lasă `brand_ids[]`/`location_ids[]` GOALE, iar directorul UI filtrează după array. Soluție: după creare, spune-i userului să-l vadă pe „Toate unitățile" SAU să deschidă o dată fișa în aplicație și să o salveze (populează array-ul). Tu confirmă mereu prin `get_staff_overview(brandId)` — acolo apare corect.
+2. **PIN-ul SE poate seta prin MCP** — `create_employee(..., pin:"4321")` sau `update_employee(employeeId, pin)` chiar funcționează (confirmă cu `get_staff_overview` → angajatul apare cu `pin:"setat"`). **Parola NU se trimite prin MCP**: din fișa angajatului → „Copiază link setare parolă" (48h) → i-l trimiți, și-o alege singur. Și PIN-ul are link similar dacă preferi ca el să-l aleagă.
 3. ⚠ **Câmpul PIN apare DOAR dacă rolul are permisiunea `pin_login`** — altfel link-ul/câmpul de PIN nu există. Pune `pin_login` pe rol (vezi (b)) sau alege un rol care o are.
 4. Import în masă: `bulk_create_employees(brandId*, employees[], locationId)`.
 
 ## (b) Creează/editează rol + permisiuni
 
 1. Rapid, setul standard: `seed_default_roles(brandId*, businessType*)` (restaurant|bar|cafenea|fast_food|hotel_restaurant|catering…) — creează ~15 roluri predefinite, idempotent.
-2. Rol nou: `create_role(name*, brandId*, permissions?)`. Editare: `update_role(roleId*, brandId*, name?, permissions?)`.
-3. Permisiuni fin: `set_role_permissions(roleId*, permissions? | addPermissions? | removePermissions?)` — `permissions` ÎNLOCUIEȘTE tot setul; `add/removePermissions` modifică incremental (preferă-le ca să nu ștergi din greșeală).
-4. „Toate dintr-o categorie": cheia `all:<categorie>` (ex. `all:pos`, `all:payments`, `all:staff`) acordă tot grupul, inclusiv permisiuni viitoare. `all` simplu = super-admin (doar Admin/Proprietar). Câteva chei `staff`: `staff_view`, `staff_manage`, `schedule_manage`, `roles_manage`, `pin_login`.
+2. Rol nou: `create_role(name*, brandId*)`. **⚠ NU trimite `permissions` ca OBIECT la `create_role`** (ex. `{pos:true}`) — se salvează ca blob stricat (rolul rămâne fără permisiuni reale) ȘI strică apoi `set_role_permissions(addPermissions)` (crapă „n is not iterable"). **Creează rolul gol, apoi pune permisiunile cu `set_role_permissions` (array).**
+3. Permisiuni fin: `set_role_permissions(roleId*, permissions[] | addPermissions[] | removePermissions[])` — toate iau **array de string-uri**. `permissions` ÎNLOCUIEȘTE tot setul (folosește-o întâi pe un rol nou); `add/removePermissions` merg incremental DOAR dacă setul curent e deja array (pe un rol creat greșit cu obiect, „repară-l" întâi cu `permissions`).
+4. **⚠ NU există validare pe chei** — orice string e acceptat tăcut, inclusiv chei greșite care NU deblochează nimic. **Folosește DOAR cheile reale** din `knowledge/personal-hr.md` → „Catalog permisiuni". „Toate dintr-o categorie": `all:<categorie>` (categorii valide: `pos`, `client_orders`, `delivery`, `payments`, `kitchen`, `reservations`, `inventory`, `menu`, `staff`, `tasks`, `cleaning`, `haccp`, `marketing`, `ai_assistants`, `sales_crm`, `finance`, `cashbook`, `analytics`, `ecommerce`, `hotel`) acordă tot grupul; `all` = super-admin (doar Admin/Proprietar). Chei `staff` uzuale: `staff_view`, `staff_manage`, `schedule_view`, `schedule_manage`, `roles_manage`, `pin_login`. Pentru un rol standard întreg, preferă `seed_default_roles` (pasul 1).
 5. Pagina nepermisă îl redirecționează pe angajat la „Sarcinile Mele" — dacă „nu vede o pagină", adaugă permisiunea pe rol.
 
 ## (c) Programează tură cu raionul corect (ca să meargă rutarea QR)
 
 1. **Verifică ÎNTÂI Program Salon pe ziua respectivă**: aranjamentul activ pe acea zi trebuie să conțină raionul pe care vrei să pui ospătarul. Dacă raionul nu există în aranjamentul zilei, nu-l poți programa și comanda QR nu va prinde. (Configurare Program Salon → (d).)
-2. `create_shift(employeeId*, date*, startTime*, endTime*, brandId*, locationId*, floorConfigId, sectionId, sectionName)`. **Pentru ospătari `sectionName` (raionul, ex. „Terasă"; mai multe = „Terasă,Bar") + `floorConfigId` (aranjamentul zilei) sunt esențiale** — pe ele se face rutarea. Editare: `update_shift(shiftId*, …, sectionName?)`. Mai multe deodată: `bulk_create_shifts(locationId*, shifts[])`.
-3. Tura e ciornă (invizibilă angajatului) până e **publicată** — în aplicație „Salvează și Publică Program".
-4. Confirmă: `get_shift_detail` / `get_staff_overview` arată tura cu raionul ei.
+2. **⚠ DOUĂ tabele de tură — alege corect (confirmat live):**
+   - `create_shift(employeeId*, date*, startTime*, endTime*, brandId*, locationId*, floorConfigId, sectionId, sectionName)` scrie în tabela `shifts` (pontaj / „tură deschisă POS"). **ARE raion** (`sectionName`, ex. „Terasă"; mai multe = „Terasă,Bar") → rutează QR-ul pentru ziua aia, **DAR NU apare în Planificator Ture** (planificatorul citește `staff_schedules`).
+   - `create_staff_schedule(employeeId*, scheduledStart*, scheduledEnd*, floorConfigId, locationId, status)` scrie în `staff_schedules` → **apare în Planificator Ture** (calea „program publicat"). **DAR nu are param de raion** (`sectionName` rămâne gol) și nici de `brandId` (rămâne null).
+   - **Concluzie: niciun tool MCP nu face singur «intrare în planificator CU raion».** Reguli: vrea doar **rutare QR azi** → `create_shift` cu `sectionName`. Vrea **programul în planificator** → `create_staff_schedule` (`status:"published"`), apoi **pune raionul din aplicație** (Planificator → tură → Secțiune Atribuită) sau spune-i clar că raionul se setează în UI. Editare: `update_shift(shiftId*, …, sectionName?)`. Mai multe: `bulk_create_shifts` / `bulk_create_staff_schedules`.
+   - **⚠ Timezone:** orele trimise se stochează ca UTC și se afișează cu offset-ul local (vara RO = +3h → „10:00" apare „13:00"). Dacă userul vrea fix 10:00 local, scade offset-ul sau avertizează-l de decalaj.
+   - **⚠ `dayOfWeek` (Program Salon):** 0=Duminică … 6=Sâmbătă — calculează ziua REALĂ a datei, nu presupune.
+3. `create_staff_schedule` cu `status:"draft"` = ciornă (invizibilă); `"published"` = vizibilă angajatului. (Rândul din `shifts` nu are draft/publish — există direct.)
+4. Confirmă: `get_staff_overview(brandId, locationId)` arată turele viitoare cu raionul (`sectionName`); pentru detaliu fin, SQL read-only pe `shifts`. (`get_shift_detail` e pentru turele de **producție**, nu pentru turele de personal — nu-l folosi aici.)
 
 ## (d) Configurează Program Salon (aranjament per zi)
 
@@ -43,7 +49,7 @@ Pregătire aranjamente (dacă lipsesc): `create_floor_zone` → `bulk_create_flo
 
 ## (e) Contracte CIM/PFA/Zilier + alocări + bonusuri
 
-**MCP doar după deploy** (`create_employee_contract` / `update_employee_contract` cu `contractKind`, salariu brut/net sau `dailyRate`, `allocations` toate de același tip [% ≤ 100 sau sume fixe ≤ brut], `bonuses` [monthly_fixed|percent_sales|per_day|one_time]; `upsert_employee_monthly_salary` pe lună; ⚠ la update `allocations`/`bonuses` înlocuiesc tot setul). **Acum (UI)**: `/staff?tab=contracts` → alegi angajatul → contract nou (CIM/SRL-PFA/Zilier/Fără contract) → alocări pe brand/locație + bonusuri. Salariul lunii se editează din tab Listă Personal (butonul de salarii de pe rândul angajatului), separat de contract.
+**MCP live** (se apelează direct): `create_employee_contract(employeeId*, contractKind*` [cim|srl_pfa|zilier|fara_contract]`, monthlyGrossSalary | monthlyNetSalary | dailyRate` [zilier]`, allocations` [`allocationType` toate de același tip: percent ≤ 100 SAU fixed ≤ brut]`, bonuses` [`bonusType`: monthly_fixed|percent_sales|per_day|one_time]`)`; editare `update_employee_contract(contractId*, …)` — ⚠ `allocations`/`bonuses` ÎNLOCUIESC tot setul (trimite lista întreagă), lasă-le nesetate ca să le păstrezi. Salariul lunii: `upsert_employee_monthly_salary(employeeId*, year*, month*, grossSalary, netSalary, bonuses)` — unic pe (angajat, an, lună), reapelarea suprascrie. Pontaj: `create_time_entry(employeeId*, clockIn?, clockOut?)` (guard idempotent: pontaj deschis nu se dublează) → închizi cu `update_time_entry(timeEntryId*, clockOut)`. Concedii: `create_leave_request(employeeId*, type*` [concediu_odihna|medical|personal|fara_plata|eveniment_special]`, startDate*, endDate*)` → `update_leave_request(leaveRequestId*, status` [pending|approved|declined|cancelled]`, reviewedBy?, reviewNote?)`. Confirmă valorile cu userul înainte de scriere.
 
 ## (f) Schimbă unitatea (brand/locație)
 
@@ -66,8 +72,8 @@ Mergi pe ladder (vezi `knowledge/personal-hr.md`), în ordine:
 3. **Raion scris diferit** — „Terasă" vs „Terasa" (diacritice/majuscule) → nu se potrivesc.
 4. **Niciun aranjament programat azi** în Program Salon → fallback pe alt aranjament care poate nu conține masa.
 5. **Tura e ciornă** sau în afara intervalului orar → nu e „activă acum".
-Verifică tura din Planificator (raion corect, publicată, interval) + aranjamentul zilei din Program Salon (masa e în el, raionul scris identic). Citește live cu `get_shift_detail`/`get_staff_overview` sau SQL read-only (`staff_schedules`, `shifts`, `zone_assignments`, `floor_configs`). Nu presupune.
+Verifică tura din Planificator (raion corect, publicată, interval) + aranjamentul zilei din Program Salon (masa e în el, raionul scris identic). Citește live cu `get_staff_overview(brandId, locationId)` (turele viitoare cu raionul) sau SQL read-only (`staff_schedules`, `shifts`, `zone_assignments`, `floor_configs`). Nu presupune. (`get_shift_detail` e pentru turele de **producție**, nu de personal.)
 
 ## Verifică prin CITIRE (nu prin UI)
 
-După orice scriere: `get_staff_overview` / `get_shift_detail` / `list_entities` confirmă. Interfața se actualizează abia după refresh — succes la tool = salvat, nu repeta scrierea. Dacă modulul `personal` nu e pe token („permisiune insuficientă"), explică activarea din portal Hub → Acces AI. Audit pe un angajat: `jurnal_activitate(categorie:"STAFF", angajatId)`.
+După orice scriere: `get_staff_overview` (angajați, roluri, ture viitoare, pontaje) / `list_entities` confirmă; pentru contracte `list_employee_contracts(employeeId?, active?)`, pentru concedii `list_leave_requests(employeeId?, brandId?, status?)`. Interfața se actualizează abia după refresh — succes la tool = salvat, nu repeta scrierea. Dacă modulul `personal` nu e pe token („permisiune insuficientă"), explică activarea din portal Hub → Acces AI. Audit pe un angajat: `jurnal_activitate(categorie:"STAFF", angajatId)`.

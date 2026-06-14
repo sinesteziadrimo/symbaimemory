@@ -9,7 +9,7 @@ Citește întâi `knowledge/tasks-sarcini.md` (model nou: țintă rol+tură+raio
 
 **Două pagini, NU le confunda:** managerul **construiește** în `/staff` → tab **Sarcini & Liste**; angajatul **vede și bifează** în `/my-tasks`. O listă cu o ȚINTĂ (rol+tură+raion) apare AUTOMAT la cei care sunt azi în tură și se potrivesc — nu mai atribui manual fiecăruia.
 
-**⚠ Deploy:** tool-urile MCP dedicate (cele de mai jos) sunt LIVE **abia după deploy-ul nexuspos**. Până atunci → lucrezi **prin interfață** (eventual cu extensia Chrome) + citești prin **SQL read-only**. Verifică la conectare ce tool-uri apar; ce nu e în listă, nu se poate apela.
+**Tool-urile MCP dedicate sunt LIVE** — le apelezi direct: `create_targeted_task_list`/`create_task_list`, `create_targeted_task`/`create_task`/`bulk_create_tasks`, `clone_task_list`, `assign_task`, `complete_task`, `update_task`, `update_task_list`, `get_my_tasks`, `get_task_dashboard`, `list_tasks`, `list_task_lists`, `get_task`. Treci pe interfață (extensia Chrome) DOAR când modulul `personal` (scriere) nu e pe token („permisiune insuficientă”) — vezi activarea la final.
 
 ## Regula de aur
 
@@ -19,6 +19,7 @@ Citește întâi `knowledge/tasks-sarcini.md` (model nou: țintă rol+tură+raio
 
 1. Context: `list_brands` + `list_locations` (ai nevoie de brandId/locationId). Rolul-țintă: `list_entities(entityType:"roles", brandId)` pentru roleId.
 2. `create_targeted_task_list` cu: `title`, `targetRoleId` (gol = orice rol), `targetShift` (`any`|morning|afternoon|evening|night), `targetSection` (raion; gol = orice), `locationId`, `recurrence` (none|daily|weekdays|weekly|monthly), `recurrenceDays` (weekly: „mon,thu”; monthly: „15”), `dueTime` („11:00”), `color`.
+   - **⚠ CAPCANĂ confirmată live cu `targetSection`:** vizibilitatea pe raion se uită la raionul de pe `staff_schedule`-ul angajatului — iar raionul pe `staff_schedule` **NU se poate seta prin MCP** (`create_staff_schedule` n-are param de raion; raionul pus prin `create_shift` stă în altă tabelă, ignorată aici). Deci dacă turele au fost create prin MCP, o listă cu `targetSection` **NU ajunge la nimeni** — chiar dacă rolul și raionul par corecte. Soluție: țintește pe **rol + tură** (lasă `targetSection` gol) SAU pune raionul pe tură din aplicație (Planificator → Secțiune Atribuită), apoi re-verifică audience-ul.
 3. Adaugi sarcinile cu `create_targeted_task` per sarcină (suportă dovadă/verificare/oră-limită; în liste recurente devine sarcină-șablon). `bulk_create_tasks` e doar pentru titluri simple, FĂRĂ aceste câmpuri. La cele care cer dovadă pune `requiresProof` (none|photo|note|photo_note|number|signature); la cele critice `requiresVerification:true`; opțional `dueTime` (suprascrie lista), `estimatedMinutes`.
 4. **Verifică audience** (Recipe 2). Apoi confirmă userului ce ai făcut + link la `/staff?tab=tasks`.
 
@@ -42,14 +43,15 @@ Citește întâi `knowledge/tasks-sarcini.md` (model nou: țintă rol+tură+raio
 ## Recipe 5 — Marchează cu dovadă / verificare
 
 - Angajatul: `complete_task(taskId, employeeId, photoUrl?|note?|value?)` — trimite exact ce cere `requiresProof` (număr la `number`, text la `note`, URL poză la `photo`, etc.). De-bifare: `complete_task(... uncomplete:true)`.
-- Sarcină cu verificare: după bifare rămâne „de confirmat” până o validează managerul — din interfață (`/staff` → Sarcini & Liste, butonul de verificare pe sarcina bifată; endpoint `POST /api/tasks/:id/verify`). NU există tool MCP dedicat de verificare (la nevoie, `update_task` poate seta verifiedBy/verifiedAt).
+- Sarcină cu verificare: după bifare rămâne „de confirmat” până o validează managerul. NU există tool MCP dedicat de verificare — sign-off-ul se face din aplicație (`/staff` → Sarcini & Liste, butonul de verificare pe sarcina bifată). Prin MCP poți doar citi starea (`get_task` arată dacă cere verificare).
 
 ## Recipe 6 — Dashboard manager
 
 - `get_task_dashboard(brandId, locationId, date)` → per listă: De făcut / În lucru / Gata / Întârziate / total / procent (+ țintă, recurență, culoare). Rezumă userului ce listă rămâne în urmă.
 
-## Cum lucrează Claude când tool-urile MCP NU sunt încă LIVE (Chrome)
+## Fallback pe interfață (Chrome) — DOAR când modulul `personal` (scriere) nu e pe token
 
+Tool-urile MCP de mai sus sunt LIVE; folosește-le mereu întâi. Treci pe interfață DOAR când scrierea e blocată („permisiune insuficientă” — modulul `personal` nu e pe token; vezi activarea la final).
 Click-paths cu extensia Chrome (după ce userul e logat în aplicația lui):
 - **Manager construiește**: navighează la `/staff?tab=tasks` → buton „Listă Nouă” → completezi titlu + țintă (rol/tură/raion/locație) + recurență + oră-limită + dovadă → uită-te la panoul „Cine va vedea asta și când” → „Salvează”. Adaugi sarcini cu „Adaugă sarcină” pe listă.
 - **Șablon**: pe listă → „Salvează ca șablon” / „Pornește din șablon”.
@@ -60,6 +62,7 @@ Click-paths cu extensia Chrome (după ce userul e logat în aplicația lui):
 ## „De ce nu vede angajatul sarcina?” (diagnostic rapid)
 
 1. E azi în tură/program? (fără tură, ținta pe tură nu-l prinde). 2. Rolul lui = ținta listei? 3. Raionul turei = raionul-țintă? 4. Locația se potrivește? 5. Lista e `active`? 6. Listă recurentă → instanța zilei generată? Confirmă cu audience / `get_my_tasks`, nu din presupunere. Cauza clasică: listă veche cu rol/tură „decorative” (nu setate ca țintă reală).
+**Cauza #1 când turele vin din MCP:** lista are `targetSection` (raion), dar `staff_schedule`-ul angajatului n-are raion (MCP nu-l poate seta) → vizibilitatea pe raion nu-l prinde. **Test rapid:** scoate `targetSection` (`update_task_list(taskListId, targetSection:"")`) și recheamă `get_my_tasks` — dacă acum îl vede, ăsta era. Apoi fie lași ținta pe rol+tură, fie pui raionul pe tură din aplicație.
 
 ## Verifică prin CITIRE (nu prin UI)
 

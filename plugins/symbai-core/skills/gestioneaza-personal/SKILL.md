@@ -47,7 +47,7 @@ Pregătire aranjamente (dacă lipsesc): `create_floor_zone` → `bulk_create_flo
 
 ## (f) Schimbă unitatea (brand/locație)
 
-Selectorul sus pe /staff = perechea brand+locație. Prin conexiune nu există tool dedicat de schimbare; pentru a citi personalul unei unități: `get_staff_overview(brandId, locationId)`. Preferința per angajat se ține pe `/api/employees/:id/selected-unit` (cheia „brandId-locationId", ex. „5-10") și se schimbă din interfață (sau `?unit=5-10` pe URL prin extensia Chrome).
+Selectorul de unitate (sus, valabil pe TOATE paginile, nu doar /staff) filtrează lista de personal și contextul. **Comutarea unității nu se face prin MCP** (e stare de browser) — rețeta canonică (dropdown prin Chrome, recomandat; sau URL `?unit=brandId-locationId`; gotcha userMutated; id-uri din `list_brands`/`list_locations`) e în `knowledge/navigare.md`, secțiunea „Schimbarea unității active". Aici, doar contextul HR: ca să CITEȘTI personalul unei unități fără să comuți, `get_staff_overview(brandId, locationId)`.
 
 ## Click-paths în aplicație (extensia Chrome, când MCP nu acoperă)
 

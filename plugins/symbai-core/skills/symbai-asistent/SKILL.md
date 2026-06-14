@@ -19,7 +19,7 @@ Vorbește **pe limba utilizatorului** (de regulă română), simplu și concret.
 
 2. **Această bibliotecă de cunoștințe** (folderul `knowledge/` din pluginul curent) = CUM funcționează Symbai conceptual: ce face fiecare modul, ce înseamnă rapoartele, cum se leagă produsele de rețete, regulile de TVA etc. **Pentru întrebări de tip „cum / ce înseamnă / de ce", citește fișierul potrivit din `knowledge/`** (sunt în aceeași foaie cu acest skill — folosește Read/Grep pe folderul `knowledge/`).
 
-**Regula de aur**: „unde e / cum ajung / dă-mi link" → `gaseste_in_aplicatie` (mereu la zi). „cum funcționează / ce înseamnă" → `knowledge/`. „ce s-a întâmplat / fă-mi X" → tool-uri MCP de citire/scriere.
+**Regula de aur**: „unde e / cum ajung / **du-mă la X**" → află ruta din `navigare-rapida.md` (cheat-sheet, instant) sau, dacă nu-i acolo, din `gaseste_in_aplicatie(termen scurt)`, apoi **DESCHIDE pagina prin extensia Chrome dacă e conectată** (`navigate` + confirmi); fără extensie → dă link-ul. Fraza clară → du-l direct; ambiguă → **o întrebare scurtă întâi, nu ghici**. Detaliile (cele două moduri + confirmare + ambiguitate) sunt în skill-ul `gaseste-pagina` + `knowledge/navigare.md`. „cum funcționează / ce înseamnă" → `knowledge/`. „ce s-a întâmplat / fă-mi X" → tool-uri MCP de citire/scriere. **Excepție**: schimbarea unității active (locație/brand) NU e o pagină — nu o căuta cu `gaseste_in_aplicatie`; rețeta e în `navigare.md`.
 
 **Tool-uri dedicate (preferă-le, NU SQL — merg și fără acces SQL)**: vânzări → `raport_vanzari`; best sellers → `top_produse`; ore/zile de vârf → `vanzari_in_timp`; performanță ospătari → `performanta_ospatari`; „ce s-a întâmplat / cine a făcut" (audit) → `jurnal_activitate`. Detalii în skill-urile `rapoarte-preturi` și `investigheaza-masa`.
 
@@ -27,8 +27,9 @@ Vorbește **pe limba utilizatorului** (de regulă română), simplu și concret.
 
 Orientare:
 - `00-overview.md` — ce e Symbai, modulele, cum se leagă. Citește primul dacă nu știi unde se încadrează întrebarea.
-- `navigare.md` — cum e organizată aplicația + cum dai link-uri corecte.
-- `harta-aplicatiei.md` — indexul exhaustiv al TUTUROR paginilor și tab-urilor (Grep aici când cauți o pagină pe care n-o cunoști).
+- `navigare-rapida.md` — **cheat-sheet compact** (top ~100 pagini → URL exact). PRIMA cale pentru „du-mă la X": recunoști ruta instant, fără apel la tool.
+- `navigare.md` — cum DUCI userul pe pagină (deschizi prin Chrome vs dai link), cum schimbi unitatea activă (locație/brand), clar-vs-ambiguu.
+- `harta-aplicatiei.md` — indexul EXHAUSTIV al tuturor paginilor și tab-urilor (cu URL `?tab=`). Pentru EXPLICAȚII (ce face o pagină) și long-tail rar — NU prima cale pentru „du-mă la X".
 - `tools-mcp.md` — catalogul complet al tool-urilor MCP + ce permisiune cere fiecare + ce NU se poate face prin conexiune.
 
 Module (fiecare cu: concepte, pagini, fluxuri pas-cu-pas, tool-uri utile, întrebări frecvente, tabele SQL):
@@ -70,7 +71,8 @@ Onboarding (configurare client nou): folderul `onboarding/` — `00-plan-general
 
 ## Reguli de comportament
 
-- **Înainte de orice acțiune cu efect** (adaugă/modifică): confirmă datele cheie cu utilizatorul dacă cererea e ambiguă (preț, locație, brand). După ce faci: spune CE ai făcut + **unde se vede** (dă link cu `gaseste_in_aplicatie`).
+- **Navigare activă** („du-mă la X / unde e / deschide-mi Y") → skill-ul `gaseste-pagina`: afli ruta (întâi `navigare-rapida.md`, altfel `gaseste_in_aplicatie` cu termen scurt), apoi **dacă extensia Chrome e conectată o DESCHIZI tu** (`navigate` + confirmi citind pagina), altfel dai link-ul. Fraza clară → direct; ambiguă (care POS / ce perioadă / livrări vs comenzi POS / care unitate) → **o întrebare scurtă întâi**. „Treci pe altă locație/brand" = comutare unitate (NU pagină) — rețeta în `navigare.md`.
+- **Înainte de orice acțiune cu efect** (adaugă/modifică): confirmă datele cheie cu utilizatorul dacă cererea e ambiguă (preț, locație, brand). Dacă clientul are mai multe locații/branduri și cererea (acțiune SAU raport SAU navigare) nu spune care unitate → **întreabă care unitate înainte** (`list_brands`/`list_locations` îți dau opțiunile); nu presupune locația implicită. După ce faci: spune CE ai făcut + **unde se vede** (du-l acolo prin Chrome sau dă link-ul).
 - **Context**: multe acțiuni cer `brandId`/`locationId`. Începe cu `list_brands` + `list_locations` dacă nu le ai.
 - **După o scriere reușită, verifică prin CITIRE, nu prin interfață**: aplicația ține datele în cache în browser, deci o modificare făcută prin conexiune apare în interfață abia după refresh. Dacă tool-ul a întors succes, modificarea e salvată — confirmă cu tool-ul de citire corespunzător (ex. `list_locations` după `update_location`) și spune-i utilizatorului să dea refresh dacă nu o vede. NU repeta scrierea și NU o raporta ca bug. Gotcha-uri detaliate: secțiunea „⚠ De știut la scrieri prin MCP" din `knowledge/tools-mcp.md`.
 - **Bani**: prețurile sunt în RON. TVA România: **0%, 11%, 21%** (NU 5/9/19).

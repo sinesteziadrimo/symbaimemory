@@ -1,25 +1,57 @@
 ---
 name: gaseste-pagina
-description: Ajută utilizatorul care întreabă unde se află ceva în Symbai sau cum ajunge la o pagină — „sunt pe pagina X, cum ajung la Y", „unde văd rapoartele", „unde adaug un produs", „dă-mi link la setări imprimante". Întoarce pagina + link direct + pașii.
+description: Du userul pe pagina pe care o vrea, rapid — „du-mă la X", „deschide-mi Y", „sunt pe X, cum ajung la Y", „unde văd rapoartele", „unde adaug un produs", „dă-mi link la setări imprimante", „treci pe locația din centru / schimbă unitatea". Află ruta (cheat-sheet/tool), deschide pagina prin extensia Chrome dacă e conectată (altfel dă link), confirmă; la cereri ambigue întreabă o dată înainte.
 ---
 
-# Găsește o pagină / dă link
+# Du userul pe pagină (rapid) — sau dă link
 
-Când utilizatorul întreabă **unde** e ceva sau **cum ajunge** undeva:
+Când userul vrea să **ajungă** undeva sau întreabă **unde** e ceva: bucla e **află ruta → deschide → confirmă**. Nu te opri la „uite link-ul" dacă poți să-l duci tu acolo.
 
-1. Apelează tool-ul MCP **`gaseste_in_aplicatie`** cu întrebarea lui în cuvintele lui (ex: „rapoarte vânzări", „adaugă imprimantă", „setări TVA"). Tool-ul citește harta LIVE a aplicației, deci e mereu corect chiar dacă meniul s-a schimbat.
-2. Tool-ul întoarce: pagina potrivită, un **link direct** (ex: `https://restaurantultau.symbai.app/analytics`) și, uneori, pașii de navigare.
-3. Dă utilizatorului **link-ul direct** + o frază scurtă „cum ajungi din meniu" dacă e disponibilă.
-4. Dacă sunt mai multe potriviri (`data.matches`), oferă top 2-3 ca să aleagă.
+## 1. Află ruta — fără să-l pui pe așteptare
+
+1. **Întâi `navigare-rapida.md`** (cheat-sheet). Cele mai cerute ~100 pagini cu URL exact. Dacă intenția e acolo → ai ruta INSTANT, fără niciun apel.
+2. **Altfel → `gaseste_in_aplicatie(termen scurt)`.** Citește harta LIVE a instanței lui (la zi, ține cont de permisiuni). Întoarce pagina + **link direct** + uneori pașii din meniu.
+   - **Pasează un TERMEN SCURT, nu fraza lungă** a userului: „pnl", „închidere zi", „imprimante", „stoc curent". Așa răspunde instant. O frază liberă lungă îl face „să analizeze" (mai lent). Tu traduci intenția în termen; userului îi vorbești normal.
+3. **Nu ghici URL-uri din memorie.** Ruta vine din cheat-sheet sau din tool.
+
+## 2. Clar → du-l direct. Ambiguu → o întrebare scurtă ÎNTÂI
+
+Înainte să acționezi, întreabă-te: **fraza arată UNIC o pagină?**
+- **DA** (ex. „rapoarte", „stoc", „închidere zi", „mese deschise", „setări imprimante") → mergi mai departe, fără întrebări.
+- **NU / ambiguu** (mai multe pagini plauzibile sau lipsește o coordonată) → pune **o singură** întrebare scurtă, NU ghici la noroc:
+  - „deschide POS-ul" → care interfață: **ospătar / bar / mobil / kiosk**?
+  - „comenzi" / „comenzi online" → din sală (`/pos/waiter-orders`), **livrări** Glovo/Wolt (`/channels`), sau magazin online (`/ecommerce/orders`)?
+  - „vânzările" / „un raport" → raport zilnic, pe produse, P&L, plăți? (tab-uri în `/analytics`)
+  - „meniul" → prețuri, afișaj digital, meniu fizic tipărit, platforme POS? (tab-uri în `/menu`)
+  - client cu **mai multe locații** + cerere fără unitate → întreabă **care unitate** (vezi pasul „Schimbarea unității").
+- **Dacă tool-ul întoarce mai multe potriviri (`matches`) sau o întrebare (`clarification` + `alternatives`)** → relayează userului întrebarea + cele 2-3 variante; lasă-l pe EL să aleagă. NU alege tu una arbitrar.
+
+## 3. Deschide pagina — două căi
+
+- **(A) Ai extensia Chrome (`claude-in-chrome`) + user logat** → **deschide TU pagina**: `navigate(link)`. Asta e „du-mă", nu „uite link".
+- **(B) Fără extensie** → dă-i **link-ul direct** (+ „din meniu: ..." dacă tool-ul a dat pașii). Merge și pe alt device.
+
+## 4. Confirmă (când ai deschis tu)
+
+După `navigate()`, **citește pagina** (`read_page` / `get_page_text` — nu screenshot doar pentru asta) și verifică ruta:
+- corespunde → „Te-am dus pe **X**, vezi pe ecran...".
+- pagină goală / a sărit pe login sau altă rută → **nu raporta succes orb**: „Pagina X pare ascunsă pentru rolul/contul tău sau modulul nu e activ".
+
+## Schimbarea unității (locație / brand) — NU e o pagină
+
+„Treci pe locația din centru / vezi datele de la cealaltă locație / schimbă pe brandul X" = comutarea **unității active** (stare de browser, afectează tot). **Nu o căuta cu `gaseste_in_aplicatie`** și nu se face prin MCP. Rețeta completă (id-uri din `list_brands`/`list_locations` → dropdown prin Chrome, recomandat, sau URL `?unit=brandId-locationId`) e în `knowledge/navigare.md`, secțiunea „Schimbarea unității active".
 
 ## Exemple
 
-- „Sunt pe pagina de comenzi, unde văd cât am vândut azi?" → `gaseste_in_aplicatie("rapoarte vânzări azi")` → dă link la Rapoarte/Analytics + „din meniul stâng → Rapoarte".
-- „Unde schimb prețul la un produs?" → `gaseste_in_aplicatie("editare preț produs meniu")` → link la Meniu.
-- „Cum ajung la setările de imprimantă?" → `gaseste_in_aplicatie("setări imprimante")`.
+- „du-mă la rapoarte" → cheat-sheet → `/analytics` → (Chrome) `navigate`, confirmi „te-am dus pe Rapoarte".
+- „unde schimb prețul la un produs?" → cheat-sheet `/menu?tab=pricing` → deschizi / dai link.
+- „deschide-mi setările de imprimantă" → `gaseste_in_aplicatie("imprimante")` → `/settings?tab=printers` → deschizi.
+- „comenzile" (client cu livrări) → întrebi „din sală sau livrările din apps?" → apoi deschizi pagina aleasă.
 
 ## Reguli
 
-- NU ghici rute din memorie — folosește mereu `gaseste_in_aplicatie` (harta reală a instanței LUI, cu paginile lui).
-- Dacă tool-ul nu găsește nimic, întreabă utilizatorul ce vrea să **facă** acolo (intenția), apoi reîncearcă cu alți termeni.
-- Pentru „ce face pagina asta / ce înseamnă", după ce dai link-ul, completează din `knowledge/` (vezi `navigare.md` și fișierul modulului).
+- Ruta vine MEREU din cheat-sheet/tool, niciodată inventată; clar → direct, ambiguu → o întrebare întâi.
+- Link-ul rămâne fallback util chiar dacă deschizi tu pagina.
+- Dacă tool-ul nu găsește nimic, întreabă ce vrea să **facă** acolo (intenția) și reîncearcă cu alt termen; dacă tot nu apare, ține de permisiuni/modul (vezi `00-overview.md`).
+- Pentru „ce face pagina asta / ce înseamnă", după ce ajungi acolo, completează din `knowledge/` (modulul potrivit; harta exhaustivă în `harta-aplicatiei.md`).
+- Nu cere niciodată parole — login-ul în Symbai îl face userul în browserul lui.

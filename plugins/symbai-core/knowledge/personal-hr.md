@@ -131,7 +131,7 @@ Reparare: verifică tura din Planificator (raion corect + publicată + interval)
 
 ## Schimbarea unității (selectorul brand/locație)
 
-Sus în pagina /staff (la multi-brand/multi-locație) e selectorul de **unitate** = perechea brand + locație (ex. „Drimoland — Sala Principală"); „Toate unitățile" arată tot. Schimbarea filtrează lista de personal și contextul de planificare. Fiecare angajat își poate salva unitatea preferită (cu care intră implicit data viitoare). Prin conexiune nu există încă un tool dedicat de schimbare a unității — pentru a citi personalul unei unități folosește `get_staff_overview(brandId, locationId)`; preferința per angajat se ține pe `/api/employees/:id/selected-unit` (cheia „brandId-locationId", ex. „5-10") și se schimbă din interfață (sau cu `?unit=5-10` pe URL prin extensia Chrome).
+Sus (selectorul de **unitate** = perechea brand + locație, ex. „Drimoland — Sala Principală"; „Toate unitățile" arată tot) — valabil pe TOATE paginile, nu doar /staff. Schimbarea filtrează lista de personal și contextul de planificare. Fiecare angajat își poate salva unitatea preferită (cu care intră implicit data viitoare). **Comutarea unității nu se face prin conexiune (MCP)** — e stare de browser; rețeta canonică (dropdown prin extensia Chrome = recomandat, sau URL `?unit=brandId-locationId`, plus gotcha-ul de reconciliere și obținerea id-urilor) e în `navigare.md`, secțiunea „Schimbarea unității active". Ca să CITEȘTI doar personalul unei unități fără să comuți: `get_staff_overview(brandId, locationId)`.
 
 ## Tool-uri MCP utile
 

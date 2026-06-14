@@ -1,6 +1,10 @@
 # Harta aplicației Symbai — toate paginile
 
-> Index exhaustiv generat din registrul de navigare al aplicației (aceeași sursă pe care o citește tool-ul `gaseste_in_aplicatie`). Folosește harta pentru ORIENTARE (ce pagini există, ce face fiecare); pentru link-ul exact pe instanța clientului folosește MEREU tool-ul `gaseste_in_aplicatie` — el e la zi și ține cont de permisiuni/module. Intrările marcate Tab sunt tab-uri în interiorul paginii părinte.
+> Index exhaustiv generat din registrul de navigare al aplicației (aceeași sursă pe care o citește tool-ul `gaseste_in_aplicatie`). Folosește harta pentru ORIENTARE (ce pagini există, ce face fiecare); pentru link-ul exact pe instanța clientului folosește MEREU tool-ul `gaseste_in_aplicatie` — el e la zi și ține cont de permisiuni/module. Intrările marcate Tab sunt tab-uri în interiorul paginii părinte (au și URL-ul complet `?tab=` între paranteze).
+>
+> ⚡ **Pentru „du-mă la X" / cele mai cerute pagini NU citi harta asta** — folosește `navigare-rapida.md` (cheat-sheet compact, recunoști ruta instant, fără apel la tool). Harta de față e pentru EXPLICAȚII (ce face o pagină) și pentru long-tail-ul de pagini rare. Cum DESCHIZI efectiv pagina prin extensia Chrome și cum SCHIMBI unitatea: `navigare.md`.
+>
+> ⚠️ **Autoritatea pe „ce conține o pagină" = `navigare-rapida.md`** (descrierile de acolo sunt verificate contra paginilor reale). Harta asta e generată din registrul aplicației și are câteva descrieri mai vechi/mai vagi — **la conflict, crede `navigare-rapida.md`**. Capcane cunoscute aici: `/inventory` NU are tab-uri (stocul real e la `/inventory-check`, mișcările la `/stock-operations`, ieșirile la `/stock-exits`); `/floorplan` e VIZUALIZARE live (editorul e `/plan-sala`); „Comenzi" `/pos/waiter-orders` e panou de cereri QR, NU istoric comenzi; `/menu-engineering` e doar redirect (analiza reală e `/ai-pricing`); `/purchases` e raport agregat (lista de comenzi furnizor e `/smart-ordering`).
 
 ## DASHBOARD & OPERATIUNI
 
@@ -22,69 +26,69 @@
 ## MENIU & DISPOZITIVE POS
 
 - **Meniu & Dispozitive POS** (`/menu`) — Pagină centrală cu 5 tab-uri: Prețuri Meniu, Platforme, Configurare Afișaj, Meniu Fizic, Oferte & Promoții
-  - Tab **Prețuri Meniu** — Tab Prețuri Meniu — prețuri de vânzare, analiza popularitate vs profitabilitate, food cost
-  - Tab **Platforme POS** — Tab Platforme — activare/dezactivare puncte de vânzare POS (kiosk, waiter, bar, tablete, recepție, website) și asociere meniu per dispozitiv. Website Builder-ul include un asistent AI propriu (WB Assistant) cu 27 de tool-uri. _Notă: Din acest tab poți activa Website-ul propriu și comenzile online. Click pe 'Website/Online' → butonul 'Configurează' pentru Website Builder. Website Builder-ul are un asistent AI integrat (WB Assistant) care apare în dreapta jos — ajută cu template-uri, pagini, componente, design, setări._
-  - Tab **Configurare Afișaj** — Tab Configurare Afișaj — profile de afișare pentru POS și web, layout, culori, ordine categorii, imagini
-  - Tab **Meniu Fizic** — Tab Meniu Fizic — designer de meniu tipărit/PDF pentru restaurant, layout profesional
-  - Tab **Oferte & Promoții** — Tab Oferte & Promoții — creare promoții, reduceri, coduri, oferte speciale, happy hour, combo, meniuri combo
+  - Tab **Prețuri Meniu** (`/menu?tab=pricing`) — Tab Prețuri Meniu — prețuri de vânzare, analiza popularitate vs profitabilitate, food cost
+  - Tab **Platforme POS** (`/menu?tab=menus`) — Tab Platforme — activare/dezactivare puncte de vânzare POS (kiosk, waiter, bar, tablete, recepție, website) și asociere meniu per dispozitiv. Website Builder-ul include un asistent AI propriu (WB Assistant) cu 27 de tool-uri. _Notă: Din acest tab poți activa Website-ul propriu și comenzile online. Click pe 'Website/Online' → butonul 'Configurează' pentru Website Builder. Website Builder-ul are un asistent AI integrat (WB Assistant) care apare în dreapta jos — ajută cu template-uri, pagini, componente, design, setări._
+  - Tab **Configurare Afișaj** (`/menu?tab=display`) — Tab Configurare Afișaj — profile de afișare pentru POS și web, layout, culori, ordine categorii, imagini
+  - Tab **Meniu Fizic** (`/menu?tab=physical-menu`) — Tab Meniu Fizic — designer de meniu tipărit/PDF pentru restaurant, layout profesional
+  - Tab **Oferte & Promoții** (`/menu?tab=promotions`) — Tab Oferte & Promoții — creare promoții, reduceri, coduri, oferte speciale, happy hour, combo, meniuri combo
 ## FINANȚE
 
 - **Finanțe & Contabilitate** (`/finance`) — Pagină centrală finanțe cu tab-uri: Cash Flow (flux numerar), Cheltuieli & Plăți (înregistrare facturi furnizori + salarii), Reconciliere Canale (Glovo/Wolt/etc.), Control Viva (terminale card), Solduri inițiale. Pagini SEPARATE accesibile din meniu: /finance/daily-close (raport Z + numărătoare casă), /finance/cash-book (registru numerar legal 14-4-7A), /finance/cash-registers (configurare casierii multi-locație).
-  - Tab **Cash Flow** — Tab Cash Flow — fluxul AGREGAT de numerar (încasări vs plăți), grafice, previziuni viitor. Pentru registrul fizic numerar pe zi → /finance/cash-book.
-  - Tab **Cheltuieli & Plăți** — Tab Cheltuieli & Plăți — înregistrare cheltuieli noi + categorii + furnizori + facturi de plătit + plăți recurente + salarii. ATENȚIE: pentru facturile EMISE de tine (către clienți) → /finance (alt tab) sau eFactura. Pentru cele PRIMITE de la furnizori, AICI.
+  - Tab **Cash Flow** (`/finance?tab=cashflow`) — Tab Cash Flow — fluxul AGREGAT de numerar (încasări vs plăți), grafice, previziuni viitor. Pentru registrul fizic numerar pe zi → /finance/cash-book.
+  - Tab **Cheltuieli & Plăți** (`/finance?tab=expenses`) — Tab Cheltuieli & Plăți — înregistrare cheltuieli noi + categorii + furnizori + facturi de plătit + plăți recurente + salarii. ATENȚIE: pentru facturile EMISE de tine (către clienți) → /finance (alt tab) sau eFactura. Pentru cele PRIMITE de la furnizori, AICI.
 - **Închidere Zi** (`/finance/daily-close`) — Pagină standalone — RITUAL DE ZI: numărătoare cash în casierie + reconciliere cu sistemul + generare raport Z fiscal. Necesar la finalul fiecărei zile de lucru pentru fiscalizare RO. _Notă: Procedură standard: 1) numără cash fizic, 2) verifică total Viva/card, 3) confirmă rest casierie pentru ziua următoare, 4) generează raport Z, 5) sigilează zi._
 - **Casierii (mod organizare)** (`/finance/cash-registers`) — Configurare casierii și mod organizare: per firmă / per locație / per brand × locație. Tot aici: reguli pe țară și mapări auto-feed.
-  - Tab **Reconciliere Canale** — Tab Reconciliere — potrivire plăți canale livrare vs POS, comisioane
-  - Tab **Control Viva** — Tab Control Viva — integrare plăți Viva Wallet, tranzacții card, decontări
+  - Tab **Reconciliere Canale** (`/finance?tab=reconciliation`) — Tab Reconciliere — potrivire plăți canale livrare vs POS, comisioane
+  - Tab **Control Viva** (`/finance?tab=viva`) — Tab Control Viva — integrare plăți Viva Wallet, tranzacții card, decontări
 - **Cash Flow Dedicat** (`/finance/cashflow`) — Pagina dedicată de Cash Flow — vizualizare completă flux numerar
 - **Registru de casă** (`/finance/cash-book`) — Registru de casă (cod 14-4-7A) — operațiuni numerar pe zi, închidere/sigilare cu hash, reconciliere extras bancă, conformitate RO/MD
 - **Casierii (Registre)** (`/finance/cash-book/registers`) — Alias către configurarea casieriilor accesibilă din pagina registru de casă
 ## ANALYTICS & RAPOARTE
 
 - **Rapoarte & Analiză** (`/analytics`) — Dashboarduri de analiză cu 13 tab-uri: Raport Zilnic, P&L, Vânzări Angajați, Timpi, Mese, Avansate, Costuri, Vânzări, Inventar, Personal, Plăți, Categorii, Gestiune
-  - Tab **Raport Zilnic (Z)** — Tab Raport Zilnic — rezumat vânzări pe zi, raport Z
-  - Tab **P&L Detaliat** — Tab P&L (Profit & Loss) — profit și pierdere detaliat pe categorii, raport profit
-  - Tab **Vânzări Angajați** — Tab Vânzări Angajați — performanță vânzări per angajat
-  - Tab **Timpi Așteptare** — Tab Timpi Așteptare — analiza timpilor de servire, bucătărie, livrare, viteza serviciu
-  - Tab **Analiză Mese** — Tab Analiză Mese — ocupare, rotație, venit per masă, raport mese
-  - Tab **Rapoarte Avansate** — Tab Rapoarte Avansate — rapoarte personalizabile, export
-  - Tab **Costuri Operaționale** — Tab Costuri Operaționale — analiză costuri pe categorii
-  - Tab **Vânzări & Venituri** — Tab Vânzări & Venituri — grafice vânzări, tendințe, comparații, top produse vândute
-  - Tab **Inventar & Costuri** — Tab Inventar & Costuri — valoare stoc, rotație, food cost
-  - Tab **Performanță Personal** — Tab Performanță Personal — ore lucrate, productivitate, evaluare
-  - Tab **Plăți & Metode** — Tab Plăți & Metode — defalcare pe metode de plată (cash, card, online)
-  - Tab **Mix Categorii** — Tab Mix Categorii — distribuția vânzărilor pe categorii de produse, raport categorii
-  - Tab **Rapoarte Gestiune** — Tab Rapoarte Gestiune — NIR, avize, fișe de magazie, rapoarte stoc
+  - Tab **Raport Zilnic (Z)** (`/analytics?tab=daily`) — Tab Raport Zilnic — rezumat vânzări pe zi, raport Z
+  - Tab **P&L Detaliat** (`/analytics?tab=pnl`) — Tab P&L (Profit & Loss) — profit și pierdere detaliat pe categorii, raport profit
+  - Tab **Vânzări Angajați** (`/analytics?tab=staff_sales`) — Tab Vânzări Angajați — performanță vânzări per angajat
+  - Tab **Timpi Așteptare** (`/analytics?tab=speed`) — Tab Timpi Așteptare — analiza timpilor de servire, bucătărie, livrare, viteza serviciu
+  - Tab **Analiză Mese** (`/analytics?tab=tables`) — Tab Analiză Mese — ocupare, rotație, venit per masă, raport mese
+  - Tab **Rapoarte Avansate** (`/analytics?tab=advanced`) — Tab Rapoarte Avansate — rapoarte personalizabile, export
+  - Tab **Costuri Operaționale** (`/analytics?tab=costs`) — Tab Costuri Operaționale — analiză costuri pe categorii
+  - Tab **Vânzări & Venituri** (`/analytics?tab=sales`) — Tab Vânzări & Venituri — grafice vânzări, tendințe, comparații, top produse vândute
+  - Tab **Inventar & Costuri** (`/analytics?tab=inventory`) — Tab Inventar & Costuri — valoare stoc, rotație, food cost
+  - Tab **Performanță Personal** (`/analytics?tab=staff`) — Tab Performanță Personal — ore lucrate, productivitate, evaluare
+  - Tab **Plăți & Metode** (`/analytics?tab=payments`) — Tab Plăți & Metode — defalcare pe metode de plată (cash, card, online)
+  - Tab **Mix Categorii** (`/analytics?tab=categories`) — Tab Mix Categorii — distribuția vânzărilor pe categorii de produse, raport categorii
+  - Tab **Rapoarte Gestiune** (`/analytics?tab=gestiune`) — Tab Rapoarte Gestiune — NIR, avize, fișe de magazie, rapoarte stoc
 ## PERSONAL (STAFF)
 
 - **Personal** (`/staff`) — Administrare angajați cu 8 tab-uri: Planificator Ture, Foaie Pontaj, Sarcini & Liste, Listă Personal, Roluri & Permisiuni, Grupuri Mesaje, Program Salon, Contracte & Salarii
-  - Tab **Planificator Ture** — Tab Planificator Ture — calendar ture, repartizare angajați pe ture
-  - Tab **Foaie Pontaj** — Tab Foaie Pontaj — ore lucrate, prezență, absențe, overtime
-  - Tab **Sarcini & Liste** — Tab Sarcini & Liste — managerul construiește checklist-uri cu țintă pe rol+tură+raion (vizibile automat celor în tură), atribuire pe nume sau liste libere, recurență, oră-limită, dovadă (foto/notă/număr/semnătură), verificare; panou „Cine va vedea asta și când", șabloane și dashboard per listă. Angajatul le bifează din /my-tasks
-  - Tab **Listă Personal** — Tab Listă Personal — toți angajații, date personale, contract, PIN POS
-  - Tab **Roluri & Permisiuni** — Tab Roluri & Permisiuni — creare roluri, atribuire permisiuni, acces module
+  - Tab **Planificator Ture** (`/staff?tab=scheduler`) — Tab Planificator Ture — calendar ture, repartizare angajați pe ture
+  - Tab **Foaie Pontaj** (`/staff?tab=timesheets`) — Tab Foaie Pontaj — ore lucrate, prezență, absențe, overtime
+  - Tab **Sarcini & Liste** (`/staff?tab=tasks`) — Tab Sarcini & Liste — managerul construiește checklist-uri cu țintă pe rol+tură+raion (vizibile automat celor în tură), atribuire pe nume sau liste libere, recurență, oră-limită, dovadă (foto/notă/număr/semnătură), verificare; panou „Cine va vedea asta și când", șabloane și dashboard per listă. Angajatul le bifează din /my-tasks
+  - Tab **Listă Personal** (`/staff?tab=list`) — Tab Listă Personal — toți angajații, date personale, contract, PIN POS
+  - Tab **Roluri & Permisiuni** (`/staff?tab=roles`) — Tab Roluri & Permisiuni — creare roluri, atribuire permisiuni, acces module
   - Tab **Grupuri Mesaje** — Tab Grupuri Mesaje — administrarea grupurilor de chat ale personalului (apartenență nominală, pe rol sau „cine e în tură")
-  - Tab **Program Salon** — Tab Program Salon — programează ce aranjament de sală (configurație de plan sală) e activ pe fiecare zi a săptămânii + QR self-service per raion. NU repartizează ospătari pe mese (asta se face pe tură, în Planificator Ture, prin raionul/secțiunea de pe tură)
+  - Tab **Program Salon** (`/staff?tab=floor-schedule`) — Tab Program Salon — programează ce aranjament de sală (configurație de plan sală) e activ pe fiecare zi a săptămânii + QR self-service per raion. NU repartizează ospătari pe mese (asta se face pe tură, în Planificator Ture, prin raionul/secțiunea de pe tură)
   - Tab **Contracte & Salarii** — Tab Contracte & Salarii — contractele fiecărui angajat (CIM/SRL-PFA/Zilier/Fără contract), alocări pe brand/locație și bonusuri
 ## INVENTAR & STOC
 
 - **Tablou de Bord Stoc** (`/inventory`) — Dashboard inventar cu 16 tab-uri: Stoc Curent, Inventariere, Zone, Mobil, Diferențe, Niveluri, Risipă, Mișcări, Rețete, Producție, Depozite, Categorii, Documente, Rapoarte, Aprobări, Audit
-  - Tab **Stoc Curent** — Tab Stoc Curent — cantități în stoc, valoare stoc, alerte stoc minim
-  - Tab **Inventariere** — Tab Inventariere — proces NUMĂRARE FIZICĂ a stocului. Workflow: deschide sesiune → bifează articole pe gestiuni → introdu cantități numărate → finalizează → DIFERENȚELE se ajustează din /inventory?tab=variance. _Notă: Pentru ajustare după numărare → tab Diferențe Stoc. NU poți avea 2 sesiuni deschise simultan pe aceleași gestiuni (preventie dublă ajustare)._
-  - Tab **Zone Depozitare** — Tab Zone — zone de depozitare, rafturi, frigidere
-  - Tab **Inventariere Mobilă** — Tab Inventariere Mobilă — scanare și numărare pe telefon
-  - Tab **Diferențe Stoc** — Tab Diferențe — comparare stoc fizic vs sistem, ajustări
-  - Tab **Niveluri Stoc** — Tab Niveluri — stoc minim, stoc maxim, punct de recomandă
-  - Tab **Risipă & Pierderi** — Tab Risipă — înregistrare pierderi, expired, deteriorat
-  - Tab **Mișcări Stoc** — Tab Mișcări — intrări, ieșiri, transferuri, istoric mișcări
-  - Tab **Rețete Inventar** — Tab Rețete — rețete cu ingrediente, food cost, deducere automată din stoc
-  - Tab **Producție Inventar** — Tab Producție — loturi produse, semipreparate, consum materii prime
-  - Tab **Depozite & Gestiuni** — Tab Depozite — gestiuni, puncte de lucru, locații stoc
-  - Tab **Categorii Inventar** — Tab Categorii Inventar — categorii pentru produse din stoc
-  - Tab **Documente Gestiune** — Tab Documente — NIR-uri, avize, bon consum, bon transfer
-  - Tab **Rapoarte Inventar** — Tab Rapoarte — rapoarte stoc, valoare, rotație, consum
-  - Tab **Aprobări Stoc** — Tab Aprobări — aprobări transferuri, ajustări, comenzi
-  - Tab **Audit Inventar** — Tab Audit — istoric modificări, loguri acțiuni stoc
+  - Tab **Stoc Curent** (`/inventory?tab=stock`) — Tab Stoc Curent — cantități în stoc, valoare stoc, alerte stoc minim
+  - Tab **Inventariere** (`/inventory?tab=stocktake`) — Tab Inventariere — proces NUMĂRARE FIZICĂ a stocului. Workflow: deschide sesiune → bifează articole pe gestiuni → introdu cantități numărate → finalizează → DIFERENȚELE se ajustează din /inventory?tab=variance. _Notă: Pentru ajustare după numărare → tab Diferențe Stoc. NU poți avea 2 sesiuni deschise simultan pe aceleași gestiuni (preventie dublă ajustare)._
+  - Tab **Zone Depozitare** (`/inventory?tab=zones`) — Tab Zone — zone de depozitare, rafturi, frigidere
+  - Tab **Inventariere Mobilă** (`/inventory?tab=stocktake_mobile`) — Tab Inventariere Mobilă — scanare și numărare pe telefon
+  - Tab **Diferențe Stoc** (`/inventory?tab=variance`) — Tab Diferențe — comparare stoc fizic vs sistem, ajustări
+  - Tab **Niveluri Stoc** (`/inventory?tab=par_levels`) — Tab Niveluri — stoc minim, stoc maxim, punct de recomandă
+  - Tab **Risipă & Pierderi** (`/inventory?tab=waste`) — Tab Risipă — înregistrare pierderi, expired, deteriorat
+  - Tab **Mișcări Stoc** (`/inventory?tab=movements`) — Tab Mișcări — intrări, ieșiri, transferuri, istoric mișcări
+  - Tab **Rețete Inventar** (`/inventory?tab=recipes`) — Tab Rețete — rețete cu ingrediente, food cost, deducere automată din stoc
+  - Tab **Producție Inventar** (`/inventory?tab=production`) — Tab Producție — loturi produse, semipreparate, consum materii prime
+  - Tab **Depozite & Gestiuni** (`/inventory?tab=warehouses`) — Tab Depozite — gestiuni, puncte de lucru, locații stoc
+  - Tab **Categorii Inventar** (`/inventory?tab=categories`) — Tab Categorii Inventar — categorii pentru produse din stoc
+  - Tab **Documente Gestiune** (`/inventory?tab=documents`) — Tab Documente — NIR-uri, avize, bon consum, bon transfer
+  - Tab **Rapoarte Inventar** (`/inventory?tab=reports`) — Tab Rapoarte — rapoarte stoc, valoare, rotație, consum
+  - Tab **Aprobări Stoc** (`/inventory?tab=approvals`) — Tab Aprobări — aprobări transferuri, ajustări, comenzi
+  - Tab **Audit Inventar** (`/inventory?tab=audit`) — Tab Audit — istoric modificări, loguri acțiuni stoc
 ## ALTE PAGINI INVENTAR & PRODUCȚIE
 
 - **Verificări Stoc** (`/inventory-check`) — Inventariere fizică — numărare, comparare, ajustare diferențe
@@ -107,10 +111,10 @@
 ## REZERVĂRI
 
 - **Rezervări** (`/reservations`) — Sistem de rezervări cu 5 tab-uri: Listă Așteptare, Plan Sală, Listă Rezervări, Analiză, Configurare
-  - Tab **Listă de Așteptare** — Tab Listă Așteptare — pentru HOSTESS la intrare: gestionează WALK-IN-uri (clienți fără rezervare), coadă de așteptare, asignare mese libere, comunicare timp estimat. Diferit de Listă Rezervări (care e calendar).
-  - Tab **Plan Sală Live** — Tab Plan Sală Live — vizualizare sală cu mese și ocupare în timp real
-  - Tab **Listă Rezervări** — Tab Listă Rezervări — toate rezervările, calendar, confirmare, anulare
-  - Tab **Analiză Rezervări** — Tab Analiză — timpi rotație, rată ocupare, ore de vârf
+  - Tab **Listă de Așteptare** (`/reservations?tab=host`) — Tab Listă Așteptare — pentru HOSTESS la intrare: gestionează WALK-IN-uri (clienți fără rezervare), coadă de așteptare, asignare mese libere, comunicare timp estimat. Diferit de Listă Rezervări (care e calendar).
+  - Tab **Plan Sală Live** (`/reservations?tab=floor`) — Tab Plan Sală Live — vizualizare sală cu mese și ocupare în timp real
+  - Tab **Listă Rezervări** (`/reservations?tab=bookings`) — Tab Listă Rezervări — toate rezervările, calendar, confirmare, anulare
+  - Tab **Analiză Rezervări** (`/reservations?tab=analytics`) — Tab Analiză — timpi rotație, rată ocupare, ore de vârf
 - **Configurare Rezervări** (`/reservations/config`) — Regulile sistemului de rezervări — activare, fereastră de timp, persoane min/max, inventar și zone, controlul fluxului (pacing, câți clienți pot sosi per interval) și câmpurile formularului
 ## PLAN SALĂ & BUCĂTĂRIE
 
@@ -120,30 +124,30 @@
 ## CONTRACTE & CHESTIONARE
 
 - **Contracte** (`/contracts`) — Administrare contracte cu 2 tab-uri: Șabloane și Contracte Active
-  - Tab **Șabloane Contracte** — Tab Șabloane — template-uri contracte, creare șabloane noi
-  - Tab **Contracte Active** — Tab Contracte — contracte semnate, urmărire expirare, status
+  - Tab **Șabloane Contracte** (`/contracts?tab=templates`) — Tab Șabloane — template-uri contracte, creare șabloane noi
+  - Tab **Contracte Active** (`/contracts?tab=contracts`) — Tab Contracte — contracte semnate, urmărire expirare, status
 - **Chestionare** (`/questionnaires`) — Builder chestionare cu 3 tab-uri: Șabloane, Răspunsuri, Statistici Personal
-  - Tab **Șabloane Chestionare** — Tab Șabloane — builder chestionare, 22 tipuri întrebări, condiții, design
-  - Tab **Răspunsuri Chestionare** — Tab Răspunsuri — vizualizare răspunsuri primite, analitice
-  - Tab **Statistici Personal** — Tab Statistici Personal — performanța angajaților din feedback clienți
+  - Tab **Șabloane Chestionare** (`/questionnaires?tab=templates`) — Tab Șabloane — builder chestionare, 22 tipuri întrebări, condiții, design
+  - Tab **Răspunsuri Chestionare** (`/questionnaires?tab=responses`) — Tab Răspunsuri — vizualizare răspunsuri primite, analitice
+  - Tab **Statistici Personal** (`/questionnaires?tab=staff-stats`) — Tab Statistici Personal — performanța angajaților din feedback clienți
 ## CANALE LIVRARE
 
 - **Manager Canale Livrare** (`/channels`) — Integrare livrări cu 5 tab-uri: Prezentare, Comenzi, Meniu, Reconciliere, Integrări
-  - Tab **Prezentare Canale** — Tab Prezentare — status platforme livrare, statistici, comisioane
-  - Tab **Comenzi Livrare** — Tab Comenzi — comenzi de pe platforme, status, acceptare/refuz
-  - Tab **Meniu Platforme** — Tab Meniu — sincronizare meniu cu platformele de livrare
-  - Tab **Reconciliere Livrări** — Tab Reconciliere — verificare plăți platforme vs comenzi efective
-  - Tab **Integrări Livrare** — Tab Integrări — conectare API Glovo, Wolt, Bolt Food, Tazz
+  - Tab **Prezentare Canale** (`/channels?tab=overview`) — Tab Prezentare — status platforme livrare, statistici, comisioane
+  - Tab **Comenzi Livrare** (`/channels?tab=orders`) — Tab Comenzi — comenzi de pe platforme, status, acceptare/refuz
+  - Tab **Meniu Platforme** (`/channels?tab=menu`) — Tab Meniu — sincronizare meniu cu platformele de livrare
+  - Tab **Reconciliere Livrări** (`/channels?tab=reconciliation`) — Tab Reconciliere — verificare plăți platforme vs comenzi efective
+  - Tab **Integrări Livrare** (`/channels?tab=integrations`) — Tab Integrări — conectare API Glovo, Wolt, Bolt Food, Tazz
 ## SOCIAL MEDIA & MARKETING
 
 - **Conturi Social Media** (`/social-media`) — Conectare și gestionare conturi cu 3 tab-uri: Conectare, Setări, WhatsApp
-  - Tab **Conectare Conturi** — Tab Conectare — conectare OAuth pentru Facebook, Instagram, TikTok, YouTube, LinkedIn, Google Business
-  - Tab **Setări Social Media** — Tab Setări — configurare posturi automate, reguli, template-uri
-  - Tab **WhatsApp Business** — Tab WhatsApp — conectare WhatsApp Business, configurare mesaje
+  - Tab **Conectare Conturi** (`/social-media?tab=connect`) — Tab Conectare — conectare OAuth pentru Facebook, Instagram, TikTok, YouTube, LinkedIn, Google Business
+  - Tab **Setări Social Media** (`/social-media?tab=settings`) — Tab Setări — configurare posturi automate, reguli, template-uri
+  - Tab **WhatsApp Business** (`/social-media?tab=whatsapp`) — Tab WhatsApp — conectare WhatsApp Business, configurare mesaje
 - **Social Content Hub** (`/social-hub`) — Hub unificat de conținut social — postări, calendar editorial, story-uri, reels, carusele. View list (?view=list) sau calendar (?view=calendar)
 - **Listă Postări Social** (`/social-hub?view=list`) — View listă postări — toate postările publicate/programate/draft pe canale
 - **Calendar Editorial Social** (`/social-hub?view=calendar`) — View calendar — planificare postări pe luna/saptamana, drag & drop multi-platforma
-  - Tab **Inbox Social Unificat** — Inbox mesaje, comentarii și mențiuni de pe toate platformele cu răspunsuri AI
+  - Tab **Inbox Social Unificat** (`/marketing/audience?tab=inbox`) — Inbox mesaje, comentarii și mențiuni de pe toate platformele cu răspunsuri AI
 - **Google Business Profile** (`/gbp`) — Manager fișa Google Business — postări, recenzii, întrebări, fotografii, ore
 - **Evenimente Facebook** (`/facebook-events`) — Creare și gestionare evenimente Facebook pe pagina ta — seri tematice, lansări, workshop-uri
 - **Analiză Social Media** (`/social-analytics`) — Dashboard analytics — engagement, reach, followers, ore optime
@@ -167,10 +171,10 @@
 ## PORTAL CLIENȚI
 
 - **Clienți Portal** (`/portal-customers`) — Administrare clienți portal cu 4 tab-uri: Listă Clienți, Segmente, Promoții, Autentificare & RFID
-  - Tab **Listă Clienți** — Tab Listă Clienți — toți clienții, XP, nivel, insigne, istoric
-  - Tab **Segmente & Grupuri** — Tab Segmente — grupare clienți pe criterii, segmentare
-  - Tab **Promoții Portal** — Tab Promoții — promoții și voucher-uri în portalul clienți
-  - Tab **Autentificare & RFID** — Tab Autentificare — carduri RFID, brățări NFC, metode de acces portal
+  - Tab **Listă Clienți** (`/portal-customers?tab=list`) — Tab Listă Clienți — toți clienții, XP, nivel, insigne, istoric
+  - Tab **Segmente & Grupuri** (`/portal-customers?tab=segments`) — Tab Segmente — grupare clienți pe criterii, segmentare
+  - Tab **Promoții Portal** (`/portal-customers?tab=promotions`) — Tab Promoții — promoții și voucher-uri în portalul clienți
+  - Tab **Autentificare & RFID** (`/portal-customers?tab=auth`) — Tab Autentificare — carduri RFID, brățări NFC, metode de acces portal
 - **Atracții** (`/portal-attractions`) — Administrare atracții — browse, recenzii, programare
 - **Jocuri** (`/portal-games`) — Administrare jocuri — sloturi, prețuri, rezervări, program
 - **Misiuni & Recompense** (`/portal-missions`) — Gamificație — misiuni zilnice/săptămânale, insigne, recompense
@@ -179,35 +183,35 @@
 ## HACCP & SIGURANȚĂ ALIMENTARĂ
 
 - **HACCP & Siguranță Alimentară** (`/haccp`) — Dashboard HACCP cu 5 tab-uri: Temperaturi, Curățenie, Incidente, Senzori, Răcire Rapidă
-  - Tab **Temperaturi HACCP** — Tab Temperaturi — monitorizare temperaturi frigidere, congelatoare, depozite
-  - Tab **Curățenie & Igienă** — Tab Curățenie — planuri de curățenie, verificări igienă, checklist-uri cleaning
-  - Tab **Incidente HACCP** — Tab Incidente — raportare incidente siguranță alimentară, acțiuni corective
-  - Tab **Senzori IoT** — Tab Senzori — configurare și monitorizare senzori IoT temperatură, umiditate
-  - Tab **Răcire Rapidă** — Tab Răcire Rapidă — monitorizare procese de răcire rapidă HACCP
+  - Tab **Temperaturi HACCP** (`/haccp?tab=temps`) — Tab Temperaturi — monitorizare temperaturi frigidere, congelatoare, depozite
+  - Tab **Curățenie & Igienă** (`/haccp?tab=cleaning`) — Tab Curățenie — planuri de curățenie, verificări igienă, checklist-uri cleaning
+  - Tab **Incidente HACCP** (`/haccp?tab=incidents`) — Tab Incidente — raportare incidente siguranță alimentară, acțiuni corective
+  - Tab **Senzori IoT** (`/haccp?tab=sensors`) — Tab Senzori — configurare și monitorizare senzori IoT temperatură, umiditate
+  - Tab **Răcire Rapidă** (`/haccp?tab=cooling`) — Tab Răcire Rapidă — monitorizare procese de răcire rapidă HACCP
 ## SETĂRI
 
 - **Setări** (`/settings`) — Setări platformă cu secțiuni: Date companie, Locații & Branduri, Fidelizare, Feedback, Display comenzi, Dispozitive, Imprimante, Design Bon, POS, Inventar, Integrări API, IoT MQTT, Notificări, Automatizări, Security, Localizare
-  - Tab **Date Companie** — Secțiunea Date companie — nume, CUI, adresă, logo, date fiscale
-  - Tab **Locații și Branduri** — Secțiunea Locații — gestionare branduri și locații multiple
-  - Tab **Setări Fidelizare** — Secțiunea Fidelizare — configurare program de loialitate, rate câștig/răscumpărare, niveluri
-  - Tab **Feedback & Chestionare** — Secțiunea Feedback — configurare chestionare automate, declanșatoare
-  - Tab **Display Comenzi** — Secțiunea Display comenzi — configurare ecrane KDS bucătărie
-  - Tab **Dispozitive & Hardware** — Secțiunea Dispozitive — tablete, telefoane, terminale plată
-  - Tab **Imprimante & Rutare** — Secțiunea Imprimante — configurare imprimante bonuri, bucătărie, etichete, rutare pe categorii, adăugare imprimantă nouă pe IP / rețea
-  - Tab **Design Bon & Notă** — Secțiunea Design Bon — personalizare bon fiscal, notă de plată, header/footer
-  - Tab **Setari POS** — Sectiunea POS — configurare functionalitati POS (mod operare, optiuni plata, autoSendKitchen, taxa serviciu) + sub-sectiune Taxe & Financiar (cote TVA 0%/11%/21% RO, bacsis). Configurarea TVA INALTERABILA: 0/11/21 (NU 5/9/19).
-  - Tab **Inventar & Stoc Setări** — Secțiunea Inventar — configurare gestiuni, unități măsură, alerte stoc
-  - Tab **Integrări (API)** — Secțiunea Integrări — chei API, webhook-uri, conectări externe
-  - Tab **Server IoT (MQTT)** — Secțiunea MQTT — configurare broker IoT pentru senzori temperatură
-  - Tab **Notificări** — Secțiunea Notificări — configurare alerte push, email, SMS
-  - Tab **Automatizări Clienți** — Secțiunea Automatizări — reguli automate pentru marketing (zi naștere, client inactiv)
-  - Tab **Server & Fiscal** — Secțiunea Server & Fiscal — Edge Server local (server proxy în restaurant pentru rezilienta la cădere internet), imprimantă fiscală Datecs/Daisy (driver fiscal RO), output folder fiscalizare, ghid instalare PC local + Print Agent. _Notă: Pentru instalare PC nou + Print Agent: /onboarding/print-agent (wizard 8 pași). Edge Server-ul oferă POS LOCAL functional fără internet._
-  - Tab **Unități de Măsură** — Secțiunea Unități — kg, l, buc, ml, g, conversii între unități
-  - Tab **Setări Email Marketing** — Secțiunea Email — configurare SMTP, domeniu expeditor, identități sender
-  - Tab **Symbai Hub** — Secțiunea Hub — conexiune cloud, sincronizare, licență, actualizări
-  - Tab **Grupări Clienți** — Secțiunea Grupări Clienți (doar multi-unit) — acces controlat per brand/locație
-  - Tab **Security Log** — Secțiunea Securitate — loguri autentificare, IP-uri, alerturi securitate
-  - Tab **Localizare** — Secțiunea Localizare — limbă, format dată, monedă, fus orar
+  - Tab **Date Companie** (`/settings?tab=general`) — Secțiunea Date companie — nume, CUI, adresă, logo, date fiscale
+  - Tab **Locații și Branduri** (`/settings?tab=brands`) — Secțiunea Locații — gestionare branduri și locații multiple
+  - Tab **Setări Fidelizare** (`/settings?tab=loyalty`) — Secțiunea Fidelizare — configurare program de loialitate, rate câștig/răscumpărare, niveluri
+  - Tab **Feedback & Chestionare** (`/settings?tab=surveys`) — Secțiunea Feedback — configurare chestionare automate, declanșatoare
+  - Tab **Display Comenzi** (`/settings?tab=kds`) — Secțiunea Display comenzi — configurare ecrane KDS bucătărie
+  - Tab **Dispozitive & Hardware** (`/settings?tab=devices`) — Secțiunea Dispozitive — tablete, telefoane, terminale plată
+  - Tab **Imprimante & Rutare** (`/settings?tab=printers`) — Secțiunea Imprimante — configurare imprimante bonuri, bucătărie, etichete, rutare pe categorii, adăugare imprimantă nouă pe IP / rețea
+  - Tab **Design Bon & Notă** (`/settings?tab=bill-design`) — Secțiunea Design Bon — personalizare bon fiscal, notă de plată, header/footer
+  - Tab **Setari POS** (`/settings?tab=pos`) — Sectiunea POS — configurare functionalitati POS (mod operare, optiuni plata, autoSendKitchen, taxa serviciu) + sub-sectiune Taxe & Financiar (cote TVA 0%/11%/21% RO, bacsis). Configurarea TVA INALTERABILA: 0/11/21 (NU 5/9/19).
+  - Tab **Inventar & Stoc Setări** (`/settings?tab=inventory`) — Secțiunea Inventar — configurare gestiuni, unități măsură, alerte stoc
+  - Tab **Integrări (API)** (`/settings?tab=integrations`) — Secțiunea Integrări — chei API, webhook-uri, conectări externe
+  - Tab **Server IoT (MQTT)** (`/settings?tab=mqtt`) — Secțiunea MQTT — configurare broker IoT pentru senzori temperatură
+  - Tab **Notificări** (`/settings?tab=notifications`) — Secțiunea Notificări — configurare alerte push, email, SMS
+  - Tab **Automatizări Clienți** (`/settings?tab=customer-automations`) — Secțiunea Automatizări — reguli automate pentru marketing (zi naștere, client inactiv)
+  - Tab **Server & Fiscal** (`/settings?tab=edge-server`) — Secțiunea Server & Fiscal — Edge Server local (server proxy în restaurant pentru rezilienta la cădere internet), imprimantă fiscală Datecs/Daisy (driver fiscal RO), output folder fiscalizare, ghid instalare PC local + Print Agent. _Notă: Pentru instalare PC nou + Print Agent: /onboarding/print-agent (wizard 8 pași). Edge Server-ul oferă POS LOCAL functional fără internet._
+  - Tab **Unități de Măsură** (`/settings?tab=uom`) — Secțiunea Unități — kg, l, buc, ml, g, conversii între unități
+  - Tab **Setări Email Marketing** (`/settings?tab=email-marketing`) — Secțiunea Email — configurare SMTP, domeniu expeditor, identități sender
+  - Tab **Symbai Hub** (`/settings?tab=symbai-hub`) — Secțiunea Hub — conexiune cloud, sincronizare, licență, actualizări
+  - Tab **Grupări Clienți** (`/settings?tab=customer-groups`) — Secțiunea Grupări Clienți (doar multi-unit) — acces controlat per brand/locație
+  - Tab **Security Log** (`/settings?tab=security`) — Secțiunea Securitate — loguri autentificare, IP-uri, alerturi securitate
+  - Tab **Localizare** (`/settings?tab=localization`) — Secțiunea Localizare — limbă, format dată, monedă, fus orar
 - **Setări Sales CRM** (`/settings/sales-crm`) — Configurare CRM vânzări — pipeline, etape, câmpuri custom
 ## SALES CRM
 
@@ -238,9 +242,9 @@
 ## DATA IMPORT
 
 - **Import Date** (`/data-import`) — Wizard import date cu 3 tab-uri: Import Nou, Șabloane, Istoric
-  - Tab **Import Nou** — Tab Import Nou — încărcare fișier Excel/CSV pentru import
-  - Tab **Șabloane Import** — Tab Șabloane — descărcare template-uri Excel pentru import
-  - Tab **Istoric Import** — Tab Istoric — lista importurilor anterioare cu status
+  - Tab **Import Nou** (`/data-import?tab=new-import`) — Tab Import Nou — încărcare fișier Excel/CSV pentru import
+  - Tab **Șabloane Import** (`/data-import?tab=templates`) — Tab Șabloane — descărcare template-uri Excel pentru import
+  - Tab **Istoric Import** (`/data-import?tab=history`) — Tab Istoric — lista importurilor anterioare cu status
 ## ALTE PAGINI
 
 - **Loguri Activitate** (`/audit-logs`) — Istoric complet acțiuni — cine a făcut ce, când, unde
@@ -380,7 +384,8 @@
 
 - **Raport P&L** (`/reports/pnl`) — Profit & Loss complet — venituri, COGS, cheltuieli operaționale, EBITDA
 - **P&L KPI** (`/reports/pnl-kpi`) — KPI-uri P&L — gross margin, contribution margin, EBITDA margin, prime cost
-- **P&L Comparație** (`/reports/pnl-compare`) — Comparație P&L — perioadă vs perioadă, brand vs brand, locație vs locație
+- **P&L Comparație** (`/reports/pnl-compare`) — Comparație P&L MULTI-ENTITATE — brand vs brand, locație vs locație, perioadă vs perioadă
+- **P&L Comparație Perioade** (`/reports/pnl-compare-periods`) — O entitate × N perioade (lună vs lună, an vs an, YTD, trailing, A-vs-B) — waterfall/punte de profit, biggest movers, trend rebazat. La „compară luna asta cu luna trecută / evoluție profit / an vs an" → ASTA, nu /reports/pnl-compare.
 - **P&L Salvate** (`/analytics/saved-pnl`) — Lista rapoarte P&L salvate — snapshot-uri istorice, partajare
 ## CALENDAR PLATFORMĂ
 

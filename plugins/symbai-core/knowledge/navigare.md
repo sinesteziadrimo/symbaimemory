@@ -20,7 +20,9 @@ Link-ul rămâne mereu util ca rezervă — chiar dacă deschizi tu pagina, e bi
 
 ## 3. Confirmă (când ai deschis tu pagina)
 
-După `navigate()`, **citește pagina** (`read_page` / `get_page_text` — NU pixeli/screenshot doar pentru asta) și verifică că s-a încărcat ruta cerută:
+**Întâi lasă pagina să se încarce.** Symbai e SPA — după `navigate()` durează 2-4 secunde până se montează. Dacă citești/dai screenshot/interacționezi imediat, prinzi overlay-ul „Se încarcă..." sau o pagină pe jumătate goală și raportezi greșit. Așteaptă scurt sau re-citește; **nu confirma și nu acționa cât timp vezi „Se încarcă..."** (inclusiv click/tastare în câmpuri — se înregistrează abia după ce pagina e gata). Ruta `/` poate redirecta pe pagina de start a contului (des `/operations`) — nu e bug.
+
+După ce s-a încărcat, **citește pagina** (`read_page` / `get_page_text` — NU pixeli/screenshot doar pentru asta) și verifică că s-a încărcat ruta cerută:
 - dacă titlul/conținutul corespunde → „Te-am dus pe **X**, vezi pe ecran...".
 - dacă pagina e goală sau a sărit pe altă rută (login/permisiuni) → **NU raporta succes orb**. Spune-i: „Pagina X pare ascunsă pentru rolul/contul tău (sau modulul nu e activ)" — vezi `00-overview.md` despre vizibilitate.
 
@@ -54,6 +56,6 @@ Notă: un link pe care i-l dai userului deschide pagina pe **unitatea curentă**
 
 - Meniul e grupat pe zone: Operațiuni (dashboard, control operațional, POS), Vânzări/Comenzi, Meniu & Produse, Stocuri & Furnizori, Producție, Rezervări & Evenimente, Personal, Rapoarte, Finanțe, Marketing & Website, Setări.
 - Multe pagini au **tab-uri** interne (ex. /menu, /analytics, /finance, /staff, /inventory) — tool-ul și cheat-sheet-ul întorc tab-ul corect (`?tab=…`).
-- Există și o căsuță „Caută pagina..." în bara laterală a aplicației (`data-testid="input-nav-search"`) — dacă ești în Chrome și nu vrei un URL, poți tasta acolo numele paginii și apăsa rezultatul.
+- Există și o căsuță „Caută pagina..." în bara laterală a aplicației (`data-testid="input-nav-search"`). E un ajutor de ultimă instanță, NU prima cale: indexul ei e parțial și amestecă pași din ghidul de onboarding (ex. „imprimante" întoarce „8. Imprimante & KDS", nu pagina reală de setări). Pentru navigare folosește `navigare-rapida.md` + `gaseste_in_aplicatie`, nu căsuța asta.
 - Butonul flotant **Sym** (dreapta-jos) e asistentul AI din aplicație — diferit de tine (tu ești prin Claude Code), funcții similare.
 - Dacă o pagină pe care o aștepți nu apare deloc: fie modulul nu e activ în abonament, fie rolul userului nu are permisiunea (vezi `00-overview.md`). Nu insista pe o rută pe care tool-ul nu o întoarce.

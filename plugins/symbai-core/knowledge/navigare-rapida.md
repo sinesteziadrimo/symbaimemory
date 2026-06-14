@@ -55,6 +55,10 @@
 · NU aici: pentru taguri de alergeni propuse de AI + rutare KDS + TVA → /ai-tags (Sym Tag Master); pentru alergeni la import → tot /ai-tags sau fișa produsului
 - **Etichete & Alergeni (Sym Tag Master)** `/ai-tags` — Titlu „Sym Tag Master”: gestionare etichete (panou „Etichete”) + chat AI „Chat AI / Propuneri AI” care PROPUNE taguri de alergeni (Reg. UE 1169), rutare imprimante/KDS și marketing — tu Aplici/Refuzi fiecare propunere, nimic automat.
 · NU aici: pentru lista oficială de alergeni + matrice cross-contact → /allergens; pentru regula efectivă tag→imprimantă → Setări → Imprimante; pentru cote TVA pe tip produs → /ai-product-types
+- **Meniu din PDF / poze** `/menu/import-pdf` — Încarci meniul ca PDF sau poze; AI extrage produsele, prețurile, pozele și designul paginilor (pentru Meniu Fizic), cu propunere editabilă înainte de import.
+· NU aici: pentru import produse/stoc/furnizori din Excel → /data-import; pentru editarea prețurilor după import → /menu?tab=pricing
+- **Leagă Rețetarul (import Excel)** `/recipe-mapping` — Imporți rețetarul din Excel: fiecare ingredient se mapează la un produs existent (potrivire exactă/similară/AI); conflictele de unitate de măsură blochează importul până le rezolvi.
+· NU aici: ca să CREEZI/editezi rețete manual → /ai-recipes; pentru fișă tehnică tabelară (export CSV) → /recipe-datasheet
 
 ## Stocuri, furnizori & achiziții
 - **Tablou de Bord Stoc** `/inventory` — Dashboard FĂRĂ tab-uri: carduri KPI (valoare stoc, stoc redus, de plătit furnizori) + alerte + ultimele mișcări.
@@ -85,6 +89,16 @@
 · NU aici: pentru a înregistra o cheltuială/factură nouă de la furnizor → /finance (tab Cheltuieli & Plăți); pentru catalogul/datele furnizorului → /suppliers
 - **Achiziții (raport)** `/purchases` — Raport AGREGAT pe produs: ce ai cumpărat, cât, la ce cost mediu (~90 zile) + banner NIR ciornă.
 · NU aici: lista comenzilor către furnizori (PO draft/trimise) → /smart-ordering
+- **Mișcări Stoc** `/stock-movements` — Istoricul curat al tuturor mișcărilor de stoc: intrări, ieșiri, transferuri între gestiuni, ajustări — cu căutare și filtre.
+· NU aici: ca să FACI efectiv o mișcare/ieșire/transfer → /stock-operations; pentru recepție pe factură (NIR) → /stock-entries
+- **Calitate Inbox Facturi** `/inventory/inbox-quality` — De ce nu intră bine facturile pe stoc: mapări cu încredere scăzută, NIR-uri ciornă mai vechi de 7 zile, facturi eFactura fără NIR, anomalii de preț.
+· NU aici: ca să procesezi efectiv factura/NIR → /stock-entries; pentru diferențe contestate → /inventory/disputes
+- **Dispute Inventar** `/inventory/disputes` — Diferențele constatate la recepție, clasificate: dispute cu furnizorul, corecții OCR, variații de livrare — locul unde contești o diferență.
+· NU aici: pentru igiena/anomaliile intrărilor → /inventory/inbox-quality; pentru solduri/datorii furnizori → /supplier-balances
+- **AI Achiziții** `/ai-procurement` — Întrebi AI-ul ce să comanzi de la furnizori săptămâna asta: analiză cheltuieli + optimizare comenzi, conversațional.
+· NU aici: pentru generarea efectivă a comenzilor (predicție) → /smart-ordering; pentru comparare prețuri furnizori → /procurement-recommendations
+- **HACCP & Siguranță Alimentară** `/haccp` — Notezi temperaturile la frigidere și gestionezi siguranța alimentară: 5 tab-uri (Temperaturi, Curățenie, Incidente, Senzori IoT, Răcire Rapidă).
+· NU aici: pentru checklist-uri generale de echipă → /staff?tab=tasks; pentru sarcinile mele ca angajat → /my-tasks
 
 ## Producție
 - **Producție Bucătărie** `/production` — Pagina de EXECUȚIE producție (shop-floor / fabrică). Titlu real în cod: «Execuție Producție». Bară live sus (operații active, loturi active, operatori, containere azi). 6 taburi: Execuție, Operații Active, Consumuri & Pierderi, Predări, KPI Live, Containere & QR (+buton Scanner Mobil pe tabul Containere).
@@ -95,6 +109,10 @@
 · NU aici: pentru a EXECUTA fluxul (operații live, scanare, predări) → /production; pentru loturi/rețete restaurant simplu → /productie-evenimente; pentru rețete de ingrediente (food cost) → /inventory?tab=recipes
 - **Producție** `/productie-evenimente` — Pagina PRINCIPALĂ de producție restaurant. Titlu adaptiv (Producție / Producție & Evenimente / Producție & Rețete). Taburi: Calendar & Capacitate, Loturi Producție (creezi/pornești/finalizezi loturi+evenimente), Rețete. +Operații/+Echipamente la mod restaurant_events; +Fluxuri Tehnologice la mod fabrică. Butoane: Adaugă Lot Producție, Adaugă Eveniment.
 · NU aici: pentru shop-floor execuție/scanare containere/predări → /production; pentru KPI/OEE/control tower fabrică → /factory-dashboard; pentru configurat fluxul tehnologic (operații+QC+BOM) → /fluxuri-tehnologice
+- **Centru de Printare** `/print` — Printezi etichete de producție, foi de producție și foi de transfer pentru loturi (3 tab-uri: Etichete, Foi de Producție, Foi de Transfer); cauți producția după nume/lot/id.
+· NU aici: pentru configurarea/rutarea imprimantelor → /settings?tab=printers
+- **Loturi WIP** `/loturi-wip` — Toate loturile de producție aflate în lucru (work-in-progress), pe scurt.
+· NU aici: pentru execuția pe shop-floor (scanare/predări) → /production; pentru KPI/OEE fabrică → /factory-dashboard
 
 ## Rapoarte & analiză
 - **Rapoarte & Analiză** `/analytics` — Hub rapoarte: 4 carduri sus (Venit cu TVA, fără TVA, de Predat, Profit Estimat NET) + 15 tab-uri (Raport Zilnic, P&L, Vânzări Angajați, Timpi, Mese, Avansate, Produse Vândute, Costuri, Vânzări, Inventar, Personal, Plăți, Categorii, Gestiune, Note Clienți). Filtre dată/brand/locație.
@@ -122,6 +140,12 @@
 · NU aici: pentru a compara branduri/locații una lângă alta (aceeași perioadă) → /reports/pnl-compare (alias /analytics/pnl-compare); pentru un P&L singular → /reports/pnl
 - **P&L Salvate** `/analytics/saved-pnl` — Listă carduri cu snapshot-uri P&L înghețate (nume, perioadă, nr. ajustări, lacăt). Acțiuni: deschide detaliu (cere parolă dacă e blocat), redenumire, ștergere, lock/unlock/schimbă parolă.
 · NU aici: pentru un snapshot anume cu ajustări manuale → /analytics/saved-pnl/:id; pentru a CREA un snapshot nou → /reports/pnl (salvează ca snapshot)
+- **Raport P&L** `/reports/pnl` — Profit & Loss complet pe lună/perioadă: venituri, COGS, cheltuieli operaționale, EBITDA; export și salvare ca snapshot.
+· NU aici: pentru P&L cu drill-down în hub → /analytics?tab=pnl; pentru KPI cu semafor → /reports/pnl-kpi; pentru compară perioade → /reports/pnl-compare-periods; snapshot-uri salvate → /analytics/saved-pnl
+- **Rapoarte Clienți** `/customer-reports` — Raport despre clienți: segmentare, comportament, lifetime value (LTV), frecvență — cât cheltuie fiecare.
+· NU aici: pentru lista/fișele clienților → /customers; pentru follow-up + sugestii AI per client → /customer-followup
+- **AI Rapoarte** `/ai-reports` — Întrebi AI-ul cum ți-au mers vânzările (ex. „cum a fost săptămâna asta") și primești rapoarte cu analiză, conversațional.
+· NU aici: pentru rapoartele clasice cu tab-uri/filtre → /analytics; pentru P&L → /reports/pnl
 
 ## Finanțe & casă
 - **Finanțe & Contabilitate** `/finance` — Pagină-umbrelă, 7 tab-uri: Sumar (default), Cash Flow, Cheltuieli & Plăți, Reconciliere Canale, Control Viva, Control Card GP, Solduri inițiale. Buton „Ghid". Tab-ul „close" redirect→/finance/daily-close.
@@ -144,6 +168,12 @@
 · NU aici: pentru operațiunile zilnice de numerar → /finance/cash-book; pentru închiderea de zi → /finance/daily-close. Alias: /finance/cash-book/registers redirect aici.
 - **Registru Contabil** `/accounting-ledger` — Note contabile cu 3-4 vizualizări (butoane, nu tab-uri): „Conturi" (solduri pe cont cu drill-down la înregistrări), „Toate înregistrările" (jurnal filtrabil pe brand/perioadă/sursă/status), „Plan de Conturi" (chart + populare RO), iar la multi-brand/locație: „Analitice Brand & Locații" (reguli denumire analitice + reguli split cheltuieli). Export CSV.
 · NU aici: pentru configurarea conturilor pe tip de produs → /ai-product-types; pentru importul de date contabile de la contabil → /accounting-import; pentru cheltuieli/plăți operaționale → /finance?tab=expenses
+- **Rapoarte Fiscale** `/finance/fiscal-reports` — Raportul fiscal pentru contabilitate: bonuri emise, X/Z, defalcare TVA, export ANAF.
+· NU aici: pentru ritualul de închidere de zi cu numărătoare casă → /finance/daily-close; pentru raportul Z din analiză → /analytics?tab=daily
+- **Import Contabilitate** `/accounting-import` — Imporți datele contabile: balanțe, jurnale, plan de conturi din software-ul contabil.
+· NU aici: pentru notele contabile/planul de conturi în aplicație → /accounting-ledger; pentru import produse/clienți → /data-import sau /customer-import
+- **AI CFO (Cash Flow)** `/ai-cashflow` — Întrebi AI-ul cum stai cu cash-flow-ul („am bani de salarii?"): previziuni + strategie financiară, conversațional.
+· NU aici: pentru fluxul de numerar detaliat (plăți programate/recurente) → /finance?tab=cashflow; pentru registrul legal de numerar → /finance/cash-book
 
 ## Personal & sarcini
 - **Personal** `/staff` — Pagina centrală HR „Personal & Control Acces": 8 tab-uri (Planificator Ture, Foaie Pontaj, Sarcini & Liste, Listă Personal, Roluri & Permisiuni, Grupuri Mesaje, Program Salon, Contracte & Salarii) + buton Adaugă Angajat + selector unitate.
@@ -180,6 +210,18 @@
 · NU aici: pentru chestionare/sondaje construite (builder + răspunsuri) → /questionnaires; pentru feedback hotel/oaspeți (NPS PMS) → /hotel/guest-feedback
 - **Abonamente Clienți** `/subscriptions` — Abonamentele CLIENȚILOR cu livrări recurente: KPI MRR/ARR/ARPU/Churn 30z/LTV/Venit 30z, distribuție pe statusuri, listă abonați cu filtre+căutare; drawer detaliu cu Pauză/Reactivare/Anulare + sub-tab-uri Livrări/Dunning/Istoric.
 · NU aici: pentru abonamentul TĂU la platforma Symbai (facturare SaaS) → Setări → Module & Facturare sau portalul Hub
+- **Calendar Rezervări & Evenimente** `/calendar` — Vedere unificată: rezervări + evenimente + deal-uri de vânzări, pe zi/săptămână/lună, cu cod culori pe status; click pe element → detalii.
+· NU aici: pentru rezervări restaurant (tab-uri host/listă/disponibilități) → /reservations; pentru evenimente cu P&L → /events; pentru planificarea turelor → /staff?tab=scheduler
+- **Contracte** `/contracts` — Contracte pentru evenimente/nunți: 2 tab-uri (Șabloane, Contracte Active), urmărire expirare și status.
+· NU aici: pentru fișa completă a evenimentului (inclusiv tab Contract) → /event/:id
+- **Chestionare** `/questionnaires` — Chestionare de satisfacție pentru clienți: 3 tab-uri (Șabloane cu builder, Răspunsuri, Statistici Personal).
+· NU aici: pentru recenzii Google/Facebook + declanșatoare → /feedback; pentru NPS hotel → /hotel/guest-feedback
+- **Comenzi B2B** `/b2b-orders` — Comenzile clienților pe firmă (B2B): clienți firmă, contracte cadru, prețuri negociate.
+· NU aici: pentru comenzi sală → /pos/waiter-orders; pentru magazin online → /ecommerce/orders; pentru persoane juridice în baza de clienți → /customers
+- **Follow-up Clienți** `/customer-followup` — Clienți care n-au mai venit: funnel + Next Best Action (sugestii zilnice cu scor — sună/ofertă/cere recenzie), coadă de sarcini, playbooks automate, timeline per client.
+· NU aici: pentru lista/fișele clienților → /customers; pentru rapoarte clienți → /customer-reports; pentru automatizări marketing → /marketing-automations
+- **Import Clienți** `/customer-import` — Imporți o listă de clienți din Excel/CSV: contact, segmente, puncte loialitate.
+· NU aici: pentru import produse/meniu/stoc → /data-import; pentru rapoarte despre clienți → /customer-reports
 
 ## Hotel + Marketing, online & livrări
 - **Dashboard Hotel** `/hotel` — Dashboard PMS: KPI ocupare (camere libere/ocupate, %), sosiri/plecări azi, in-house, plus hub de quick-links spre toate sub-paginile hotel (recepție, camere, rate, channel, folio, analytics).
@@ -214,6 +256,20 @@
 · NU aici: pentru scrierea/editarea articolelor → /blog/posts; pentru trafic blog → /blog/analytics
 - **Coduri QR** `/qr-codes` — Două tab-uri: QR Mese (cod per masă → meniul digital al mesei, regenerare) și QR-uri dinamice (link scurt /q/cod cu destinație editabilă oricând fără re-tipărire, etichete, activ/inactiv, contor scanări, export PNG/SVG/PDF).
 · NU aici: pentru meniul public al portalului → /portal/menu; pentru carduri RFID/acces fizic → /access-cards sau /portal-customers?tab=auth
+- **Livrări (flotă proprie)** `/deliveries` — Monitorizezi comenzile de livrare la domiciliu cu curierii TĂI: status comenzi, cine ce duce, timpi pe traseu.
+· NU aici: pentru comenzi de pe Glovo/Wolt/Bolt (agregatori) → /channels; pentru kanban dispecer + hartă live → /deliveries/dispatch; pentru zone de livrare → /deliveries/zones
+- **Inbox WhatsApp** `/whatsapp-inbox` — Citești și răspunzi la mesajele clienților de pe WhatsApp Business (primite și trimise).
+· NU aici: pentru conectarea numărului WhatsApp → /social-media (tab WhatsApp); pentru mesaje/comentarii social → /marketing/audience?tab=inbox
+- **AI Marketing Agent** `/ai-marketing` — Pui AI-ul să-ți facă o campanie de marketing: agent conversațional pentru reclame, postări și strategii.
+· NU aici: pentru programarea postărilor → /social-hub; pentru reclame plătite (wizard) → /ad-campaigns; pentru automatizări/triggere → /marketing-automations
+- **Automatizări Marketing** `/marketing-automations` — Mesaje automate (ex. de ziua clientului): fluxuri, triggere, secvențe email/SMS.
+· NU aici: pentru follow-up cu Next Best Action → /customer-followup; pentru programare postări → /social-hub; pentru agent AI marketing → /ai-marketing
+- **Template-uri Email** `/email-templates` — Editezi șablonul de email trimis clienților: galerie template-uri, HTML custom, editor drag & drop.
+· NU aici: pentru crearea/trimiterea campaniei → /email-campaigns; pentru statistici → /email-analytics; pentru loguri trimiteri → /email-logs
+- **Analitice Email** `/email-analytics` — Câți clienți au deschis emailul: open rate, click rate, bounce, dezabonări, tendințe.
+· NU aici: pentru crearea campaniei → /email-campaigns; pentru designul șablonului → /email-templates
+- **Evenimente Facebook** `/facebook-events` — Publici un eveniment pe pagina ta de Facebook (seri tematice, lansări, workshop-uri).
+· NU aici: pentru evenimente cu P&L în CRM → /events; pentru postări/story-uri → /social-hub
 
 ## Setări & administrare
 - **Setări** `/settings` — Pagină hub cu meniu lateral pe secțiuni (Companie, POS, Personal, Hardware, Stocuri, Marketing, Contabilitate, Asistent AI, Tehnic, Sistem); ?tab= deschide fiecare secțiune.
@@ -240,6 +296,8 @@
 · NU aici: pentru același jurnal prin AI → tool MCP jurnal_activitate. Pentru starea tehnică/erori sistem → /observability. Pentru logurile edge/Print Agent live → /settings?tab=edge-server „Loguri Live”.
 - **Import Date** `/data-import` — Titlu „Importuri Date”. 3 tab-uri: „Import Nou” (wizard 4 pași: Încărcare fișier → Mapare coloane → Confirmare → Rezultat, alegi entitatea țintă), „Șabloane (N)” (salvează/reaplică mapări), „Istoric (N)” (rulări trecute).
 · NU aici: pentru import asistat conversațional → onboarding/asistent Sym. Pentru pasul de import din onboarding → /onboarding/step/2.
+- **Contexte QR dinamice** `/settings/qr-contexts` — Configurezi ce context se deschide la scanarea QR-ului de pe masă (Terasă/Piscină/Cameră hotel/Eveniment): cheie URL, nume, imagine, culoare, masă implicită.
+· NU aici: pentru generarea/tipărirea codurilor QR → /qr-codes; pentru presetul QR per raion (câmpuri cerute) → /staff?tab=floor-schedule
 
 ## NU sunt pagini (atenție)
 - **Schimbarea unității active** (locație/brand) — stare de browser, NU rută. Vezi secțiunea „Schimbarea unității active” din `navigare.md`. NU o căuta cu `gaseste_in_aplicatie`.

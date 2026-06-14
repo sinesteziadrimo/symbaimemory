@@ -41,7 +41,8 @@ Modulul de rapoarte acoperă tot ce ține de cifre: dashboard-ul de start, rapoa
 ### P&L și KPI
 - **Raport P&L** (`/reports/pnl`) — contul de rezultate detaliat: venituri nete (fără TVA), COGS realizat, pierderi (risipă, minusuri), cheltuieli operaționale din facturi (clasificate pe categorii P&L), salarii, venituri din verticale (hotel, B2B, online) → profit brut, prime cost, profit net, prag de rentabilitate. Drill-down ierarhic pe categorii → subcategorii → tipuri de produs și buton „Vezi facturile" pe fiecare linie de cheltuială (deschide lista facturilor din spatele cifrei). Filtre: perioadă cu presetări și interval orar, brand, locație (inclusiv „Fără locație"). Export PDF / Excel și salvare ca snapshot.
 - **KPI P&L** (`/reports/pnl-kpi`) — toate KPI-urile definite, pe categorii (venituri, marketing, leaduri, evenimente, finanțe, operațional), cu valoare calculată live, semafor și trend. Definițiile și pragurile se editează din **Setări > Setări P&L**; tot acolo există **template-uri per industrie** (7 profiluri: restaurant/cafenea/bar, hotel/pensiune, spa/parc, fabrică, magazin, e-commerce, servicii) care creează cu un click seturi întregi de KPI-uri gata configurate — ex. prime cost live, food cost %, marjă pe produs, profit net agregatori după comision, vânzări pe oră de muncă, menu engineering.
-- **Comparație P&L** (`/reports/pnl-compare`, alias `/analytics/pnl-compare`) — compară branduri sau locații una lângă alta pe aceleași metrici: matrice comparativă cu heatmap colorat pe pragurile configurate, carduri „Top performer", „Atenție necesară" și „Total consolidat".
+- **Comparație P&L (entități)** (`/reports/pnl-compare`, alias `/analytics/pnl-compare`) — compară branduri sau locații una lângă alta pe aceleași metrici: matrice comparativă cu heatmap colorat pe pragurile configurate, carduri „Top performer", „Atenție necesară" și „Total consolidat".
+- **Comparație P&L pe perioade** (`/reports/pnl-compare-periods`) — același business, perioade diferite (lună vs lună, an vs an, YTD, ultimele N luni, A vs B): profit bridge („de ce s-a schimbat profitul"), tendință și tabel de variație. În chat se obține direct cu tool-ul `compare_pnl_periods`.
 - **P&L-uri Salvate** (`/analytics/saved-pnl`) — lista snapshot-urilor P&L înghețate.
 - **Detaliu P&L Salvat** (`/analytics/saved-pnl/:id`) — un snapshot cu datele fixe la momentul salvării, peste care poți adăuga **ajustări manuale** (override-uri, venituri/cheltuieli suplimentare) ce recalculează totalurile fără să atingă datele live. Tab-uri: Personal, OpEx detaliat, COGS, Venituri, TVA și taxe, Ajustări manuale, Evenimente, Snapshot original. Export PDF / Excel.
 
@@ -57,6 +58,19 @@ Modulul de rapoarte acoperă tot ce ține de cifre: dashboard-ul de start, rapoa
 8. **Care locație merge mai bine?** — `/reports/pnl-compare` pe dimensiunea „locații": heatmap pe marjă, food cost, labor, prime cost.
 
 ## Tool-uri MCP utile
+
+**P&L prin conexiune (citire, fără permisiune de modul):**
+- `get_pnl` — raportul P&L COMPLET pe perioadă (venituri nete, COGS, profit brut, personal, OpEx, profit net + marje, food/labor/prime cost cu semafor). Cifrele = identice cu pagina `/reports/pnl`. Primul reflex la „arată-mi P&L-ul / care e profitul".
+- `compare_pnl_periods` — compară P&L pe mai multe perioade cu profit bridge („de ce s-a schimbat profitul"). `mod`: luna_vs_luna / an_vs_an / ytd / ultimele_3_luni / _6_luni / _12_luni, sau `periods` explicit.
+- `get_pnl_config` — cum e configurat P&L-ul (categorii, grupări, KPI, template-uri, praguri); arată dacă e neconfigurat (risc „Nealocate").
+- `list_pnl_kpis` — KPI-urile definite; cu `evaluate: true` dă valorile live + semafor pe perioadă.
+- `list_pnl_snapshots` / `get_pnl_snapshot` — P&L-urile salvate (snapshot-uri) și ajustările lor.
+
+**P&L prin conexiune (scriere, modul `financiar`):**
+- `apply_pnl_industry_template` — aplică un profil de industrie (KPI + grupări gata). Primul pas pt. client nou. Idempotent.
+- `set_pnl_thresholds` — pragurile semafor (food cost / personal / prime cost / opex / marjă).
+- `create_pnl_category` / `configure_pnl_revenue_grouping` — categorii P&L custom și defalcări de venit.
+- `create_pnl_snapshot` / `add_pnl_snapshot_adjustment` — îngheață un P&L și adaugă cheltuieli/venituri suplimentare (închidere de lună).
 
 **Citire (disponibile mereu, fără permisiune de modul):**
 - `raport_vanzari` — vânzări pe perioadă cu comparație automată vs perioada anterioară; primul reflex la „cât am vândut".

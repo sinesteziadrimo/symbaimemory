@@ -63,9 +63,13 @@ Export PDF / Excel atât pentru raportul live cât și pentru snapshot.
 
 ## Ce poate face asistentul prin conexiune (MCP) vs. ce se face în aplicație
 
-**Important — fii sincer cu clientul:**
-- **Configurarea P&L** (categorii, grupări, praguri, KPI, template-uri) și **P&L-ul salvat + ajustările** se fac **în aplicație** (te ghidez pas cu pas și-ți dau linkul cu `gaseste_in_aplicatie`). Nu există tool MCP dedicat pentru ele.
-- Prin conexiune **POT** regla *manela*: **tipurile de produs și conturile lor** (`create_product_type`, `update_product_type`, `update_product_type_accounts_per_unit`) — exact ce decide clasificarea în P&L — și pot **citi/calcula** date: `raport_vanzari`, `top_produse`, `analyze_food_costs`, `get_accounting_overview`, `get_end_of_day_report`, plus `execute_sql_query` (doar citire) pentru analize punctuale.
+**Prin conexiune (MCP) — citire și configurare P&L:**
+- **Citire/explicare:** `get_pnl` (P&L complet cu semafor), `compare_pnl_periods` (perioade + profit bridge), `get_pnl_config` (cum e configurat), `list_pnl_kpis` (KPI live), `list_pnl_snapshots` / `get_pnl_snapshot`.
+- **Configurare:** `apply_pnl_industry_template` (template de industrie — primul pas pt. client nou), `set_pnl_thresholds` (praguri semafor), `create_pnl_category`, `configure_pnl_revenue_grouping`.
+- **Închidere de lună:** `create_pnl_snapshot` (îngheață raportul), `add_pnl_snapshot_adjustment` (adaugă o cheltuială/venit suplimentar pe snapshot).
+- **Clasificarea (manela):** `create_product_type`, `update_product_type`, `update_product_type_accounts_per_unit` — leagă tipurile de produs la categorii (ce decide unde cad banii). Plus `raport_vanzari`, `analyze_food_costs`, `get_accounting_overview`, `execute_sql_query` (read-only).
+
+**Ce rămâne în aplicație** (ghidează cu `gaseste_in_aplicatie` + deschide pagina dacă extensia Chrome e conectată): legarea fină tip-produs↔categorie cu bifare vizuală, mod avansat conturi↔categorie, lock cu parolă pe snapshot, adăugarea de angajați manuali și evenimente în snapshot, export PDF/Excel. Dacă un tool nu există încă pe instanța clientului (server mai vechi), fă fallback la pagină.
 
 ## Întrebări frecvente
 

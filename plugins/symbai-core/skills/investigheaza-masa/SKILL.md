@@ -1,34 +1,54 @@
 ---
 name: investigheaza-masa
-description: Investighează ce s-a întâmplat pe o masă, o notă, o comandă sau ce a făcut un ospătar — anulări, discount-uri, transferuri, plăți, retur, cine a aprobat. Folosește la „ce s-a întâmplat la masa 5", „de ce s-a anulat nota X", „ce a făcut ospătarul Ion azi", „cine a dat discountul".
+description: Investighează ce s-a întâmplat pe o masă, o notă, o comandă sau ce a făcut un ospătar — ce e pe masă ACUM, cine ce a comandat, anulări, discounturi, transferuri, plăți, retururi, cine a aprobat. PLUS cereri de aprobare în așteptare: vezi ce trebuie aprobat și aprobă/respinge direct. Folosește la „ce e pe masa 12", „ce a făcut ospătarul Ion azi", „de ce s-a anulat nota X", „cine a dat discountul", „ce am de aprobat", „aprobă returul de la masa 5".
 ---
 
-# Investighează o masă / notă / ospătar
+# Investighează o masă / notă / ospătar + aprobă cereri
 
-Scop: să reconstruiești **cronologic** ce s-a întâmplat și să răspunzi clar, fără a arunca date brute.
+Scop: răspunzi clar și RAPID la „ce se întâmplă / ce s-a întâmplat / ce trebuie aprobat", folosind tool-uri dedicate (fără SQL, fără click prin aplicație). Alege tool-ul după întrebare — de cele mai multe ori un singur apel ajunge.
 
-## Pasul 1 (implicit) — `jurnal_activitate`
+## Alege tool-ul după întrebare
 
-Folosește **`jurnal_activitate`** — citește jurnalul de activitate (audit log): cine / ce / când, cronologic. **Funcționează FĂRĂ acces SQL** (e tool dedicat) și acoperă: anulări, discount-uri, transferuri, retururi, oferit-gratis, plăți, aprobări/respingeri, modificări.
+### 1. „Ce e pe masa X ACUM?" → `get_table_status`
+`get_table_status(tableName: "12")` — dai numărul/numele mesei așa cum îl știe ospătarul („12", „Masa 12", „M5", „Terasă 3"; nu contează diacriticele sau cuvântul „masa"). Întoarce într-un singur apel:
+- ospătarul care ține masa + zona,
+- comenzile active cu produsele lor (doar ce e activ pe notă, fiecare cu eticheta de status — ex. „RETUR în așteptare"),
+- cât a rămas de plată,
+- cererile de aprobare în așteptare pe masă (retur/discount/casă/transfer).
 
-Cum filtrezi după întrebare:
-- „ce s-a întâmplat la masa 5" → `jurnal_activitate(masa: "5")` (sau `cauta: "masa 5"`).
-- „cine a anulat nota 1234" → `jurnal_activitate(tipEntitate: "order", idEntitate: "1234")`.
-- „ce a făcut ospătarul Ion azi" → `jurnal_activitate(cauta: "Ion", perioada: "azi")`.
-- „cine a aprobat discountul" → caută evenimentul de discount și citește câmpul `cine` + `detalii`.
+Pentru istoricul complet al unei comenzi anume de pe masă, treci la `get_order_timeline` cu orderId-ul returnat aici.
 
-Fără perioadă, întoarce cele mai recente potriviri (bun pentru investigații punctuale). Citește mereu `detalii` (e scris pentru oameni) și `modificari` (ce s-a schimbat: vechi → nou). Construiește un **răspuns narativ pe minute**:
-> Masa 5, ospătar Mada — 19:12 deschisă, 19:40 adăugat 2× Pizza, 20:05 transfer la masa 8 (aprobat de Ana), 20:30 discount 10% (motiv: client fidel), 20:45 plată card 240 RON.
+### 2. „Ce a făcut ospătarul X?" → `get_employee_activity`
+`get_employee_activity(employeeName: "Ion", date: "2026-06-16")` — `date` e opțional (implicit azi). Întoarce consolidat: bonuri finalizate, cât a vândut, bacșiș, bon mediu, mese lucrate, prima/ultima activitate, PLUS cererile lui de aprobare grupate pe tip (retururi/discounturi/casă/transferuri) și cele rămase în așteptare. Dacă numele se potrivește cu mai mulți angajați, tool-ul îți cere numele complet.
+- Pentru cronologia minut-cu-minut (ce produs a adăugat/șters, la ce oră) → `jurnal_activitate(cauta: "Ion", perioada: "azi")`.
+- Pentru comparația între ospătari (cine a vândut cel mai mult) → `performanta_ospatari`.
 
-## Pasul 2 (opțional) — corelări complexe cu SQL
+### 3. „Ce trebuie să aprob?" → `list_operation_requests`
+`list_operation_requests(status: "pending")` — vezi toate cererile în așteptare cu tot ce-ți trebuie ca să decizi: tip, ospătar, masă, produse, valoare, motiv. Filtre utile: `type` (return/house/discount/customer/...), `employeeName` (toate cererile unui ospătar), `dateFrom`/`dateTo`. Întoarce și un rezumat (câte pe fiecare tip, top aprobatori).
 
-Dacă tokenul are acces SQL și ai nevoie de corelări pe care jurnalul nu le dă direct (ex. sume agregate pe o comandă), folosește `execute_sql_query` (doar SELECT): `list_database_tables` → `describe_database_table` → SELECT pe `orders` / `order_items` / `operation_requests` / `payments` / `audit_logs` cu coloane explicite + WHERE + LIMIT.
+### 4. „Aprobă / respinge cererea" → `respond_operation_request`
+`respond_operation_request(requestId: 123, action: "approve", approvedBy: "Nume Manager", note: "…")` — aprobă sau respinge direct. Produce efectele complete (statusul produselor se actualizează, ospătarul primește notificare, se emit bonuri de retur la bucătărie, totul intră în jurnal).
+- **Confirmă MEREU cu utilizatorul înainte** de a aproba/respinge (e o acțiune reală).
+- **Excepție transferuri**: cererile de transfer între ospătari se pot doar RESPINGE de aici — aprobarea se face de ospătarul destinatar din aplicație (altfel produsele/masa nu s-ar muta efectiv).
+- Necesită ca pe conexiune (token) să fie activat dreptul de scriere pe „Comenzi POS" (din portal Hub → Acces AI). Dacă lipsește, tool-ul îți spune.
 
-Dacă tokenul NU are SQL, `jurnal_activitate` acoperă marea majoritate a investigațiilor — nu mai e nevoie de SQL. Doar pentru analize chiar complexe spune-i utilizatorului că poate activa „Interogări SQL" din portal Hub → Acces AI.
+### 5. „De ce s-a anulat nota X / ce s-a întâmplat cu comanda" → `get_order_timeline`
+`get_order_timeline(orderId: 1234)` — povestea completă a unei comenzi: antet (masă, ospătar, client, totaluri), produsele cu statusul fiecărei linii (activ/anulat/returnat/transferat), plățile (metode, bacșiș, fiscal), cererile de aprobare legate și jurnalul de audit (cine ce a făcut, când).
+
+### 6. „Cum s-a plătit nota / cât bacșiș / a fost refund" → `get_order_payments`
+`get_order_payments(orderId: 1234)` — fiecare plată cu metoda, suma, bacșișul, cine a plătit (la split), dacă s-a tipărit fiscal, plus total pe metode.
+
+### 7. Cronologie completă / orice eveniment → `jurnal_activitate`
+`jurnal_activitate` rămâne instrumentul universal când vrei firul pe minute sau cauți ceva ce nu intră în tool-urile de mai sus. Filtre: `masa`, `tipEntitate`+`idEntitate` (ex. `order`/`operation_request`), `cauta` (text liber: nume ospătar, „discount", „anulat"), `categorie`, `perioada`/`startDate`/`endDate`. Citește `detalii` (text pentru oameni) și `modificari` (vechi → nou). Fără perioadă, întoarce cele mai recente potriviri.
 
 ## Reguli
 
-- Cronologie strictă pe oră/minut; nume de ospătar/manager, nu ID-uri.
-- Pentru „cine a aprobat" / „cine a anulat" — citește autorul (`cine`) din eveniment, nu presupune.
-- Sume în RON. Nu dump-ui rânduri brute; sintetizează.
-- Dacă nu găsești evenimentul, cere mai multe detalii (numărul mesei/notei, ora aproximativă) sau lărgește perioada.
+- Începe cu tool-ul cel mai specific (masă → `get_table_status`; ospătar → `get_employee_activity`; aprobări → `list_operation_requests`). Cobori la `jurnal_activitate`/`get_order_timeline` doar pentru detaliu.
+- Cronologie pe oră/minut; folosește nume de ospătar/manager, nu ID-uri.
+- Pentru „cine a aprobat / cine a anulat" — citește autorul din eveniment, nu presupune.
+- Sume în RON. Nu arunca date brute — sintetizează.
+- Aprobare/respingere = acțiune reală: confirmă întâi cu utilizatorul, spune-i ce efect are.
+- Dacă nu găsești ceva: verifică numărul mesei/notei sau ora, lărgește perioada, sau întreabă utilizatorul. La mese cu același număr în locații diferite, trimite și `locationId`.
+
+## Corelări complexe (rar) — SQL
+Dacă tokenul are acces SQL și ai nevoie de corelări pe care tool-urile de mai sus nu le dau (ex. cât a stat o comandă în bucătărie, agregări custom): `list_database_tables` → `describe_database_table` → `execute_sql_query` (doar SELECT) pe `orders` / `order_items` / `operation_requests` / `order_payments` / `audit_logs`, cu coloane explicite + WHERE + LIMIT. Dacă tokenul NU are SQL, tool-urile dedicate acoperă aproape tot — pentru analize chiar complexe, spune utilizatorului că poate activa „Interogări SQL" din portal Hub → Acces AI.

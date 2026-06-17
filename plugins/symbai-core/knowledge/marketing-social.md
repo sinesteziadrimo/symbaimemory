@@ -134,6 +134,7 @@ Pentru campanii ads, email, blog, SEO și QR nu există tool-uri MCP dedicate �
 - **De ce e campania mea „Așteaptă aprobare manager"?** Bugetul depășește pragul de aprobare configurat — un manager trebuie să o aprobe înainte să plece spre Meta.
 - **De ce nu pleacă email-urile?** Verifică `/email-setup` (SMTP configurat per brand?) și `/email-logs` (statusul fiecărei trimiteri). Adresele invalide ajung în `/email-review`.
 - **Trebuie să retipăresc QR-urile dacă schimb destinația?** Pentru QR-urile dinamice NU — schimbi destinația din `/qr-codes` și codul tipărit rămâne valabil. QR-urile de masă duc mereu la meniul mesei; doar regenerarea codului propriu-zis cere retipărire.
+- **Cum fac un afiș / flyer / postare / cod QR de masă frumos?** Prin asistent, fără clickuri: skill-ul `materiale-grafice` (+ `knowledge/materiale-grafice.md`) — pornești dintr-un șablon profesionist, pui textele și oferta, aplici automat culorile și logo-ul brandului, apoi exporți PDF/PNG din studioul `/graphic-materials`. Cere drept de scriere pe modulul „Marketing & Social Media".
 - **Nu văd paginile de Magazin Online** — apar doar dacă modulul Magazin Online e activ în abonament.
 - **GBP nu arată nimic** — întâi trebuie conectată locația Google din pagina `/gbp` / conturile social.
 - **Unde îmi gestionez segmentele de clienți?** Din tab-ul CRM al paginii Audiență (filtrele de clienți); tab-ul Segmente doar explică acest lucru.

@@ -7,6 +7,8 @@ description: Scrie și gestionează conținutul de website al restaurantului pri
 
 Userul (proprietar/manager) vrea conținut pe website-ul lui: articole de blog care aduc trafic din Google, bannere care anunță o promoție, oferte care chiar reduc nota la POS. Tu le faci prin **conexiune (tool-uri MCP)** — scrii, actualizezi, listezi date direct — și folosești **Chrome doar ca să-i ARĂȚI** rezultatul pe pagina lui. Click pe tab-uri = ultima soluție; majoritatea muncii are tool. **Cel mai important: scrii conținut REAL și bun, confirmi deciziile mari și nu inventezi cifre.**
 
+> **Ești și account manager SEO senior.** Ai acum tool-uri MCP pentru keyword research, audit on-page, concurenți, research web și content briefs — nu mai e „doar din aplicație". Pentru muncă SEO aprofundată folosește skill-urile dedicate: **`scrie-articol-seo`** (articol de top cu research local + feedback), **`cercetare-seo`** (cuvinte, concurenți, trafic, idei), **`optimizeaza-seo`** (audit, fix-uri on-page, GEO/AI, conformitate, raportare). Acest skill rămâne HUB-ul pentru a publica/lista/edita articole + oferte/promoții website. Strategia completă (2026): `knowledge/seo-2026.md`, `geo-aeo.md`, `keyword-research-2026.md`, `local-seo-horeca.md`, `scriere-articol-seo.md`.
+
 ## Înainte de orice
 1. Citește **`knowledge/blog-seo.md`** (concepte: slug, meta description, scor SEO, keyword, redirect 301, advertorial, backlink; toate paginile `/blog/*` și `/seo/*`; cele 8 fluxuri pas-cu-pas; ce se poate prin MCP vs. doar din aplicație) și **`knowledge/condu-chrome.md`** (doctrina „tool MCP → deep-link → click pe element, nu pe pixel"; screenshot-ul = livrabilul pentru user; capcana unității active brand+locație; fallback fără extensie). Pentru amplificarea unui articol pe social/email → **`knowledge/marketing-social.md`**.
 2. **Context**: `list_brands` → `brandId` (majoritatea tool-urilor îl cer; un singur brand ⇒ implicit). `list_locations` doar dacă o ofertă/promoție e pe o locație anume.
@@ -25,6 +27,10 @@ Userul (proprietar/manager) vrea conținut pe website-ul lui: articole de blog c
 | „modifică / corectează / rescrie articolul Y" | `update_blog_post` | orice câmp (titlu, conținut, meta, categorie, featured, status) |
 | „publică toate ciornele / arhivează-le / marchează recomandate" | `bulk_update_blog_posts` | `action`: publish / archive / feature / unfeature, `ids[]` (max 100) |
 | „cum merge blogul / cât trafic am / vizitatori" | `get_blog_analytics_overview` | `days` (default 28); afișări, vizitatori unici, sesiuni, timp pe pagină, bounce |
+| „verifică SEO la articol / ce să îmbunătățesc" | `seo_audit` | scor 0-100 + fix-uri concrete (skill `optimizeaza-seo`) |
+| „ce cuvinte să țintesc / ce trafic e pe cuvinte / pe ce apar în Google" | `seo_keyword_research`, `get_search_performance`, `get_seo_overview` | (skill `cercetare-seo`) |
+| „cine-s concurenții / research piață-oraș / idei de articole" | `list_seo_competitors`, `suggest_seo_competitors`, `seo_web_research` | (skill `cercetare-seo`) |
+| „fă-mi un plan pentru articolul X" | `generate_content_brief` | structură + competitori SERP + LSI + FAQ + word count |
 | „fă un banner / pop-up pe site / pune o promoție pe website" | `create_website_promotion` | anunț VIZUAL (nu reduce prețul); cere `name` + `targetUrl` |
 | „ce promoții de website am" | `list_website_promotions` | filtru `placement`, `activeOnly` |
 | „modifică banner-ul / oprește-l / schimbă-i textul-linkul" | `update_website_promotion` | după `id` |
@@ -59,7 +65,7 @@ Blogul și promoțiile folosesc **rute pe cale**, nu `?tab=` — du-te direct cu
 Restul SEO + operațiile editoriale grele se fac **doar din aplicație** — ghidează-l userului acolo (link + pași) sau, cu extensia, conduce-l prin Chrome pe ELEMENT (nu pe pixeli):
 - **Import / migrare blog** (de pe WordPress/Ghost/CSV, cu redirect-uri 301): `/blog/import`, `/blog/migration`.
 - **Redirect-uri 301** (obligatorii la schimbarea unui slug publicat — altfel 404 în Google): `/blog/redirects`.
-- **Audit SEO pe pagini, tracking & research cuvinte-cheie, concurenți, advertoriale, backlink-uri**: paginile `/seo/*` și `/blog/advertorials|backlinks`.
+- **Audit SEO, keyword research, concurenți, research web și content briefs au ACUM tool-uri MCP** (`seo_audit`, `seo_keyword_research`, `get_search_performance`, `list/add/suggest_seo_competitors`, `run_rank_tracker`, `seo_web_research`, `generate_content_brief`) — folosește skill-urile `cercetare-seo` / `optimizeaza-seo`, NU mai trimite userul în UI pentru ele. Rămân doar prin interfața web: **advertoriale & backlink-uri** (`/blog/advertorials`, `/blog/backlinks`), dashboard-urile vizuale și setările de provider din `/seo/*`.
 - **Ștergerea** de articole/oferte/promoții întregi nu e disponibilă prin conexiune → ghidează-l să șteargă din aplicație (sau pune articolul pe `archived` + redirect 301, ca să nu strici SEO).
 
 ## Reguli (cele care contează)
@@ -72,6 +78,7 @@ Restul SEO + operațiile editoriale grele se fac **doar din aplicație** — ghi
 - **Limbaj de restaurant**, nu jargon de editor („pun articolul ca ciornă", „fac un banner pe site", „verific dacă pierzi bani la reducere"), nu `status`/`placement`/`Margin Guardrail`.
 
 ## Legături
+- **SEO aprofundat (2026)** → skill-urile `scrie-articol-seo` (scrie un articol de top), `cercetare-seo` (cuvinte/concurenți/trafic), `optimizeaza-seo` (audit/fix-uri/GEO/raportare) + `knowledge/seo-2026.md`, `geo-aeo.md`, `keyword-research-2026.md`, `local-seo-horeca.md`, `scriere-articol-seo.md`.
 - Concepte + toate paginile `/blog`+`/seo` + cele 8 fluxuri + capcane (slug fără redirect, meta lipsă, imagini grele) → `knowledge/blog-seo.md`.
 - Cum conduci Chrome (deep-link, screenshot = livrabil, click pe element nu pixel, fallback fără extensie, capcana unității) → `knowledge/condu-chrome.md`.
 - Amplifică articolul pe social + email → skill-ul `programeaza-postare` + `knowledge/marketing-social.md` / `email-marketing.md`.

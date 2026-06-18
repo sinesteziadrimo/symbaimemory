@@ -6,6 +6,8 @@
 
 Modulul Blog & SEO acoperă conținutul editorial al brandului tău și vizibilitatea lui în Google. Scrii și publici articole (manual sau cu AI), le organizezi pe categorii și autori, migrezi un blog vechi de pe altă platformă fără să pierzi poziții în căutări, și măsori traficul pe care îl aduc. Partea de SEO îți arată scorul fiecărei pagini, urmărește pozițiile cuvintelor-cheie în Google, sugerează cuvinte noi, compară-te cu concurenții și gestionează advertoriale plătite + backlink-uri. Tot conținutul se leagă natural cu Marketing (vezi `marketing-social.md`) pentru amplificare prin postări sociale și email. Este pentru proprietar/manager care vrea trafic organic și clienți noi de pe Google, fără să plătească reclame.
 
+> **Pentru STRATEGIA SEO/AI 2026 + cum folosești tool-urile MCP de SEO ca un account manager**, vezi `seo-2026.md` (master), `keyword-research-2026.md`, `geo-aeo.md` (fii recomandat de ChatGPT/Claude/Perplexity), `local-seo-horeca.md`, `scriere-articol-seo.md` + skill-urile `scrie-articol-seo` / `cercetare-seo` / `optimizeaza-seo`. Acest fișier acoperă conceptele de bază și paginile aplicației.
+
 ## Concepte
 
 - **Articol de blog** — pagină cu conținut editorial (titlu, slug, categorie, autori, dată, stare: ciornă / publicat / arhivat). Conține meta description, titluri H1-H3, imagini cu alt-text, link-uri interne.
@@ -63,7 +65,8 @@ Modulul Blog & SEO acoperă conținutul editorial al brandului tău și vizibili
 - **Scriere (modulul «Marketing & Social Media» pe token):** `create_blog_post` (articol nou), `update_blog_post` (orice câmp: titlu, conținut, meta, categorie, stare, recomandat), `bulk_update_blog_posts` (publică/arhivează/marchează recomandat mai multe deodată).
 - **Pentru link-ul exact către orice pagină:** `gaseste_in_aplicatie`.
 - **Permisiunea exactă:** vezi `tools-mcp.md`. Pentru a crea/edita articole, token-ul AI trebuie să aibă bifat modulul „Marketing & Social Media" în Hub → Acces AI; altfel tool-urile de scriere returnează „permisiune insuficientă".
-- **Doar prin interfața web (NU prin asistent):** import/migrare blog, redirecturi, audit SEO pe pagini, tracking și research cuvinte-cheie, analiza concurenților, advertoriale, backlink-uri. Pentru ele îndrumă utilizatorul către paginile respective.
+- **SEO prin asistent (tool-uri MCP — modulul «Marketing & Social Media» pentru cele de scriere/research):** `get_seo_overview`, `get_search_performance` (ce caută oamenii și pe ce poziție ești — Search Console), `list_seo_keywords` + `get_keyword_rankings`, `seo_audit` (scor + fix-uri), `get_seo_provider_status` (ce surse ai), `seo_keyword_research` (volum/dificultate hibrid), `list_seo_competitors`/`add_seo_competitor`/`suggest_seo_competitors`, `run_rank_tracker`, `seo_web_research` (research web pe subiect/oraș/concurent), `generate_content_brief`. Vezi skill-urile `cercetare-seo`, `optimizeaza-seo`, `scrie-articol-seo`.
+- **Doar prin interfața web (NU prin asistent):** import/migrare blog, redirecturi 301, advertoriale, backlink-uri, dashboard-urile vizuale și setările de provider din paginile `/seo/*`.
 
 ## Întrebări frecvente
 

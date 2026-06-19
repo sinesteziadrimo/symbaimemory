@@ -132,12 +132,19 @@ Modulul acoperă tot ce se vinde și din ce se face: catalogul de produse, meniu
 - `set_product_image` — pune o imagine pe produs dintr-un URL public (ex. de pe meniul/site-ul vechi); o descarcă și o stochează optimizat (NU rămâne hotlink), apoi o propagă la articolele de meniu. `gallery: true` adaugă în galerie fără a înlocui cover-ul.
 - `add_menu_item` / `update_menu_item` acceptă acum și `menuCategoryId`, `description`, `gramaj` — categoria se oglindește automat și pe produs.
 
-Notă: nu există tool-uri MCP pentru oferte/promoții (se gestionează doar din pagina Oferte) și nici tool-uri de ștergere de produse/meniuri (ștergerile se fac doar din aplicație).
+**Scriere — oferte care reduc nota (modul `produse_meniuri`):** asistentul POATE gestiona ofertele din chat (nu mai sunt doar din pagină):
+- `create_offer` — creează o ofertă de auto-discount care chiar reduce nota la POS (happy hour, -X%, sumă fixă, 1+1 / cadou la X lei) — cu tip, produse/categorii, zile, fereastră orară și canale.
+- `update_offer` — modifică oferta (valoare, scope, plafon, activă/inactivă etc.); dezactivarea (`active=false`) ține loc de „oprire".
+- `preview_offer_margin` — **Margin Guardrail ÎNAINTE de creare**: îți spune în lei dacă oferta vinde sub cost (cere-l mereu înainte de `create_offer`).
+- `list_offers` — ofertele active ale brandului. `list_offer_suggestions` — propuneri sigure pe marjă de la Sym (din datele reale). `get_offer_scorecard` — verdictul „Păstrează / Oprește" pentru o ofertă, în lei.
+- Codurile de reducere pentru magazinul online: `create_discount_code`, `update_discount_code`, `list_discount_codes`.
+
+Notă: nu există tool-uri MCP de **ștergere** de produse/meniuri/oferte (ștergerile se fac doar din aplicație — la oferte folosește `update_offer active=false`). Autopilot / Win-Back Radar / Surprize din pagina Oferte se folosesc tot din aplicație.
 
 **⚠ Ce rămâne DOAR din aplicație (nu prin MCP):**
 - **Regulile de rutare taguri→imprimante/KDS**: doar din Setări → Imprimante. Un tag NOU creat prin MCP nu rutează nicăieri până nu i se creează regula acolo (refolosește tagurile EXISTENTE ale clientului).
 - **Pozele în masă cu potrivire automată**: dacă ai zeci de poze fără să știi exact ce produs e fiecare, pagina Poze Bulk Meniu (`/menu/pricing/bulk-photos`) le potrivește cu AI. Prin MCP pui poza pe un produs anume cu `set_product_image` (când ai URL-ul și produsul).
-- **Ofertele/promoțiile, ștergerile de entități**: din aplicație.
+- **Ștergerile de entități** (produse, meniuri, oferte) + **Autopilot / Win-Back Radar / Surprize** din pagina Oferte: din aplicație. (Crearea/editarea ofertelor merge prin MCP — vezi `create_offer` / `update_offer` mai sus.)
 
 **⚠ Capcane de tool-uri (verificate în cod):**
 - `add_menu_item` e UPSERT: dacă produsul e deja în meniu, câmpurile trimise se aplică pe item-ul existent (nu mai e „există deja, ignorat"). Numele afișat ia implicit numele produsului dacă nu trimiți `name`.

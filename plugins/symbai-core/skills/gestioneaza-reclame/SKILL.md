@@ -41,6 +41,14 @@ Pe lângă boost, poți crea reclame de la zero, cu un obiectiv anume. Toate au 
 
 Fluxul e identic: verifică contul (`list_ad_accounts`) → confirmă bugetul + conținutul cu utilizatorul → apelează tool-ul cu `confirm:true` → confirmă rezultatul (`get_ad_campaign_status` dacă vrei să fii sigur că a trecut verificarea).
 
+## Țintirea pe locații (capcană frecventă)
+
+`locations` primește orașe/județe ca text (ex. `["Timișoara"]` sau `["Timișoara","Arad"]`); lipsă = toată țara.
+
+- **NU pune și o zonă mare, și una din interiorul ei în același timp.** Adică NU `["România","Timișoara"]` și NU `["Timiș","Timișoara"]` (județ + oraș din el). Meta respinge zonele care se suprapun → reclama nu se publică. **Alege ORI orașe/județe, ORI toată țara — niciodată ambele.**
+- **Pentru un local, ținteșt orașul (Meta adaugă automat o rază în jur), nu toată țara.** E mai eficient (ajungi la cine poate veni) și eviți o restricție: reclamele pe **toată țara** cer date de plătitor/beneficiar verificate pe cont (transparență UE) — dacă nu sunt confirmate în Ads Manager, campania pe toată țara poate fi blocată, în timp ce aceeași reclamă pe un oraș/județ se publică fără probleme.
+- Dacă o reclamă a picat cu „locațiile se suprapun / verifică targetarea", scoate zona mai mare și lasă doar orașul, apoi republică — nu trebuie reintrodus nimic altceva.
+
 ## Gestionarea campaniilor existente
 
 - **Vezi campaniile**: `list_ad_campaigns` (opțional `status`: active/paused/pending_review/error...). Întoarce status, buget zilnic, obiectiv, perioadă.

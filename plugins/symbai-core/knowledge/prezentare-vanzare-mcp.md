@@ -5,7 +5,8 @@
 ## Regula de aur a construcției prin MCP
 **Scaffold + datele „grele" prin MCP (completezi JSON), apoi ARĂȚI rezultatul în Chrome schimbând tab-urile.** Nu te chinui să dai click pentru fiecare câmp — pui JSON-ul printr-un `patch_presentation`, apoi navighezi în pagină DOAR ca să-i arăți userului ce-a ieșit (și ca să rulezi Preview-ul în fața lui).
 
-## Cele 6 tool-uri (recap)
+## Cele 6 tool-uri de BAZĂ (recap)
+> (+ 5 tool-uri GRANULARE de bibliotecă — `list_/get_/patch_/add_/remove_presentation_library_item` — vezi secțiunea `libraryOverride` mai jos. Total 11.)
 - `list_presentation_templates()` — șabloane de pornit (`symbai_horeca_2026` = gold standard, +6 verticale).
 - `list_presentations(brandId)` — ce există pe brand.
 - `get_presentation(brandId, presentationId, section?)` — CITEȘTE. `section`: `summary`(default)/`intro`/`slides`/`offers`/`theme`/`flow`/`typologies`/`library`/`full`. **Citește secțiunea ÎNAINTE de a o modifica** (patch înlocuiește cheia întreagă — ai nevoie de conținutul curent ca să nu pierzi nimic).
@@ -138,7 +139,7 @@ Confirmă în Preview: alegi acel răspuns → trebuie să apară slide-ul dedic
 {
   "showIntro": true,
   "discovery":   { "enabled": true, "maxQuestions": 6 },
-  "transition":  { "enabled": true },
+  "transition":  { "enabled": false },                          // OPT-IN (implicit OFF) — pune true ca să apară puntea + wishlist
   "solutions":   { "enabled": true, "count": 3 },               // câte perechi durere+soluție în deck
   "calculation": { "enabled": true, "calculationId": "calc_softs_savings" }, // ⚠ enabled:true ALTFEL calculatorul NU apare
   "objections":  { "enabled": true },
@@ -199,11 +200,81 @@ Maparea durere↔soluție e bidirecțională: `pain.addressedByFeatures=[feat]` 
 - **`get_presentation_library_item(presentationId, kind, itemId)`** — UN element întreg (mic). Vezi forma curentă înainte de patch.
 - **`patch_presentation_library_item(presentationId, kind, itemId, patch)`** — merge superficial pe UN element (fiecare cheie din `patch` înlocuiește cheia de pe element; `id` imuabil). Ex: schimbi `title`-ul unei dureri, `addressedByFeatures` (soluțiile care o rezolvă), `painTriggers` ale unei întrebări, `media`/`kpis` ale unei soluții.
 - **`add_presentation_library_item(presentationId, kind, item)`** — adaugă element NOU (id auto dacă lipsește). Se adaugă peste biblioteca de bază prin merge pe id — NU o șterge. ⚠ Dacă dai un `id` care există DEJA în biblioteca de bază (nu în override), îl **suprascrii** (nu adaugi unul nou); la șabloane clonate override-ul conține tot, deci primești eroare de „id duplicat" — pe care o eviți alegând alt id.
-- **`remove_presentation_library_item(presentationId, kind, itemId)`** — șterge un element (atenție la referințe orfane — inofensive, dar curăță-le).
+- **`remove_presentation_library_item(presentationId, kind, itemId)`** — șterge un element. ⚠ Referințele orfane NU sunt mereu inofensive: un `painId` orfan într-un `painTrigger` e ignorat tăcut, DAR un `painId` orfan în `typologies.dominantPains` face durerea-fantomă să fie singurul „candidat" → deck gol. După orice ștergere, curăță id-ul din `dominantPains`/`addressedByFeatures`/`painTriggers`/`flowV2.calculation.calculationId`.
 
 Rețetă „leagă o durere de o soluție": `list_presentation_library_items(kind:"pain")` → iei painId → `list_presentation_library_items(kind:"feature")` → iei featId → `patch_presentation_library_item(kind:"pain", itemId:painId, patch:{addressedByFeatures:["featId"]})` (+ opțional invers pe feature `addressesPains`). Rețetă „durere cu răspunsuri multiple legate de dureri": `add_presentation_library_item(kind:"question", item:{text, type:"single", options:[{id,label}], painTriggers:[{mode:"direct",painId,intensityWhenMet,whenAnswerEquals:"<optId>"}]})`.
 
 **Alternative tot prin MCP:** discovery-cu-dureri se poate face și pe **`introFields`** (cheie mică, se citește/scrie integral) — câmpurile intro `select` au EXACT același `painTriggers` ca discovery. Pentru un **vertical NOU cu bibliotecă mică** (`sala_evenimente`/`catering`/...), `get_presentation(section:"library")` poate încăpea sub limită → atunci o poți edita și re-pune cu `save_presentation`.
+
+---
+
+## Construiește un vertical NOU de la zero — ORDINEA OBLIGATORIE (id-uri coerente)
+
+Cazul real (parc, sală, hotel): clonezi gold-standard ca STRUCTURĂ, dar conținutul lui e HoReCa. Toate piesele se referă una la alta prin **id-uri** (o tipologie listează `dominantPains:[painId]`, o durere listează `addressedByFeatures:[featId]`, o întrebare are `painTriggers:[{painId}]`). Dacă rescrii o piesă cu id nou dar lași referința veche, legătura se rupe TĂCUT (vezi cauza #5). De aceea construiești **în ordinea grafului**, de la frunze spre rădăcină, și verifici coerența la final:
+
+1. **Soluții (features) întâi** — `add_presentation_library_item(kind:"feature", item:{id:"feat_petreceri_copii", name:"<nume = beneficiu>", description, valueProps:[...], addressesPains:[]})`. (`addressesPains` îl completezi la pasul 3, după ce există durerile.) Numele = beneficiul, nu termenul tehnic.
+2. **Dureri** — `add_presentation_library_item(kind:"pain", item:{id:"pain_capacitate_haos", title:"<fraza pe care o spune prospectul>", description, addressedByFeatures:["feat_petreceri_copii"], importance:"high"})`. Fiecare durere TREBUIE să aibă ≥1 feature în `addressedByFeatures` (altfel dispare tăcut).
+3. **Leagă invers** soluția de durere — `patch_presentation_library_item(kind:"feature", itemId:"feat_petreceri_copii", patch:{addressesPains:["pain_capacitate_haos"]})`. Maparea ideală 1:1 (o durere ↔ o soluție).
+4. **Întrebări discovery** — `add_presentation_library_item(kind:"question", item:{text, type:"single", options:[{id:"opt_a",label}, ...], painTriggers:[{mode:"direct", painId:"pain_capacitate_haos", intensityWhenMet:9, whenAnswerEquals:"opt_d"}]})`. `painId` TREBUIE să fie unul din durerile create la pasul 2.
+5. **Tipologii** — `patch_presentation(patch:{typologies:[...]})` cu fiecare tipologie având `dominantPains:["pain_capacitate_haos", ...]` (= NOILE id-uri!) + `recommendedFeatures`/`recommendedProofs` la fel + reguli de detecție (vezi forma mai jos). **Aici se rupe cel mai des** — dacă lași `dominantPains` HoReCa, durerile tale nu se admit niciodată (deck gol).
+6. **Dovezi & Obiecții** — `add_presentation_library_item(kind:"proof"/"objection", ...)` cu `forPains`/`addressedByPains` pe NOILE id-uri + `cities` pe orașele owner-ului.
+7. **Calcule** — `add_presentation_library_item(kind:"calculation", item:{...})` (forma mai jos), apoi leagă în flux: `patch_presentation(patch:{flowV2:{..., calculation:{enabled:true, calculationId:"<noul id>"}}})`. Calc-ul HoReCa clonat rămâne orfan dacă nu-l înlocuiești.
+8. **Ofertă + Temă + Flux** — `offers[]` de la zero (verticalele au 0), `theme`, `flowV2` (ce pași, câte dureri/dovezi).
+
+**✅ Checklist de COERENȚĂ id (rulează-l înainte să declari gata):** fiecare `painId` din `typologies.dominantPains` + din `painTriggers` EXISTĂ în `pains`; fiecare durere are `addressedByFeatures` ne-gol cu `featId`-uri existente; `flowV2.calculation.calculationId` EXISTĂ în `calculations`; painTriggers-ele wishlist-ului (dacă ai pornit Tranziția) sunt relegate. (Vezi „Verificare DOAR prin MCP" mai jos.)
+
+### Forma unei TIPOLOGII (ca să detecteze ceva — altfel personalizare moartă)
+```json
+{
+  "id": "tip_familie_petreceri", "name": "Familie cu copii — petreceri", "vertical": "parc",
+  "keyMessage": "Petrecere fără bătăi de cap, copii fericiți",
+  "axes": { "businessModel": "petreceri_private" },          // setezi aceeași axă prin autoDeriveRules din intro
+  "detectionThreshold": 1,
+  "weightedDetectionRules": [
+    { "id": "r_aniversare", "label": "Vine pentru aniversare", "weight": 3,
+      "conditions": [ { "fieldId": "q_scop_vizita", "op": "eq", "value": "opt_aniversare" } ] }
+  ],
+  "dominantPains": ["pain_capacitate_haos", "pain_fara_pachete"],   // NOILE id-uri — POARTA durerilor
+  "recommendedFeatures": ["feat_petreceri_copii"],
+  "predictedObjections": ["obj_pret"], "recommendedProofs": ["proof_local"]
+}
+```
+Forma unei condiții: `{ fieldId, op, value }` — `fieldId` = id-ul întrebării (răspunsul ei) sau `axis.<axă>`/`typology`/`lead.deal.<câmp>`; `op` ∈ `eq`/`neq`/`in`/`notEmpty`/`empty`; `value` = id-ul OPȚIUNII alese (nu eticheta). Fiecare regulă satisfăcută adună `weight`; fiecare axă care se potrivește = +1; câștigă scorul MAX peste `detectionThreshold`. **Calea cea mai simplă:** mapează un câmp intro pe o axă prin `autoDeriveRules` (`{id,label,targetAxis,derive:{path,source:"answer",mapping:[{op:"eq",value,result}],defaultValue}}`) + pune aceeași axă pe tipologie în `axes` — fără reguli complexe.
+
+### Forma unui CALCUL nou (comparative-list — cel mai folosit)
+```json
+{ "id": "calc_costuri_parc", "kind": "comparative-list", "title": "Cât te costă acum haosul de rezervări",
+  "currentCostOnly": false,                                  // true = ascunde prețul Symbai (faza „doar costul actual")
+  "placement": "before-offer",                              // sau "after-offer"
+  "categories": [ { "id": "cat_apps", "icon": "📋", "label": "Aplicații separate",
+    "suggestions": [ { "name": "Soft rezervări", "estimatedCost": 200 } ] } ] }
+```
+Apoi `flowV2.calculation = { enabled:true, calculationId:"calc_costuri_parc" }`. (Formula matematică: `kind:"formula"` cu `inputs:[{key,sourceKey,defaultValue,label}]` + `formula` + `outputTemplate` — inputurile iau cifrele din răspunsuri prin `sourceKey`.)
+
+### Întrebarea-ancoră (pusă MEREU)
+Nu are buton în UI — se setează prin MCP: pune `"discoveryAnchor": true` pe întrebarea-pilon (de regulă cea de profit/financiară). Ea e exceptată de la dedup și apare la fiecare prospect.
+
+## Ce poți pune la FIECARE răspuns (combinatorica — asta dă prezentarea „vie")
+
+Pe **o opțiune de răspuns** (la o întrebare discovery; intro fields acceptă doar painTriggers) poți atașa, separat sau combinat:
+
+| Atașezi | Câmp | Ce face | Când |
+|---|---|---|---|
+| **Durere** (3 moduri) | `painTriggers:[{mode,painId,intensityWhenMet,whenAnswerEquals}]` | aprinde/gradează o durere: 🎯`direct`=MAX, ➕`boost`=SUMĂ(±), 🔍`potential`=max 4 | mereu (mecanismul central) |
+| **Reveal** | `reveal:{text, imageUrl, position, size, colors}` | text/imagine de impact PESTE slide-ul curent | reacție scurtă pe loc |
+| **Trece automat** | `autoAdvance:true` | sare direct la următorul slide după alegere | la răspunsul „rezolvat" (nimic de vândut) |
+| **Slide separat** | `followUpSlide:{...}` (vezi secțiunea de sus) | un SLIDE ÎNTREG educațional după întrebare | mini-pitch / fluxuri educaționale |
+
+Și **întrebarea/slide-ul întreg** poate avea condiție de vizibilitate (`visibleWhen`/`skipIf`) ca să apară doar pentru anumite profiluri. Tipuri de slide pe care le poți pune: `info` (conținut bogat — 18 blocuri: heading/text/kpi/comparison/bullets/image/chart/timeline/cta...), `question` (discovery + wishlist multiselect), pereche durere+soluție (din bibliotecă, prin Flux), calcul, dovadă, ofertă. Slide-urile statice de tip `info`/`question` se adaugă în `slides[]`; perechile durere/soluție/calc/dovadă/ofertă vin din bibliotecă, controlate din `flowV2`.
+
+## Verifică coerența DOAR prin MCP (când n-ai Chrome, înainte de Preview)
+Preview-ul vizual e în Chrome, dar poți prinde cele 5 cauze tăcute fără el:
+1. `list_presentation_library_items(kind:"pain")` → mulțimea de `painId` existente.
+2. `get_presentation(section:"typologies")` → fiecare `dominantPains` ⊆ mulțimea de la pasul 1? (orfanii = deck gol).
+3. fiecare durere are `addressedByFeatures` ne-gol cu featId-uri existente (`kind:"feature"`).
+4. `get_presentation(section:"flow")` → `calculation.enabled` + `calculationId` există în `kind:"calculation"`.
+5. fiecare `painTrigger.painId` din întrebări/intro/wishlist ∈ mulțimea de la pasul 1.
+Dacă toate trec, în Preview o să vezi tipologie detectată + dureri + deck plin.
 
 ---
 
@@ -222,8 +293,8 @@ get_presentation(section:"theme") ; patch_presentation(patch:{theme})        // 
 get_presentation(section:"intro") ; patch_presentation(patch:{introFields})  // întrebări + dureri
 get_presentation(section:"offers"); patch_presentation(patch:{offers})       // pachetele tale
 get_presentation(section:"flow")  ; patch_presentation(patch:{flowV2})       // ce pași/câte elemente
-→ deschizi Chrome, arăți tab-urile + rulezi Preview
-→ editări fine per-durere/soluție pe bibliotecă mare = în UI
+→ editări fine per-durere/soluție/întrebare = tool-urile GRANULARE (patch/add_presentation_library_item)
+→ verifici coerența id prin MCP, apoi deschizi Chrome pentru Preview (tipologie + deck plin)
 ```
 
 ## Cross-link

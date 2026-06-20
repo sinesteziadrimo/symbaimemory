@@ -4,6 +4,8 @@
 
 Convenții valoare: `text` (scris liber) · `nr` (numeric) · `on/off` (comutator) · `listă` (alegere dintr-un set) · `culoare` (hex/selector) · `formulă` · `imagine` (URL sau Upload R2) · `chips` (multi-selecție on/off).
 
+**Antet / ecran de start** (sus, peste taburi): **Nume prezentare** · **Titlu ecran de start** · **Subtitlu ecran de start** (ce vede prospectul) · **Imagine ecran de start** (`coverImageUrl` — URL, fundal peste degrade) + **Focalizare** (`coverImageObjectPosition`, ex „50% 30%") · **Domeniu de activitate**. ✅ controale în PresentationConfigTab; setabile și prin `patch_presentation`.
+
 ---
 
 ## 1. INTRO — un câmp din formularul de start
@@ -49,6 +51,7 @@ Câmpuri Intro (`{cheie}`) · `lead.customer.*` (firstName/lastName/name/company
 
 ## 7. DURERE (tab Dureri)
 - **Cover image** `imagine` · **Titlu** `text` · **Descriere emoțională** `text` · **Cod intern** (read-only) · **Tags** `text` (virgulă) · **Importanță** `listă`: Scăzută/Medie/Mare/Critică (decide ordinea).
+- **Eticheta de pe slide** `text` (eyebrow-ul de deasupra titlului; default „Problema ta") · **Arată eticheta** `on/off` (debifează ca s-o ascunzi — utilă pentru operatori cu experiență, ca să nu sune acuzator). ✅ controale în PainsEditor.
 - **Soluții care REZOLVĂ** `chips` (bidirecțional) · **Tipologii unde e dominantă** `chips` · „Apare automat când răspunsul Discovery…" (read-only, se editează în Discovery).
 - **Coach (doar agent)**: **Tips** / **Întrebări** / **Note** — liste de texte.
 - Acțiuni tab: „Setup Symbai (6 dureri)", „Adaugă rapid" (chips presetate), „Durere custom", filtru pe importanță, căutare, reordonare drag.

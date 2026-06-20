@@ -172,13 +172,40 @@ Conceptual: `{ id, name, vertical, keyMessage, axes:{experience,businessSize,bus
 
 ⚠ **`dominantPains` e POARTA de admitere a durerilor (regula #1 de calitate).** O durere apare în secțiunea Dureri & Soluții DOAR dacă e în `dominantPains` la tipologia detectată (sau bifată pe wishlist). Scorul din painTriggers doar **ordonează** durerile admise — **nu le admite**. Deci pentru fiecare durere prioritară: leag-o de răspunsuri (painTriggers) ȘI pune-i `painId`-ul în `dominantPains` la tipologia relevantă. Altfel, oricât scor ar avea, **nu apare**. (Și fiecare durere are nevoie de minim o soluție în `addressedByFeatures`, altfel e sărită tăcut.)
 
-## SLIDE-URI cu POZE → `slides[]` (slide-uri statice cu conținut bogat)
-Slide-urile statice (intro discovery, tranziție, closing) folosesc blocuri de conținut bogat. Bloc imagine:
-```json
-{ "type": "image", "url": "https://...", "alt": "...", "aspect": "16:9", "rounded": true, "caption": "...", "focalPoint": {"x":50,"y":50} }
-```
-Alte blocuri (18 tipuri în campuri §9): heading, text, kpi, video, embed, chart, bullets, comparison, timeline, cta, divider, spacer, calc-ref, objection-card, proof-card, stat-grid, quote.
-**De unde iau poza (URL):** (1) biblioteca media a brandului — `browse_brand_media(brandId)` întoarce URL-uri; (2) upload în UI (R2) și apoi copiezi URL-ul; (3) URL public extern. Prin MCP setezi DOAR URL-ul (nu poți încărca fișier de pe disc) — dacă biblioteca brand e goală, cere userului să încarce sau dă-i un URL.
+## SLIDE-URI FRUMOASE rapid → `apply_slide_design` / `compose_rich_slide` ✅ NOU (2026-06-20)
+Slide-urile statice (cover, info, durere, soluție, dovadă, closing) folosesc blocuri de **conținut bogat** (`richContent`). NU le scrie de mână bloc cu bloc — ai **2 tool-uri** care le compun corect, server-side, fără să retrimiți tot `slides[]`:
+
+**1. `apply_slide_design(presentationId, preset, content, slideId?, afterSlideId?|index?)`** — dintr-un BRIEF SIMPLU → slide premium. Alegi un PRESET de layout + dai conținutul minim; tool-ul emite blocurile corecte cu smart-defaults (imagine 16:9 rounded, KPI cu count-up, comparație cu reveal). **Începe cu `list_slide_design_presets()`** ca să vezi preseturile + ce câmpuri cer. Cele 8 preset-uri:
+
+| preset | când | content |
+|---|---|---|
+| **hero-image** | intro / deschidere de secțiune — imagine full-bleed + 1 titlu mare | `title`, `imageUrl`, `imageObjectPosition`, `bullets[]`(≤4) |
+| **bold-stat** | o cifră uriașă (ROI/economie) + label mic + 1 frază | `title`, `stat:{value,label,delta?}`, `subtitle` |
+| **kpi-trio** | 3 cifre pe rând (300+ · 24/7 · 99.8%) | `title`, `stats:[{value,label}]`×3 |
+| **split-compare** | Înainte/După (durere→soluție), reveal live la click | `title`, `before:{title,items[]}`, `after:{title,items[]}` |
+| **bullets-with-image** | listă scurtă (3-5) + imagine de sprijin (lateral automat) | `title`, `bullets[]`, `imageUrl` |
+| **quote** | citat mare centrat (social proof) | `quote`, `author`, `authorTitle` |
+| **stat-grid** | 4 cifre de impact | `title`, `stats:[{value,label}]`×4 |
+| **closing-cta** | ultimul slide: pas concret + buton | `title`, `bullets[]`, `ctaLabel` |
+
+Ex: `apply_slide_design(preset:"hero-image", content:{title:"Petreceri fără bătăi de cap", imageUrl:"https://…", imageObjectPosition:"50% 35%"})`.
+
+**2. `compose_rich_slide(presentationId, type, title, blocks[], slideId?, …)`** — control TOTAL când preseturile nu ajung. Trimiți direct blocuri rich; tool-ul le validează (tip cunoscut + câmpuri obligatorii) + smart-defaults. `type`: `cover`(hero)/`info`/`pain`/`solution`/`proof`/`closing-cta`.
+
+**3. `set_slide_background_image(presentationId, slideId, imageUrl, objectPosition?)`** — pune/înlocuiește poza hero pe un slide existent (o mută pe prima poziție → fundal full-bleed pe cover, lateral pe restul).
+
+### Cele 18 blocuri rich (forma JSON)
+`heading{level:1|2|3, text}` · `text{text, size, emphasis:muted|highlight|danger|success, align}` · `image{src, aspectRatio:"16:9"|"4:3"|"1:1", rounded, objectPosition, caption}` · `kpi{value, label, delta:{value,positive}, color, animated}` · `bullets{items[], icon:check|arrow|dot|number|star|x, color}` · `comparison{left:{title,items[],icon,color}, right:{…}, steppedReveal}` · `stat-grid{stats:[{value,label}], columns:2|3|4}` · `quote{quote, author, authorTitle, style:card|minimal|pullquote}` · `cta{label, action:next-slide|schedule|contact, variant}` · `proof-card{proofId, style}` · `objection-card{objectionId, style}` · `calc-ref{calculationId, layout}` · plus chart/video/embed/timeline/divider/spacer. (⚠ `timeline.steps[].icon` și `stat-grid.stats[].icon` NU se randează — nu le pune.)
+
+### ⭐ REGULI de DESIGN premium (ca slide-urile să fie „WOW", nu plate)
+- **1 idee per slide.** Un slide = un singur mesaj. 2 idei → 2 slide-uri.
+- **Hero = imagine + overlay + 1 titlu mare.** Pentru intro/secțiuni: `apply_slide_design(preset:"hero-image")`. Mereu cu `imageUrl` (fără poză, hero-ul cade pe gradient — mai slab). Max 3-4 bullete scurte.
+- **KPI: cifră MARE, label MIC.** O singură cifră dominantă (`bold-stat`), `animated`. Label ≤ 5 cuvinte. Niciodată 4 KPI-uri + text lung pe același slide.
+- **comparison vs bullets:** `split-compare` (Înainte/După, `steppedReveal`) când arăți TRANSFORMAREA durere→soluție; `bullets` pentru o listă simplă de beneficii. Nu pune comparison ca 2 liste fără tensiune.
+- **Paletă o singură dată.** Setează `theme` (preset + `primary`/`accent` din brand) o dată; lasă blocurile fără `color` explicit ca să moștenească brandul. Maxim 1 accent dominant. **Preset-uri premium 2026:** `onyx-gold`, `vibrant-gradient`, `editorial-noir`, `deep-emerald`, `sapphire-executive` (+ cele clasice — `list` prin TemaEditor).
+- **Vocabular care arată premium** (din gold-standard): `heading + image + (bullets|comparison|kpi|stat-grid) + quote`. **Evită** `timeline/chart/embed/divider/spacer` — gold-standardul aproape nu le folosește.
+- **Imagine mereu** `rounded` + `aspectRatio` corect. De unde URL: `browse_brand_media(brandId)` (biblioteca brandului), upload în UI (R2), sau URL public extern. Prin MCP setezi DOAR URL-ul.
+- **Workflow:** `apply_slide_design` per slide → `check_presentation_health` → deschizi Chrome pentru Preview (arăți rezultatul, nu doar „tool success").
 
 ---
 
@@ -268,13 +295,9 @@ Pe **o opțiune de răspuns** (la o întrebare discovery; intro fields acceptă 
 Și **întrebarea/slide-ul întreg** poate avea condiție de vizibilitate (`visibleWhen`/`skipIf`) ca să apară doar pentru anumite profiluri. Tipuri de slide pe care le poți pune: `info` (conținut bogat — 18 blocuri: heading/text/kpi/comparison/bullets/image/chart/timeline/cta...), `question` (discovery + wishlist multiselect), pereche durere+soluție (din bibliotecă, prin Flux), calcul, dovadă, ofertă. Slide-urile statice de tip `info`/`question` se adaugă în `slides[]`; perechile durere/soluție/calc/dovadă/ofertă vin din bibliotecă, controlate din `flowV2`.
 
 ## Verifică coerența DOAR prin MCP (când n-ai Chrome, înainte de Preview)
-Preview-ul vizual e în Chrome, dar poți prinde cele 5 cauze tăcute fără el:
-1. `list_presentation_library_items(kind:"pain")` → mulțimea de `painId` existente.
-2. `get_presentation(section:"typologies")` → fiecare `dominantPains` ⊆ mulțimea de la pasul 1? (orfanii = deck gol).
-3. fiecare durere are `addressedByFeatures` ne-gol cu featId-uri existente (`kind:"feature"`).
-4. `get_presentation(section:"flow")` → `calculation.enabled` + `calculationId` există în `kind:"calculation"`.
-5. fiecare `painTrigger.painId` din întrebări/intro/wishlist ∈ mulțimea de la pasul 1.
-Dacă toate trec, în Preview o să vezi tipologie detectată + dureri + deck plin.
+**Cel mai simplu: `check_presentation_health(brandId, presentationId)`** (read-only) — un singur apel care prinde toate cele 5 cauze tăcute de „deck plat" (id-uri orfane: painId/dominantPains/calculationId; durere fără soluție; placement-mismatch; count>conținut; ofertă lipsă) și întoarce `warnings[]` + diagnostic per pas de flux (ce e activ, ce id referă, dacă există). **Rulează-l ÎNAINTE de a declara prezentarea gata** — dacă `healthy:true`, în Preview o să vezi tipologie detectată + dureri + deck plin.
+
+(Bonus: `patch_presentation`/`save_presentation`/`setup_two_phase_calculation` întorc deja `warnings[]` la fiecare scriere — deci prinzi orfanii pe loc.) Manual, dacă vrei să verifici singur: (1) `list_presentation_library_items(kind:"pain")` → `painId`-urile existente; (2) `get_presentation(section:"typologies")` → fiecare `dominantPains` ⊆ ele; (3) fiecare durere cu `addressedByFeatures` ne-gol; (4) `get_presentation(section:"flow")` → `diagnostics[]` arată calc enabled + id existent; (5) fiecare `painTrigger.painId` ∈ painId-uri.
 
 ---
 

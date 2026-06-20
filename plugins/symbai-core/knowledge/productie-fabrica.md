@@ -127,16 +127,19 @@ Aceasta e calea industrială, pe tabletă (`/workstation-tablet`) sau din `/prod
 - **MPS** (Master Production Schedule) = ce produci, când, pe ce stație, în ce tură.
 - **MRP** = necesarul net de materiale: cerere − stoc existent − deja programat = ce TREBUIE produs/comandat.
 - **Readiness gate** = verificarea obligatorie înainte de planificare/lansare: rețetă + BOM, stoc disponibil, conversii de unități, flux tehnologic activ, echipamente/capacitate, resurse de operație (scule, calibre, testere, grupe de capabilități), calibrare și cerințe QC. Tool: `get_manufacturing_readiness`.
+- **Schedule feasibility gate** = verificarea obligatorie pentru comenzi mari / mai multe loturi înainte de a promite termen sau de a scrie MPS: încarcă turele, operatorii alocați, echipamentele, timpii de operație, capacitățile pe rețetă-echipament și programul deja ocupat. Tool: `get_production_schedule_feasibility`.
 - **Batch material gate** = verificarea obligatorie după ce lotul există și înainte de pornirea shop-floor: stoc disponibil utilizabil, `batch_material_links`, loturi sursă upstream și riscuri de unități. Tool: `get_batch_material_readiness`.
 - **Bucla planificare:**
   1. **Citește cererea**: `get_orders_summary` (`dateFrom`, `dateTo`, `status` all/open/completed/cancelled, `groupBy` product/order) — ce produse sunt cerute, în ce cantități.
   2. **Citește stocul**: `get_stock_levels` (`productType` raw_material/wip/finished_good/all, `warehouseId`, `onlyLowStock`, `productName`) — stoc curent + prag minim + deficit.
   3. **Calculează necesarul net**: `get_mps_net_requirements` (`horizonDays`) — cerere − stoc − programat, pe orizont.
   4. **Readiness**: `get_manufacturing_readiness` pentru rețeta/produsul propus. Dacă status = `blocked`, nu planifica și explică blocajele, inclusiv scule/calibre necalibrate sau echipamente în mentenanță; dacă status = `needs_attention`, cere confirmare cu riscurile clare.
-  5. **Vezi programul**: `list_mps_schedule` (`from`, `to` YYYY-MM-DD) — rețete planificate pe date/ture/stații.
-  6. **Adaugă în plan**: `create_mps_entry` (`scheduledDate` + `plannedQty` obligatorii; opțional `stationId`, `recipeId`, `shiftNumber`, `status` draft/confirmed/in_progress/completed/cancelled).
-  7. **Actualizează plan**: `update_mps_entry` (`entryId` + câmpuri).
-  8. **Loturi planificate**: `list_planned_lots` — loturi pre-producție din comenzi B2B sau cereri interne care necesită producție.
+  5. **Fezabilitate calendar**: `get_production_schedule_feasibility` (`dateFrom`, `dateTo` sau `horizonDays`, `orders`) — confirmă că loturile încap pe echipamente, ture și oameni. Dacă status = `blocked`, nu promite termen; dacă status = `needs_attention`, arată încărcarea și cere acceptare explicită.
+  6. **Auto-programare sigură**: `schedule_production_orders` cu `commit:false` (default) pentru preview de loturi/MPS/operații fixate; `commit:true` doar după confirmarea explicită a userului.
+  7. **Vezi programul**: `list_mps_schedule` (`from`, `to` YYYY-MM-DD) — rețete planificate pe date/ture/stații.
+  8. **Adaugă în plan**: `create_mps_entry` (`scheduledDate` + `plannedQty` obligatorii; opțional `stationId`, `recipeId`, `shiftNumber`, `status` draft/confirmed/in_progress/completed/cancelled).
+  9. **Actualizează plan**: `update_mps_entry` (`entryId` + câmpuri).
+  10. **Loturi planificate**: `list_planned_lots` — loturi pre-producție din comenzi B2B sau cereri interne care necesită producție.
 - După ce planul e aprobat și lotul concret există, dar înainte de `exec_start_operation`, rulezi `get_batch_material_readiness`. Interpretezi astfel:
   - `ready` → lotul are acoperire reală.
   - `partial` → există stoc sau semifabricat candidat, dar lipsește link-ul explicit de staging/pegging sau lotul sursă nu e finalizat.
@@ -244,10 +247,11 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 | „Care e statusul QC al lotului X" | `exec_get_lot_qc_status` (`lotId`). |
 | „Statistici calitate / cele mai dese defecte" | `get_qc_stats` / `get_defect_pareto`. |
 | „Cât rebut/pierderi am avut" | `get_waste_report`. |
-| „Ce trebuie să produc săptămâna asta" | `get_orders_summary` + `get_stock_levels` + `get_mps_net_requirements`, apoi `get_manufacturing_readiness` pe produsele/rețetele care intră în plan. |
-| „Pot porni/programez produsul X?" | `get_manufacturing_readiness` (`productId`/`recipeId` sau `productName`, `quantity`, opțional `scheduledDate`) — verifică BOM, materiale, flux, echipamente/capacitate, scule/calibre, calibrare și QC. |
+| „Ce trebuie să produc săptămâna asta" | `get_orders_summary` + `get_stock_levels` + `get_mps_net_requirements`, apoi `get_manufacturing_readiness` și `get_production_schedule_feasibility` pe produsele/rețetele care intră în plan. |
+| „Pot porni/programez produsul X?" | `get_manufacturing_readiness` (`productId`/`recipeId` sau `productName`, `quantity`, opțional `scheduledDate`) + `get_production_schedule_feasibility` pentru interval — verifică BOM, materiale, flux, echipamente/capacitate, scule/calibre, calibrare, QC și calendar real. |
 | „Pot porni lotul X pe bune / are materialele gata de stație?" | `get_batch_material_readiness` (`batchId`, opțional `operationId`) — verifică stocul utilizabil, link-urile explicite de staging și loturile sursă upstream. |
-| „Pune în planul de producție rețeta X, 500 kg pe vineri" | Întâi `get_manufacturing_readiness`; dacă nu e `blocked`, `create_mps_entry` (`scheduledDate`, `plannedQty`). |
+| „Pune în planul de producție rețeta X, 500 kg pe vineri" | Întâi `get_manufacturing_readiness`, apoi `get_production_schedule_feasibility`; dacă nu e `blocked`, `create_mps_entry` (`scheduledDate`, `plannedQty`) sau `schedule_production_orders` cu `commit:false` pentru preview complet pe echipamente/ture. |
+| „Programează automat comenzile pe echipamente/oameni" | `schedule_production_orders` cu `commit:false` întâi; arată `wouldCreate`, blocajele și capacitatea. Re-rulează cu `commit:true` doar după confirmare explicită. |
 | „Arată-mi programul MPS" | `list_mps_schedule` (`from`, `to`). |
 | „De câte materii prime am nevoie pentru 1000 buc din rețeta X" | `run_bom_explosion` (`recipeId`, `quantity`) — doar previzualizare. |
 | „Cât stoc de semipreparate am" | `get_semipreparate_stock` / `get_production_stock_overview`. |

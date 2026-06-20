@@ -9,34 +9,47 @@ Pluginul se folosește **împreună cu conexiunea MCP** la instanța ta Symbai (
 
 ## Instalare (clientul rulează o singură dată)
 
-În Claude Code:
+**Metoda recomandată — prin fișier, cu AUTO-UPDATE pornit din start.** Funcționează în orice mediu (inclusiv aplicația desktop, unde comanda `/plugin` poate lipsi) și e singura care pornește actualizarea automată. Editează `settings.json` din folderul Claude (Windows: `C:\Users\<nume>\.claude\settings.json`; macOS/Linux: `~/.claude/settings.json`; creează-l dacă lipsește) și **îmbină** următoarele chei, păstrând restul fișierului:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "symbai": {
+      "source": { "source": "git", "url": "https://github.com/sinesteziadrimo/symbaimemory.git" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": { "symbai-core@symbai": true }
+}
+```
+
+> ⚠️ `"autoUpdate": true` este **obligatoriu** — fără el rămâi blocat pe versiunea de la instalare și nu mai primești ghidurile noi. Comanda `/plugin marketplace add` **nu** pornește auto-update — de aceea folosim fișierul.
+
+Apoi instalează pluginul **o singură dată** (activarea efectivă), pe metoda disponibilă la tine:
 
 ```
-/plugin marketplace add sinesteziadrimo/symbaimemory
+# caseta de chat Claude Code:
 /plugin install symbai-core@symbai
+# aplicația desktop fără /plugin: Customize / Settings → Plugins/Marketplaces → instalează „symbai-core" din marketplace-ul „symbai"
+# terminal, doar dacă `claude --version` merge:
+claude plugin install symbai-core@symbai
 ```
 
-Sau din terminal:
+Repornește Claude Code. De aici încolo pluginul se actualizează **singur** la fiecare pornire — nu mai faci nimic.
 
-```bash
-claude plugin marketplace add sinesteziadrimo/symbaimemory
-```
-
-Apoi, din portalul tău Symbai Hub → **Acces AI**, ia instrucțiunile de conectare la datele instanței tale — fie mesajul de lipit în chat (aplicația Claude Desktop, fără terminal), fie comanda pentru terminal (`claude mcp add --transport http --scope user symbai ...`). Dacă ceva nu merge la conectare, spune-i asistentului „conectează-mă la Symbai" — skill-ul `conecteaza-symbai` îl ghidează (inclusiv la eroarea „Some MCP servers could not be loaded").
+Separat, din portalul tău Symbai Hub → **Acces AI**, ia instrucțiunile de conectare la datele instanței tale (server MCP `symbai`). Dacă ceva nu merge la conectare, spune-i asistentului „conectează-mă la Symbai" — skill-ul `conecteaza-symbai` îl ghidează (inclusiv la eroarea „Some MCP servers could not be loaded").
 
 ## Actualizare
 
-Când Symbai publică ghiduri sau funcții noi:
+Cu `"autoUpdate": true` în `settings.json` (vezi Instalare) **nu trebuie să faci nimic** — Claude Code reîmprospătează marketplace-ul și upgradează pluginul la fiecare pornire.
 
-```
-/plugin marketplace update symbai
-```
-
-(sau scrie în chat „actualizează skill-urile Symbai" — skill-ul `symbai-update` te ghidează.)
+Dacă vrei ultima versiune **imediat**, fără să aștepți următoarea pornire: scrie în chat „actualizează skill-urile Symbai" (skill-ul `symbai-update` te ghidează și îți verifică/pornește auto-update-ul), sau, dacă ai comanda disponibilă, `/plugin marketplace update symbai`.
 
 ## Cum se livrează conținut nou
 
-Echipa Symbai urcă fișiere noi de skill/knowledge în acest repo (pe `main`). Clienții le iau cu `/plugin marketplace update symbai`. Versiunea pluginului se bumpează în `plugins/symbai-core/.claude-plugin/plugin.json` + intrarea din `.claude-plugin/marketplace.json`.
+Echipa Symbai urcă fișiere noi de skill/knowledge în acest repo (pe `main`) și **bumpează versiunea** în `plugins/symbai-core/.claude-plugin/plugin.json` + intrarea din `.claude-plugin/marketplace.json`. Clienții cu `autoUpdate: true` le primesc automat la următoarea pornire; ceilalți, manual cu `/plugin marketplace update symbai`.
+
+> **Bumpul de versiune e obligatoriu la fiecare livrare.** Claude Code servește pluginul dintr-un folder fixat pe versiune (`cache/symbai/symbai-core/<versiune>/`); dacă `version` nu se schimbă, clienții rămân pe copia veche din cache chiar dacă au tras commit-uri noi.
 
 ## Structură
 

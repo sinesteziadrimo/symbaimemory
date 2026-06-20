@@ -3,6 +3,7 @@
 > Pentru linkul exact către orice pagină folosește `gaseste_in_aplicatie` — el e sursa autoritară de navigare.
 > Acest ghid = **cum CONSTRUIEȘTI și CONFIGUREZI site-ul public** (paginile, componentele, aspectul, catalogul pe site). Pentru **comenzi online / eMAG / feed-uri / retururi** vezi `ecommerce-magazin-online.md`. Pentru **portalul clienților** (aplicația de la masă, prin QR — meniu/comenzi/rezervări) vezi `portal-config.md`. Sunt lucruri DIFERITE: portalul = app-ul pentru clienții din local; website-ul = site-ul public, indexat de Google, cu magazin.
 > ⭐ **Pentru CALITATE (ce face un magazin să convertească) + cum explici clientului fiecare alegere, citește `website-best-practices-2026.md`** — best-practice moderne (header pe 2 rânduri cu bară de categorii dedicată, megamenu cu grupuri + hover lin, search proeminent, anti-dead-end pe pagina de produs, „shop by age/occasion", bară de transport gratuit), fiecare cu cifra de conversie de citat clientului.
+> 🛍️ **Pentru PAGINA DE PRODUS completă (galerie, descriere lungă, specificații, preț redus, garanție, FAQ, accesorii, pachete, video) citește `website-builder-pdp.md`** — rețetă cu listă de bife + ce tool completează fiecare lucru pe pagină.
 
 ## Pe scurt — ce e și ce poate face
 
@@ -55,11 +56,14 @@ Symbai are un **builder de website** integrat: din catalogul de produse + meniul
 - `create_menu_category` — creează o categorie; acceptă `parentId` pentru ierarhie.
 - `bulk_reparent_menu_categories` — mută atomic mai multe categorii sub un părinte (sau la rădăcină) — construiește/repară arborele.
 - `set_products_menu_category` — pune mai multe produse într-o categorie deodată. **Important**: count-ul de produse pe categorie se citește de aici — fără el, categoria poate apărea „0 produse" chiar dacă are articole pe meniu.
-- `add_menu_item` / `update_menu_item` — pun produsul pe meniu cu câmpurile de magazin: `productBrand` (brand), `material`, `ageRangeMin`/`ageRangeMax` (vârstă), `interestCategory` (categorie de interes), `dimensions`. **Acestea alimentează filtrele faceted** (brand/material/vârstă/interes).
+- `add_menu_item` / `update_menu_item` — pun produsul pe meniu cu câmpurile de magazin: `productBrand` (brand), `material`, `ageRangeMin`/`ageRangeMax` (vârstă), `interestCategory` (categorie de interes), `dimensions`. **Acestea alimentează filtrele faceted** (brand/material/vârstă/interes). PLUS câmpurile de **pagină de produs bogată** (vezi `website-builder-pdp.md`): **`compareAtPrice`** (preț VECHI → reducere: strikethrough + badge „-N%" + „Economisești N lei"), **`descriptionHtml`** (descriere LUNGĂ HTML pentru tab-ul Descriere; `description` = textul scurt), **`specs`** (tabel de specificații: listă de `{label, value}`), **`faq`** (întrebări frecvente: listă de `{q, a}`), **`warrantyMonths`** (garanție în luni → „Garanție inclusă: 24 luni"), **`displaySku`** (cod produs vizibil), **`badges`** (etichete marketing: `free_shipping`/`installments`/`new`/`bestseller`/`eco`), **`installmentMonths`** (rate fără dobândă, ex. `[3,6,12]`), **`videoUrl`** (video YouTube/Vimeo), **`safetyCert`** (`["EN71","OEKO-TEX"]` → badge-uri de certificare).
+- `update_menu_category_fields(categoryId, imageUrl)` — **imagine curată per categorie** (tile category-grid). Fără ea, storefront-ul derivă poza categoriei din primul produs. `clear:["imageUrl"]` revine la derivare.
 - `set_product_image` / `bulk_set_product_images` — poza principală + galerie.
-- `set_product_variants` — variante (mărime/culoare) cu preț/stoc per variantă.
+- `set_product_variants` — variante (mărime/culoare) cu preț/stoc per variantă (compareAtPrice merge și per variantă).
 - `define_product_custom_fields` / `list_product_custom_fields` — câmpuri custom pe produs (ex. „Certificare", „Compoziție").
-- `set_product_recommendations` — produse recomandate (cross-sell).
+- `bulk_set_product_custom_values` — completează specificațiile (specs) pe zeci/sute de produse dintr-un singur apel.
+- `set_product_recommendations` — produse recomandate pe pagina de produs (accesorii / „S-ar putea să te intereseze" / „Alți clienți au cumpărat"), cu tip de relație.
+- `set_product_bundle` — pachet „Cumpărate frecvent împreună" (produs principal + produse din pachet + reducere opțională).
 
 **Promoții & setări**
 - `create_website_promotion` / `update_website_promotion` / `list_website_promotions` — bannere/pop-up-uri pe site (placement: banner / header-strip / footer-strip / side-modal).
@@ -91,7 +95,8 @@ Le pui prin `add_website_section`/`set_website_page_content` cu `type` + `config
 6. **Footer + legale**: `set_website_footer(contactInfo + socialLinks + columns)` + `set_website_legal_page` pentru Despre/Contact/Termeni/Confidențialitate/Livrare/Retur/FAQ (`fillCompanyData:true`) — conform ANPC, indexat de Google.
 7. **Anunțuri + logo**: `add_website_section(type:"announcement-bar", ...)` + logo în navigare.
 8. **Promoții**: `create_website_promotion` (pop-up de abonare / banner reduceri).
-9. **Verifică**: deschide site-ul (link prin `gaseste_in_aplicatie`) — Acasă, o categorie-părinte (subcategorii + produse + filtre), Despre/Contact pline. Pune o comandă test.
+9. **Pagini de produs bogate** (cel puțin pe best-sellers): galerie ≥3 poze, descriere lungă, specificații, preț redus, garanție, FAQ, accesorii/pachet — vezi rețeta completă în `website-builder-pdp.md`.
+10. **Verifică**: deschide site-ul (link prin `gaseste_in_aplicatie`) — Acasă, o categorie-părinte (subcategorii + produse + filtre), o pagină de produs (galerie + tab-uri + specificații + preț redus + FAQ + accesorii), Despre/Contact pline. Pune o comandă test.
 
 ## Bune practici (ca să arate „ca un magazin mare")
 
@@ -118,5 +123,6 @@ Le pui prin `add_website_section`/`set_website_page_content` cu `type` + `config
 - **Diferența website vs portal?** Portalul = app-ul pentru clienții din local (QR la masă: meniu/comenzi/rezervări). Website-ul = site-ul public indexat de Google, cu magazin. Configurări diferite, tool-uri diferite.
 - **Pot importa un magazin existent (alt site)?** Da — vezi `onboarding/02d-import-surse-externe.md` (import asistat din surse externe). După import, aplici rețeta de mai sus (ierarhie + filtre + footer + legale).
 - **Cum fac filtrele ca la magazinele mari?** Activează `showFacets` pe grila de produse ȘI populează brand/material/vârstă/interes pe produse.
+- **Cum fac pagina de produs să arate completă (ca la Bebebliss/eMAG)?** Galerie ≥3 poze + descriere lungă + specificații + preț redus + garanție + FAQ + accesorii/pachet + (opțional) video — rețeta cu bife și tool-uri în `website-builder-pdp.md`.
 - **De ce e goală o categorie când dau click?** Ori e părinte fără ierarhie setată, ori produsele nu sunt legate de ea (`set_products_menu_category`).
 - **Unde văd comenzile de pe site?** În modulul de magazin — `ecommerce-magazin-online.md` (`/ecommerce/orders`).

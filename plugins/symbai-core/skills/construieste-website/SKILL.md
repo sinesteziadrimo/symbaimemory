@@ -1,6 +1,6 @@
 ---
 name: construieste-website
-description: Construiește, îmbunătățește și configurează SITE-UL PUBLIC / magazinul online al brandului prin conexiune (MCP) — pagini, componente, ierarhie de categorii, filtre faceted, hero, footer, pagini legale (Despre/Contact/Termeni/ANPC), bară de anunțuri, logo, promoții, temă. Folosește la „fă-mi un site / magazin online", „construiește-mi magazinul", „adaugă filtre / categorii / subcategorii pe site", „site-ul arată gol / categoriile sunt goale", „pune un hero / banner / footer mai bun", „adaugă pagina Despre / Termeni / Livrare", „de ce nu apar produsele pe categorie", „fă site-ul să arate ca un magazin mare", „pune o bară de anunțuri / pop-up de reduceri", „schimbă aspectul / culorile site-ului". NU pentru: comenzi online/eMAG/feeds/retururi (→ gestioneaza-ecommerce-emag), portalul clienților de la masă (→ configureaza-portal).
+description: Construiește, îmbunătățește și configurează SITE-UL PUBLIC / magazinul online al brandului prin conexiune (MCP) — pagini, componente, ierarhie de categorii, filtre faceted, hero, footer, pagini legale (Despre/Contact/Termeni/ANPC), bară de anunțuri, logo, promoții, temă, ȘI pagina de produs completă (galerie, descriere lungă, specificații, preț redus, garanție, FAQ, accesorii, pachete, video). Folosește la „fă-mi un site / magazin online", „construiește-mi magazinul", „adaugă filtre / categorii / subcategorii pe site", „site-ul arată gol / categoriile sunt goale", „pune un hero / banner / footer mai bun", „adaugă pagina Despre / Termeni / Livrare", „de ce nu apar produsele pe categorie", „fă site-ul să arate ca un magazin mare", „pune o bară de anunțuri / pop-up de reduceri", „schimbă aspectul / culorile site-ului", „fă pagina de produs completă", „produsul arată sărac pe site", „adaugă specificații / garanție / FAQ la produs", „pune accesorii compatibile / produse recomandate", „pune un pachet cumpărate frecvent împreună", „adaugă galerie de poze la produs", „pune preț redus / rate / video / certificări pe produs". NU pentru: comenzi online/eMAG/feeds/retururi (→ gestioneaza-ecommerce-emag), portalul clienților de la masă (→ configureaza-portal).
 ---
 
 # Construiește website / magazin online — hands-free, prin conexiune + link direct
@@ -8,7 +8,7 @@ description: Construiește, îmbunătățește și configurează SITE-UL PUBLIC 
 Proprietarul vrea un **site public / magazin** care arată și funcționează bine — fără să umble prin builder. Tu faci munca prin **tool-urile MCP** (date + acțiuni reale pe instanța lui) și-i **arăți** rezultatul deschizând pagina cu link direct + screenshot. Vorbește pe limba lui de business („site", „magazin", „pagina Despre", „filtre", „categorii") — niciodată „MCP/tool/component/JSON".
 
 ## Înainte de orice
-1. Citește **`knowledge/agent-operare-avansata.md`** (standardul de execuție cap-coadă), **`knowledge/website-builder.md`** (ce poate face builder-ul, toate componentele, tool-urile, rețeta rapidă, capcanele), **`knowledge/website-best-practices-2026.md`** (⭐ best-practice moderne de e-commerce + cifrele de conversie + cum le EXPLICI clientului — aplică-le la fiecare build) și **`knowledge/condu-chrome.md`** (cum arăți paginile: deep-link + screenshot). Pentru catalog/produse leagă `knowledge/produse-meniu-retete.md`; pentru comenzi/eMAG `knowledge/ecommerce-magazin-online.md`; pentru import dintr-un site existent `knowledge/onboarding/02d-import-surse-externe.md`.
+1. Citește **`knowledge/agent-operare-avansata.md`** (standardul de execuție cap-coadă), **`knowledge/website-builder.md`** (ce poate face builder-ul, toate componentele, tool-urile, rețeta rapidă, capcanele), **`knowledge/website-builder-pdp.md`** (🛍️ pagina de produs COMPLETĂ: galerie, descriere lungă, specificații, preț redus, garanție, FAQ, accesorii, pachete, video — listă de bife + tool per câmp), **`knowledge/website-best-practices-2026.md`** (⭐ best-practice moderne de e-commerce + cifrele de conversie + cum le EXPLICI clientului — aplică-le la fiecare build) și **`knowledge/condu-chrome.md`** (cum arăți paginile: deep-link + screenshot). Pentru catalog/produse leagă `knowledge/produse-meniu-retete.md`; pentru textul descrierilor (SEO/anti-duplicat) `knowledge/descrieri-produse-seo.md`; pentru comenzi/eMAG `knowledge/ecommerce-magazin-online.md`; pentru import dintr-un site existent `knowledge/onboarding/02d-import-surse-externe.md`.
 2. **Context (citiri, fă-le întâi):** `list_brands` (+ `list_locations`) → `brandId`. `list_websites(brandId)` → există deja un site? ce `id`/`kind`? `get_ecommerce_settings(brandId)` → monedă/TVA/checkout. `list_menus`/`list_menu_items` → are catalog cu prețuri? `list_menu_categories` → câte categorii, au ierarhie? `browse_brand_media(brandId)` → poze pentru hero/logo.
 3. **Permisiune** pe token: `setari` (scrierile de site/footer/legale/promoții) + `produse_meniu` (categorii/produse/atribuiri). Fără modul → scrierea întoarce „permisiune insuficientă" → userul bifează modulul în Hub → Acces AI.
 
@@ -50,6 +50,20 @@ Logo-ul e cel mai des copiat GREȘIT. Reguli:
 | „schimbă culorile / aspectul" | culoarea vine din brand (`apply_website_template` o preia); fine-tuning prin `update_menu_display_config` |
 | „adaugă variante (mărimi/culori) la produs" | `set_product_variants(productId, variants)` |
 | „TVA-ul e greșit (19%)" | corectează la **21%** (cota standard RO): `update_ecommerce_settings` + produsele (TVA pe produs) |
+| „pune reduceri / preț tăiat / badge -N%" | `add_menu_item`/`update_menu_item` cu **`compareAtPrice`** = prețul VECHI (mai mare); `price` = prețul redus. Storefront-ul afișează automat strikethrough + „-N%". NU mai trebuie variante. (Reduceri pe tot catalogul = batch `update_menu_item` cu compareAtPrice.) |
+| „poze curate pe categorii (nu din primul produs)" | `update_menu_category_fields(categoryId, imageUrl)` — imagine reprezentativă per categorie (tile category-grid). `clear:["imageUrl"]` = revine la derivare din primul produs. |
+| „video pe pagina de produs" | `update_menu_item(menuItemId, videoUrl)` — YouTube/Vimeo/CDN, afișat pe pagina de produs. |
+| „badge-uri de certificare (EN71/OEKO-TEX/CE)" | `add_menu_item`/`update_menu_item` cu **`safetyCert: ["EN71","OEKO-TEX"]`** — badge pe card/pagină. |
+| „fă pagina de produs completă / produsul arată sărac pe site" | rețeta din `knowledge/website-builder-pdp.md` (galerie + descriere lungă + specificații + preț redus + garanție + FAQ + accesorii/pachet) |
+| „adaugă galerie de poze la produs" | `bulk_set_product_images` (mai multe deodată; prima = coperta) / `set_product_image` (una) |
+| „descriere lungă / detaliată pe produs (tab Descriere)" | `update_menu_item` cu **`descriptionHtml`** (text bogat: titluri/liste/poze/tabele); `description` = textul scurt |
+| „adaugă specificații (tabel) la produs" | `update_menu_item` cu **`specs: [{label, value}, ...]`** (sau în masă: `bulk_set_product_custom_values`) |
+| „adaugă garanție / cod produs vizibil" | `update_menu_item` cu **`warrantyMonths`** (ex. 24) și/sau **`displaySku`** (ex. „1179/1341") |
+| „adaugă întrebări frecvente (FAQ) la produs" | `update_menu_item` cu **`faq: [{q, a}, ...]`** — 3-5 întrebări reale |
+| „pune etichete (transport gratuit / nou / bestseller)" | `update_menu_item` cu **`badges: ["free_shipping","installments","new","bestseller","eco"]`** |
+| „pune rate fără dobândă" | `update_menu_item` cu **`installmentMonths: [3,6,12]`** → „Plătește în până la N rate" |
+| „pune accesorii / produse recomandate / similare" | `set_product_recommendations` (cu tip de relație: accesorii / similare / complementare) |
+| „pune un pachet «cumpărate frecvent împreună»" | `set_product_bundle` (produs principal + produse din pachet + reducere opțională) |
 
 ## Ordinea de impact când „faci site-ul ca lumea" (de sus în jos)
 1. **Catalog complet** — produse cu poze + preț + TVA 21 + brand/material/vârstă.
@@ -57,9 +71,19 @@ Logo-ul e cel mai des copiat GREȘIT. Reguli:
 3. **Filtre** — `showFacets`+`showFilters` pe grila de produse.
 4. **Hero** pe Acasă (imagine reală).
 5. **Footer + pagini legale** (Despre/Contact/Termeni/Confidențialitate/Livrare/Retur/FAQ, `fillCompanyData`).
-6. **Anunțuri + logo + promoții**.
-7. **Comandă test** (vezi `ecommerce-magazin-online.md`).
-8. **⚠ VERIFICĂ cu `audit_shop_health` + repară** (vezi mai jos) — ÎNAINTE de a-i spune userului că e gata.
+6. **Pagini de produs bogate** (cel puțin pe best-sellers) — vezi secțiunea de mai jos.
+7. **Anunțuri + logo + promoții**.
+8. **Comandă test** (vezi `ecommerce-magazin-online.md`).
+9. **⚠ VERIFICĂ cu `audit_shop_health` + repară** (vezi mai jos) — ÎNAINTE de a-i spune userului că e gata.
+
+## 🛍️ Pagina de produs completă (PDP) — „produsul arată sărac pe site"
+Când userul cere o pagină de produs bogată (ca la Bebebliss/eMAG) sau spune că „produsul arată sărac", **urmează rețeta din `knowledge/website-builder-pdp.md`** (listă de bife + tool per câmp). Pe scurt, completezi pe `update_menu_item` (plus poze/recomandări/pachet):
+- **Galerie ≥3 poze** (`bulk_set_product_images`, prima = coperta) + **descriere lungă** (`descriptionHtml`; `description` rămâne textul scurt) + **specificații** (`specs`, sau `bulk_set_product_custom_values` pe multe produse).
+- **Preț redus** (`compareAtPrice` = preț vechi) + **garanție** (`warrantyMonths`) + **cod produs** (`displaySku`) + **certificări** (`safetyCert`) + **etichete** (`badges`) + **rate** (`installmentMonths`).
+- **FAQ** (`faq`) + **video** (`videoUrl`).
+- **Accesorii / similare** (`set_product_recommendations`) + **pachet «cumpărate frecvent împreună»** (`set_product_bundle`).
+- **Import dintr-un magazin existent**: dai URL-ul produsului/site-ului → se preiau pozele, descrierea și specificațiile pe produs (detaliu în `website-builder-pdp.md` + secțiunea „Replici un site existent" de mai sus). **Nu inventa** garanție, certificări sau specificații care nu sunt reale.
+- **Verifică**: deschide pagina produsului (deep-link + screenshot) — galerie, tab-uri, specificații, preț redus, FAQ, accesorii. Nu spune „gata" până n-ai văzut pagina plină.
 
 ## ⚠⚠ VERIFICARE OBLIGATORIE — auto-corectează-te, nu aștepta ca userul să-ți găsească greșelile
 După ORICE build sau import de magazin, **RULEAZĂ `audit_shop_health(brandId)`**. Întoarce probleme cu severity `error`/`warn` + statistici (categorii goale/plate/gunoi, TVA în afara 0/11/21, % filtre brand/material/vârstă, email placeholder, navbar/footer prea mari, hero fără imagine, produse fără poză).

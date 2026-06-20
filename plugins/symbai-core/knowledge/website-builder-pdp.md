@@ -1,6 +1,6 @@
 # Pagina de produs (PDP) — cum o faci COMPLETĂ, ca la magazinele mari
 
-> PDP = „pagina de produs" (Product Detail Page): pagina pe care ajunge clientul când dă click pe un produs din magazinul online (`/produs/:id`). Aici se decide vânzarea.
+> PDP = „pagina de produs" (Product Detail Page): pagina pe care ajunge clientul când dă click pe un produs din magazinul online. URL-ul canonic e pe **slug** (`/produs/<slug>`, ex. `/produs/scaun-auto-0-13-kg`) — bun pentru SEO; `/produs/<id>` rămâne ca fallback și face automat redirect 301 spre slug. Aici se decide vânzarea.
 > Acest ghid = **ce pui pe pagina de produs ca să arate bogată și să convertească** + ce tool MCP completează fiecare lucru. Pentru construirea site-ului în ansamblu (pagini, categorii, filtre, hero, footer) vezi `website-builder.md`. Pentru textul descrierii (SEO, anti-duplicat, lungime) vezi `descrieri-produse-seo.md`.
 
 ## De ce contează

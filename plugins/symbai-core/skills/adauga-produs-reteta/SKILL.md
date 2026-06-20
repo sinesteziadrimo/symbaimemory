@@ -17,7 +17,8 @@ Regula de bază peste tot: **nu inventa NIMIC** — nici prețuri, nici gramaje,
 
 1. **Întreabă userul de unde vin datele**: website-ul restaurantului? PDF cu meniul? Excel/export din vechiul POS? poze? pagina de Glovo/Wolt? Cere-i fișierele direct în chat.
 2. **Website**: ia conținutul URL-ului. Dacă HTML-ul vine gol → e un SPA (React/Angular/Vue); **caută API-ul din spate** — platformele de meniu au de regulă un endpoint JSON public (exemplu real: SmartMenu servește totul din Firebase Realtime DB, `https://smart-menu-...firebasedatabase.app/restaurant-menus/{slug}.json` → categorii → produse, cu name/price/description/weight/allergens/imageUrl per produs). Dacă nu găsești API-ul, cere userului un export sau screenshot-uri — nu ghici conținutul.
-3. **Per produs vrei**: nume, preț, categorie/secție (bucătărie vs bar), descriere, gramaj, alergeni, poză (URL), și pentru băuturi: cum se vinde (sticlă întreagă vs porție turnată).
+3. **Per produs vrei**: nume, preț, categorie/secție (bucătărie vs bar), descriere, gramaj, alergeni, poză (URL), **slug-ul SEO din URL** (ultimul segment, ex. `site.ro/scaun-auto-0-13-kg` → `scaun-auto-0-13-kg`), și pentru băuturi: cum se vinde (sticlă întreagă vs porție turnată).
+   - **Slug-ul sursă**: la magazine care se MUTĂ pe Symbai, trimite slug-ul vechi ca arg `slug` la `add_menu_item`/`bulk_add_menu_items` (și `create_menu_category`) ca să PĂSTREZI URL-urile indexate (continuitate SEO, fără 404). Dacă nu-l trimiți, platforma generează automat unul curat din nume. Detalii: `knowledge/onboarding/02d-import-surse-externe.md` → „Slug-ul SEO din URL-ul sursei".
 4. **Inventariază ce lipsește** și pune userului **UN singur set compact de întrebări**, nu câte una pe rând.
 5. Alternativă in-app (propune-o când userul are PDF/poze/Excel și preferă să nu treci tu prin MCP): paginile `/menu/import-pdf` (extrage produse + prețuri + poze + design) și `/ai-bulk-import` (Excel cu mapare AI) fac importul direct în aplicație.
 

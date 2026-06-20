@@ -305,9 +305,10 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `read_integration_memory_files` — Citește fișierele de memorie ale integrărilor. (parametri opționali: fileType, integrationKey)
 - `view_brand_media` — Arată-ți EFECTIV o imagine din Biblioteca Media (sau de la un URL) ca s-o VEZI și să alegi ce atașezi la o postare. (parametri opționali: mediaAssetId, url)
 
-### Diverse — 78
+### Diverse — 80
 - `analyze_food_costs` — Analizează food cost-ul produselor unui brand. (necesită: brandId)
 - `analyze_procurement` — Analizează aprovizionarea unui brand (furnizori, prețuri, lead time-uri). (necesită: brandId)
+- `analyze_external_website` — Analizează read-only un website public și întoarce un source brief pentru replicare rapidă în builder: SEO, logo/favicon, culori, fonturi, navigație, CTA-uri, imagini/video, secțiuni, JSON-LD și indicii Next.js. Pentru copiere fidelă folosește `crawlPages:true`, `maxPages:12` și `pageUrls` pentru pagini critice; întoarce `crawl.pages`, `crawl.errors`, `crawl.urlMap`, `crawl.canonicalSlugs`, plus `frameworkHints.nextData.componentCounts`, `componentSamples`, `routeHints` și `sliderHints`. (necesită: url)
 - `audit_shop_health` — Auditează SĂNĂTATEA magazinului online al unui brand și întoarce probleme (severity error/warn) + statistici. (necesită: brandId)
 - `build_recall_report` — Construiește RAPORTUL DE RETRAGERE (recall) pentru un lot — arborele complet de impact într-un singur apel: toate loturile descendente (în ce s-a transformat / unde a ajuns) și, opțional, cele ascende (necesită: lotId)
 - `check_efactura_status` 🌐 — Verifică la ANAF starea unei facturi trimise în e-Factura (acceptată / respinsă cu erori / în procesare) și actualizează statusul local. (necesită: invoiceId)
@@ -324,7 +325,8 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_event_fiche` — Citește fișa unui EVENIMENT/REZERVARE (dintr-un deal CRM convertit) — secțiunea cerută. (necesită: reservationId, section)
 - `get_factory_dashboard` — Obține dashboard-ul fabricii: pipeline loturi, status echipamente, livrări azi/mâine, probleme QC, lipsuri materie primă, KPI-uri globale.
 - `get_keyword_rankings` — Istoricul de poziții al unui cuvânt-cheie urmărit (evoluția în Google pe ultimele N zile). (necesită: id)
-- `get_manufacturing_readiness` — Audit read-only de pregătire fabricație pentru o rețetă/produs: BoM, stoc disponibil, flux tehnologic, echipamente/capacități, QC și recomandări înainte de MPS/lansare lot. (parametri opționali: recipeId, productId, productName, quantity)
+- `get_manufacturing_readiness` — Audit read-only de pregătire fabricație pentru o rețetă/produs: BoM, stoc disponibil, flux tehnologic, echipamente/capacități, resurse/scule/calibre, calibrare echipamente, QC și recomandări înainte de MPS/lansare lot. (parametri opționali: recipeId, productId, productName, quantity)
+- `get_batch_material_readiness` — Audit read-only înainte de pornirea shop-floor: verifică dacă materialele unui lot/operații sunt realmente gata, nu doar existente undeva în stoc; separă deficit real, risc de unități, lipsă staging/pegging și loturi sursă upstream nefinalizate. (necesită: batchId; parametri opționali: operationId)
 - `get_material_design` — Citește un material grafic ca să-l ÎNȚELEGI: dimensiunile colii (mm + px), fundalul, și TOATE elementele cu id, tip, poziție (px + procente din coală), dimensiune, conținut/culoare. (necesită: designId)
 - `get_my_tasks` — Sarcinile vizibile unui angajat în ziua dată, grupate Întârziate → Azi → Viitoare + Generale (libere) + Finalizate azi. (necesită: employeeId)
 - `get_nutrition_gaps` — Arată ce ingrediente ale unui produs NU au încă valori nutriționale completate — adică ce te împiedică să rulezi recalc_product_nutrition cu succes. (necesită: productId)
@@ -380,6 +382,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_tasks` — Listează sarcinile, cu filtre. (parametri opționali: listId, assignedTo, status, locationId)
 - `list_temperature_logs` — Listează citirile de temperatură din jurnalul HACCP, cu rezumat de CONFORMITATE calculat pe server (câte normale vs în afara pragului). (parametri opționali: locationId, dateFrom, dateTo, aggregate)
 - `list_website_legal_pages` — Listează paginile legale ale magazinului unui brand și arată care sunt PERSONALIZATE (cu date reale de firmă) vs încă pe text GENERIC de șablon (de completat pentru conformitate). (necesită: brandId)
+- `list_website_component_catalog` — Listează catalogul de componente Website Builder, schema de config și exemple; include `custom-html` pentru componente custom. (parametri opționali: type, category, vertical, includeSchema, includeExamples)
 - `list_website_promotions` — Listează promoțiile de website (bannere/pop-up-uri afișate pe site-ul brandului). (parametri opționali: brandId, placement, activeOnly)
 - `list_websites` — Listează website-urile magazinului (config-uri builder din /ecommerce/websites): brand, nume, culoare, paginile din builder + numărul de itemi de meniu. (parametri opționali: brandId)
 - `seo_audit` — Audit SEO on-page: dă un scor 0-100 + probleme concrete cu fix-uri (cuvânt-cheie în titlu/slug/H1/H2/primul paragraf/densitate, lungimi titlu/meta, conținut minim, imagini & alt-text, link-uri interne (parametri opționali: brandId, postId, title, content)
@@ -474,7 +477,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `archive_flow_version` — Arhivează un flux tehnologic. (necesită: flowVersionId)
 - `assign_recipe_to_zone` — Asociază o rețetă cu o zonă de producție. (necesită: recipeId, zoneId)
 - `auto_chain_operations` — Creează automat dependențe FS (Finish-Start) secvențiale pentru toate operațiile unui flux, în ordinea lor. (necesită: flowVersionId)
-- `build_complete_flow` — Construiește un flux tehnologic complet dintr-un singur apel: creează fluxul, operațiile, materialele (cu productName auto-rezolvare), output-urile, QC checks, dependențele. (necesită: operations)
+- `build_complete_flow` — Construiește un flux tehnologic complet dintr-un singur apel: creează fluxul, operațiile, materialele (cu `requirementType`, `sourceStrategy`, `sourceOperationIndex`), output-urile (cu `outputUnit`, `outputType`, `targetOperationIndex`), QC checks și dependențele. (necesită: operations)
 - `bulk_create_shift_assignments` — Asignează mai mulți angajați la o tură pe mai multe zile (combinații). (necesită: shiftId, employeeIds, dates)
 - `bulk_create_zones_and_equipment` — Creează mai multe zone de producție cu echipamente dintr-o dată. (necesită: zones)
 - `clone_flow_version` — Duplică un flux existent pentru a crea o versiune nouă. (necesită: flowVersionId)
@@ -589,13 +592,14 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_reservation` — Actualizează o rezervare existentă (status, data, ora, nr persoane, note, etc.) (necesită: reservationId)
 - `update_waitlist_entry` — Actualizează o intrare din lista de așteptare (status, timp estimat, etc.) (necesită: entryId)
 
-### marketing_social — Marketing & Social Media — 52 tool-uri
+### marketing_social — Marketing & Social Media — 53 tool-uri
 - `add_material_elements` — Adaugă unul sau mai multe elemente (text/imagine/formă/linie/slot QR) pe o pagină a unui material existent. (necesită: designId, elements)
 - `add_seo_competitor` — Adaugă un concurent SEO la urmărire (după domeniu, ex. (necesită: domain)
 - `apply_brand_to_material` — Aplică identitatea de brand pe un material: recolorează la paleta brandului, setează fontul de brand și/sau inserează logo-ul brandului. (necesită: designId)
 - `approve_social_post` — Aprobă sau respinge o postare social media aflată „în așteptare aprobare”. (necesită: postId, approvalStatus)
 - `arrange_material_elements` — Aranjează elemente la nivel înalt (fără să calculezi px): aliniere la coală (stânga/dreapta/sus/jos/centru), centrare (orizontal/vertical/ambele), distribuție egală (3+ elemente), ordine straturi (în (necesită: designId, action, ids)
 - `bulk_schedule_social_posts` 🌐 — Creează în masă mai multe postări social media dintr-o listă (stil Buffer/Hootsuite). (necesită: posts)
+- `bulk_create_blog_posts` — Importă până la 50 de articole de blog cu dry-run, păstrare slug/data/canonical și redirect 301 din legacyPath. Folosește la migrare website/WordPress. (necesită: posts)
 - `bulk_update_blog_posts` — Operație în masă pe mai multe articole de blog: publish (publică), archive (arhivează), feature (marchează recomandat), unfeature. (necesită: action, ids)
 - `cancel_social_post` — Anulează o postare social media programată sau draft (nu poate anula postări deja publicate). (necesită: postId)
 - `conecteaza_instagram_din_facebook` 🌐 — Leagă contul Instagram Business al brandului folosind pagina de Facebook deja conectată — execută legarea direct, fără link OAuth separat (Meta refolosește tokenul paginii). (parametri opționali: brandId)
@@ -857,13 +861,16 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_delivery_zone` — Modifică o zonă de livrare existentă (taxe, praguri, ore, contur, activare). (necesită: id)
 - `update_vehicle` — Modifică un vehicul din flotă (număr, tip, status, capacitate, șofer alocat). (necesită: id)
 
-### ecommerce — Magazin Online — 17 tool-uri
+### ecommerce — Magazin Online — 21 tool-uri
+- `analyze_external_website` — Analizează read-only un website public și întoarce un source brief pentru replicare rapidă în builder: SEO, logo/favicon, culori, fonturi, navigație, CTA-uri, imagini/video, secțiuni, JSON-LD și indicii Next.js. Pentru copiere fidelă folosește `crawlPages:true`, `maxPages:12` și `pageUrls` pentru pagini critice; întoarce `crawl.pages`, `crawl.errors`, `crawl.urlMap`, `crawl.canonicalSlugs`, plus `frameworkHints.nextData.componentCounts`, `componentSamples`, `routeHints` și `sliderHints`. (necesită: url)
 - `add_website_section` — Adaugă (sau actualizează prin sectionId) o secțiune pe o pagină a website-ului magazinului — homepage implicit — FĂRĂ a înlocui restul paginii (spre deosebire de set_website_page_content). (necesită: brandId, type, config)
 - `apply_website_template` — Reconstruiește structura unui website EXISTENT dintr-un template, cu date REALE (categorii reale în meniu/footer, contact din firmă, pagini cablate la produse/meniu). (necesită: brandId)
+- `configure_storefront_trust_bar` — Configurează bara de încredere a magazinului online (pilonii „14 zile retur / transport gratuit / fidelizare / rate fără dobândă") — afișată pe TOATE paginile, deasupra sau sub meniul de sus; piloni, iconuri, culori, poziție. (necesită: brandId)
 - `create_discount_code` — Creează un cod de reducere pentru magazinul online (ex: VARA10 = 10% reducere). (necesită: code, type)
 - `create_shipping_zone` — Creează o zonă de livrare cu tarifele ei pentru MAGAZINUL ONLINE (storefront). (necesită: name)
 - `create_website` — Creează un website nou pentru un brand (config builder din /ecommerce/websites), cu structură REALĂ din prima: meniul (navbar) și footer-ul se construiesc din categoriile reale ale brandului (link-uri (necesită: brandId)
 - `delete_website_page` — Șterge o pagină din website-ul magazinului (din config.pages) — utilă pentru paginile placeholder generice de template (ex. (necesită: brandId)
+- `list_website_component_catalog` — Listează catalogul de componente Website Builder, schema de config și exemple; include `custom-html` pentru componente custom. (parametri opționali: type, category, vertical, includeSchema, includeExamples)
 - `remove_website_section` — Șterge o secțiune de pe paginile website-ului magazinului — după sectionId (o secțiune anume) SAU după type (TOATE secțiunile de acel tip, ex. (necesită: brandId)
 - `set_ecommerce_order_tracking` — Setează numărul de tracking (AWB) și/sau link-ul de urmărire pe o comandă din magazinul online. (necesită: id)
 - `set_hero` — Setează secțiunea HERO (bannerul mare de sus) a website-ului magazinului — imaginea de fundal, titlul, subtitlul și butonul (CTA). (necesită: brandId)
@@ -871,6 +878,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `set_website_footer` — Setează footer-ul website-ului magazinului: date de contact (adresă/telefon/email/program), rețele sociale, coloane de linkuri, copyright. (necesită: brandId)
 - `set_website_legal_page` — Setează textul REAL al unei pagini legale a magazinului, per brand (Despre/Contact/Termeni/Confidențialitate/Livrare/Retur/FAQ). (necesită: brandId, slug, title, bodyParagraphs)
 - `set_website_page_content` — Editează o pagină din website-ul magazinului (din config.pages): titlu, vizibilitate sau blocurile (components). (necesită: brandId)
+- `upsert_custom_website_component` — Adaugă sau actualizează o componentă custom HTML/CSS scoped în Website Builder ca fallback după componentele standard; folosește `data-wb-action` pentru navigare, coș, produs, search, scroll sau toggle fără JavaScript arbitrar, fără at-rule-uri CSS. (necesită: brandId)
 - `update_discount_code` — Actualizează un cod de reducere existent — ex: dezactivează-l (active=false), schimbă valoarea, data expirării sau limita de utilizări. (necesită: id)
 - `update_ecommerce_order_status` 🔒 🌐 — Schimbă statusul unei comenzi din magazinul online (pending/processing/paid/shipped/delivered/cancelled/returned). (necesită: id, status)
 - `update_ecommerce_settings` — Actualizează setările magazinului online (pereche de scriere pentru get_ecommerce_settings). (parametri opționali: brandId, currency, defaultVatRate, taxInclusive)

@@ -32,6 +32,25 @@ Pași: ceri userului URL-ul public → extragi `slug` → fetch JSON → mapezi 
 
 (Skill-ul `adauga-produs-reteta` are aceeași logică de descoperire — refolosește-o.)
 
+## Slug-ul SEO din URL-ul sursei — CAPTUREAZĂ-l la import
+
+Când imporți de pe un site (Magento / WooCommerce / OpenCart / Shopify / orice catalog), fiecare produs și categorie are deja un **slug** în URL — ultimul segment din cale:
+- Produs: `https://site.ro/scaune-auto-0-13-kg` → slug = `scaune-auto-0-13-kg`
+- Categorie: `https://site.ro/scaune-auto-copii` → slug = `scaune-auto-copii`
+- JSON-LD / feed: câmpul `url` / `@id` / `handle` / `slug` conține același lucru.
+
+**Extrage slug-ul sursă și trimite-l mai departe** ca să păstrezi URL-urile (continuitate SEO, fără 404, fără linkuri rupte):
+- la produse: `add_menu_item({ ..., slug: "scaune-auto-0-13-kg" })` (sau în `bulk_add_menu_items`, fiecare item are `slug`).
+- la categorii: `create_menu_category({ ..., slug: "scaune-auto-copii" })`.
+
+Reguli pentru slug:
+- **Doar ASCII, fără diacritice** (ă→a, ș→s, ț→t), litere mici, cuvinte legate cu `-`. Conținutul (numele, descrierea) rămâne CU diacritice; doar slug-ul e ASCII.
+- Ia segmentul de cale, nu tot URL-ul; scoate parametrii (`?...`), `.html`, ID-uri numerice pure.
+- Dacă **NU** trimiți slug, platforma generează **automat** unul curat din nume (tot ASCII, RO-aware, unicitate garantată) — corect, dar nu identic cu URL-ul vechi. Așa că pentru un magazin existent care se mută pe Symbai, **preferă slug-ul sursă**; pentru produse complet noi, lasă auto-generarea.
+- Slug-urile produselor sunt unice **global**; ale categoriilor — unice **per brand**. Platforma rezolvă singură coliziunile (adaugă `-2`, `-3`).
+
+Verificare după import: deschide `/produs/<slug>` (sau preview `?page=/produs/<id>`) și confirmă că URL-ul are denumire lizibilă, nu doar `id=`. La categorii, `list_menu_categories` arată `slug`-ul fiecărei categorii.
+
 ## Sursa 3 — Marketplace livrări (Glovo / Wolt / Tazz / Bolt Food / eMAG)
 
 Marketplace-urile **NU se scrapează** (prețuri per-zonă, se schimbă des, fragil). În schimb:

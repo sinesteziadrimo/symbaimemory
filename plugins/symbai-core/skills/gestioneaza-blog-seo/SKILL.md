@@ -24,6 +24,7 @@ Userul (proprietar/manager) vrea conținut pe website-ul lui: articole de blog c
 | „scrie/fă un articol despre… / pune-l pe blog ca ciornă" | `create_blog_post` | `status:"draft"` (default) = nepublicat |
 | „publică articolul ACUM" | `create_blog_post` cu `status:"published"` | cere `metaDescription` ≥70 caractere + `coverImageUrl` |
 | „programează-l pentru …" | `create_blog_post` cu `status:"scheduled"` + `scheduledAt` (ISO) | se publică automat la dată |
+| „importă blogul vechi / copiază articolele de pe site" | `bulk_create_blog_posts` (sau `create_blog_post` pe loturi mici) | intai inventariezi sursa + `list_blog_posts`; dry-run; pastrezi slug/date/canonical/imagini; trimite `legacyPath` pentru redirect 301 |
 | „modifică / corectează / rescrie articolul Y" | `update_blog_post` | orice câmp (titlu, conținut, meta, categorie, featured, status) |
 | „publică toate ciornele / arhivează-le / marchează recomandate" | `bulk_update_blog_posts` | `action`: publish / archive / feature / unfeature, `ids[]` (max 100) |
 | „cum merge blogul / cât trafic am / vizitatori" | `get_blog_analytics_overview` | `days` (default 28); afișări, vizitatori unici, sesiuni, timp pe pagină, bounce |
@@ -44,6 +45,8 @@ Userul (proprietar/manager) vrea conținut pe website-ul lui: articole de blog c
 ## Fluxul (cum lucrezi)
 
 **1) Scrii un articol de blog.** Întreabă userul subiectul, cuvântul-cheie și publicul. **Scrii conținut real** (titlu cu cuvântul-cheie, H2-uri, 2-3 link-uri interne dacă există articole conexe — verifică cu `list_blog_posts`), o **meta description de 150-160 caractere** și un slug scurt. Lasă-l implicit **ciornă** (`status:"draft"`) ca să-l vadă userul înainte; publici cu `status:"published"` doar la confirmarea lui (și-ți trebuie `metaDescription`≥70 + `coverImageUrl` — dacă nu ai poză de copertă, cere-i-o sau lasă pe draft). Confirmă cu `get_blog_post` / `list_blog_posts`. Nu inventa poze, autori sau cifre.
+
+**1b) Importi/migrezi articole dintr-un site existent.** Nu rezuma blogul si nu-l transforma in carduri statice. Inventariaza indexul si paginarea sursei (`/blog/`, `/blog/page/2/`, sitemap/RSS daca exista), pastreaza lista `title/date/url/image/excerpt/legacyPath`, apoi intra pe paginile de articol pentru continut complet. Citeste local cu `list_blog_posts`; arhiveaza sau actualizeaza drafturile placeholder. Ruleaza `bulk_create_blog_posts(dryRun:true, slugConflictPolicy:"update")`, verifica raportul inclusiv `redirectsCreated`, apoi scrie real. Daca instanta nu are tool-ul bulk, foloseste `create_blog_post` pe loturi mici si spune limita explicit. Verifici cu `list_blog_posts` + `get_blog_post` pe esantioane + testezi 1-2 URL-uri vechi.
 
 **2) Îi ARĂȚI rezultatul (Chrome).** Userul nu vede conexiunea. După ce ai creat/editat un articol, deschide pagina și fă-i screenshot: `navigate("/blog/posts")` (lista, cu status) sau editorul `navigate("/blog/<brandId>/posts/<id>/edit")`. Tool-urile întorc și un link direct la articol — dă-i-l. Pentru trafic, `get_blog_analytics_overview` + (opțional) `navigate("/blog/analytics")`.
 
@@ -74,7 +77,7 @@ Restul SEO + operațiile editoriale grele se fac **doar din aplicație** — ghi
 - **Slug-ul nu se schimbă după publicare fără redirect 301** (altfel 404 + pierzi poziția în Google). Dacă userul vrea alt slug pe un articol publicat, fă întâi redirect-ul în `/blog/redirects` (UI) — explică-i de ce.
 - **Oferta poate vinde sub cost** → rulează MEREU `preview_offer_margin` întâi; respectă refuzul Margin Guardrail (creezi cu `confirmLoss:true` doar la confirmarea explicită a userului).
 - **Nu inventa** poze de copertă, autori, testimoniale, cifre de trafic sau prețuri. Ce lipsește → întrebi userul.
-- **Permisiune**: citirile (`list_*`/`get_*`, `preview_offer_margin`, `list_product_collections`) merg oricum; **scrierile** (`create_/update_/bulk_update_blog_posts`, `create_/update_offer`, `create_/update_website_promotion`) cer modulul **«Marketing & Social Media»** (`marketing_social`) bifat pe token. „Permisiune insuficientă" → portal Hub → Acces AI.
+- **Permisiune**: citirile (`list_*`/`get_*`, `preview_offer_margin`, `list_product_collections`) merg oricum; **scrierile** (`create_/update_/bulk_create_/bulk_update_blog_posts`, `create_/update_offer`, `create_/update_website_promotion`) cer modulul **«Marketing & Social Media»** (`marketing_social`) bifat pe token. „Permisiune insuficientă" → portal Hub → Acces AI.
 - **Limbaj de restaurant**, nu jargon de editor („pun articolul ca ciornă", „fac un banner pe site", „verific dacă pierzi bani la reducere"), nu `status`/`placement`/`Margin Guardrail`.
 
 ## Legături

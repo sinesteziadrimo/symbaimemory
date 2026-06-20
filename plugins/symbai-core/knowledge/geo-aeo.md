@@ -1,6 +1,6 @@
 # GEO / AEO — cum faci brandul să fie recomandat de ChatGPT, Claude, Perplexity și Google AI
 
-> Continuă din `seo-2026.md`. GEO = Generative Engine Optimization (a fi citat/recomandat de motoarele AI). Pentru partea locală vezi `local-seo-horeca.md`.
+> Continuă din `seo-2026.md`. GEO = Generative Engine Optimization (a fi citat/recomandat de motoarele AI). Pentru partea locală vezi `local-seo-horeca.md`. Pentru **EXECUȚIA off-site** (entitate/Wikidata/directoare/recenzii/mențiuni — construite prin browser + tool-uri) folosește skill-ul **`autoritate-offsite`** (cea mai puternică pârghie GEO).
 
 ## Pe scurt
 
@@ -23,12 +23,13 @@ Trei lucruri decid dacă un AI te numește:
 - **Întrebare → răspuns**: secțiuni H2/H3 fraze ca întrebări reale (din People Also Ask), fiecare cu un răspuns concis.
 - **Tabele și liste** pentru comparații (preț, program, opțiuni) — ușor de extras.
 - **Entități numite** (nume preparate, cartiere, repere, prețuri în RON) — ancorele pe care AI le folosește.
-- **FAQ la final** (vezi mai jos despre schema).
+- **FAQ la final** (vezi mai jos despre schema) — răspunsuri de 40–60 de cuvinte (sub 40 NU se citează).
+- **Prospețime**: actualizează conținutul important trimestrial și ține un `dateModified` vizibil — paginile învechite pierd citările AI de ~3× (motoarele tratează data recentă drept „dovadă curentă").
 
 ## „Plumbing"-ul tehnic (ce contează vs ce e mit)
 
 - ✅ **robots.txt** trebuie să **permită boții de căutare AI** (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Bytespider etc.). Pe instanțele Symbai, `robots.txt` îi permite deja explicit. Dacă un client blochează acești boți, nu poate fi citat.
-- ✅ **Date structurate** (`Organization`/`LocalBusiness`/`Restaurant`/`Menu`/`Article`) — ajută recunoașterea entității și extragerea. NU sunt un „buton de citare", ci un semnal de consistență/încredere.
+- ✅ **Date structurate** (`Organization`/`LocalBusiness`/`Restaurant`/`Menu`/`MenuItem`/`Product`/`FAQPage`/`Article`) — ajută recunoașterea entității și extragerea. Schema GENERICĂ nu e un „buton de citare", DAR **`FAQPage` pe Q&A real** e schema cu cel mai mare potențial de citare (AI ridică direct întrebarea+răspunsul). Symbai emite AUTOMAT, pe paginile de produs randate server-side: `FAQPage` (din răspunsurile FAQ REALE ale produsului, afișate și vizitatorului) și specs ca `additionalProperty`; pe restaurant, `Menu`/`MenuItem` pe pagina de meniu. Marchează DOAR conținut REAL, vizibil — update-ul Google din martie 2026 a penalizat FAQ/Review fals.
 - ⚠️ **`llms.txt` NU e o pârghie de citare/ranking.** Google și inginerii lor au respins-o; traficul de boți pe ea e neglijabil. Symbai generează un `/llms.txt` orientat pe brand (nume, contact, articole, recenzii) ca **documentație utilă** — bun de avut, dar **nu** promite clientului citări AI din el. Pârghiile reale sunt cele de mai sus.
 - ❌ **„Chunking" / rescris pagini special pentru AI / mențiuni false** — Google spune explicit că NU așa câștigi în AI.
 
@@ -40,6 +41,7 @@ Trei lucruri decid dacă un AI te numește:
 
 ## Tool-uri MCP utile pentru GEO
 
+- `get_brand_entity_kit` — **sursa UNICĂ de adevăr off-site** (NAP, descriere, sameAs, afirmații Wikidata, directoare, goluri). Rulează-l ÎNAINTE de a popula orice platformă, ca totul să fie IDENTIC (consistența = semnalul #1 de entitate). Inima skill-ului `autoritate-offsite`.
 - `get_seo_provider_status` — confirmă că robots/boții AI și sursele de date sunt ok.
 - `seo_web_research` (jobType `competitor_audit` / `trend_scan`) — vezi cum e descris brandul/concurenții pe web și ce citează AI-ul.
 - `update_brand` / `update_company` — ține NAP-ul și identitatea (socialMedia, googleReviewUrl) canonice la SURSĂ (de aici se construiește entitatea/JSON-LD pe site).
@@ -50,5 +52,6 @@ Trei lucruri decid dacă un AI te numește:
 - **Nu vinde „pachete GEO" separate de SEO** — Google spune că e același SEO. Conținut util + tehnic curat + entitate + recenzii.
 - **Nu promite citări AI din `llms.txt`** — nu e o pârghie. (E ok ca documentație.)
 - **Nu băga `aggregateRating` din recenzii proprii** (vezi `local-seo-horeca.md`) — neeligibil + risc de penalizare.
-- **FAQ rich results au fost retrase din Google (7 mai 2026)** — păstrează blocurile Q&A (hrănesc featured snippets + AI Overviews) dar NU promite panouri FAQ în SERP.
+- **Panourile FAQ din SERP au fost retrase de Google (mai 2026)** — NU promite clientului panouri FAQ în rezultatele clasice. DAR `FAQPage` pe Q&A genuin rămâne **cea mai citabilă schemă pentru AI** (Overviews/ChatGPT/Perplexity ridică direct Q&A) — păstrează și marchează blocurile Q&A REALE (Symbai o face automat pe produse).
+- **Recenzii = velocitate pe terți, nu schema pe site-ul tău.** Ca „să primești recenzii" care contează pentru AI: trimite invitații după comandă/vizită spre **Google (GBP)** + Tripadvisor (nu pe site-ul propriu), răspunde la toate, ține un flux CONSTANT (velocitatea + temele de sentiment din GBP alimentează recomandările AI locale). NU pune `aggregateRating` cu recenzii proprii pe site (neeligibil + risc). Tool-uri: `dispatch_review_invitations_for_order`, `gbp_reply_review`, skill `raspunde-recenzii`.
 - **GBP e cea mai mare pârghie AI locală** — un site bun cu GBP gol pierde majoritatea răspunsurilor AI locale.

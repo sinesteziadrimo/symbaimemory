@@ -55,6 +55,7 @@ Symbai are **două căi independente** de a consuma materii prime și a produce 
 - Lotul trece prin **operații** definite în fluxul tehnologic (ex: Cântărire → Frământare → Coacere → Ambalare). Operatorul, de pe tabletă, pornește operația, declară consumul (alege/scanează lotul de materie primă), declară producția (bun/rebut/de retușat) și finalizează operația. La finalizare se creează automat containere cu QR și **genealogie completă**.
 - Folosit pentru procese industriale cu mai multe stații, predări între operatori, QC pe operație.
 - Tool-uri: `exec_start_operation` → `exec_declare_consumption` → `exec_declare_output` → `exec_complete_operation` (cu predare automată dacă e configurat).
+- Înainte de `exec_start_operation`, după ce lotul există, validezi `get_batch_material_readiness` (`batchId`, opțional `operationId`) ca să confirmi că materialele sunt nu doar în stoc, ci și legate corect de lotul/operația curentă.
 
 **Diferența cheie de trasabilitate**: motorul shop-floor scrie automat **genealogia** (legături lot intrare→lot ieșire) și creează containere cu QR. Motorul simplu mișcă corect stocul + genealogie de bază, dar nu construiește graful la fel de bogat. Pentru recall industrial complet (cu containere QR + predări între stații), folosește fluxul shop-floor.
 
@@ -76,6 +77,7 @@ Stările unui lot: **planificat (planned) → pornit (started) → în lucru (in
 ## Execuție shop-floor — operații pas cu pas
 Aceasta e calea industrială, pe tabletă (`/workstation-tablet`) sau din `/production`.
 
+0. **Verifică staging-ul real al lotului**: `get_batch_material_readiness` (`batchId`, opțional `operationId`). Dacă statusul e `blocked`, nu porni operația. Dacă e `partial`, explică exact ce lipsește: link de staging/pegging sau lot sursă upstream nefinalizat.
 1. **Pornește operația**: `exec_start_operation` (`batchId`, `flowOperationId`; opțional `employeeId`, `containerId`, `warehouseId`, `idempotencyKey`). Status operație → în lucru.
 2. **Declară consumul** de materii prime: `exec_declare_consumption` (`operationExecutionId`, `items` = listă de `{productId, qty, lotId?, unit?, unitCost?, overrideReason?}`; opțional `employeeId`, `idempotencyKey`).
    - Dacă pui `lotId`, consumi exact din lotul ales/scanat. Sistemul validează lotul contra **FEFO**; dacă încalci FEFO, consumul e blocat — dezblocarea cere o permisiune specială (administrator producție / eliberare calitate) + un motiv (`overrideReason`).
@@ -124,16 +126,21 @@ Aceasta e calea industrială, pe tabletă (`/workstation-tablet`) sau din `/prod
 ## MPS / MRP — planificarea producției
 - **MPS** (Master Production Schedule) = ce produci, când, pe ce stație, în ce tură.
 - **MRP** = necesarul net de materiale: cerere − stoc existent − deja programat = ce TREBUIE produs/comandat.
-- **Readiness gate** = verificarea obligatorie înainte de planificare/lansare: rețetă + BOM, stoc disponibil, conversii de unități, flux tehnologic activ, echipamente/capacitate și cerințe QC. Tool: `get_manufacturing_readiness`.
+- **Readiness gate** = verificarea obligatorie înainte de planificare/lansare: rețetă + BOM, stoc disponibil, conversii de unități, flux tehnologic activ, echipamente/capacitate, resurse de operație (scule, calibre, testere, grupe de capabilități), calibrare și cerințe QC. Tool: `get_manufacturing_readiness`.
+- **Batch material gate** = verificarea obligatorie după ce lotul există și înainte de pornirea shop-floor: stoc disponibil utilizabil, `batch_material_links`, loturi sursă upstream și riscuri de unități. Tool: `get_batch_material_readiness`.
 - **Bucla planificare:**
   1. **Citește cererea**: `get_orders_summary` (`dateFrom`, `dateTo`, `status` all/open/completed/cancelled, `groupBy` product/order) — ce produse sunt cerute, în ce cantități.
   2. **Citește stocul**: `get_stock_levels` (`productType` raw_material/wip/finished_good/all, `warehouseId`, `onlyLowStock`, `productName`) — stoc curent + prag minim + deficit.
   3. **Calculează necesarul net**: `get_mps_net_requirements` (`horizonDays`) — cerere − stoc − programat, pe orizont.
-  4. **Readiness**: `get_manufacturing_readiness` pentru rețeta/produsul propus. Dacă status = `blocked`, nu planifica și explică blocajele; dacă status = `needs_attention`, cere confirmare cu riscurile clare.
+  4. **Readiness**: `get_manufacturing_readiness` pentru rețeta/produsul propus. Dacă status = `blocked`, nu planifica și explică blocajele, inclusiv scule/calibre necalibrate sau echipamente în mentenanță; dacă status = `needs_attention`, cere confirmare cu riscurile clare.
   5. **Vezi programul**: `list_mps_schedule` (`from`, `to` YYYY-MM-DD) — rețete planificate pe date/ture/stații.
   6. **Adaugă în plan**: `create_mps_entry` (`scheduledDate` + `plannedQty` obligatorii; opțional `stationId`, `recipeId`, `shiftNumber`, `status` draft/confirmed/in_progress/completed/cancelled).
   7. **Actualizează plan**: `update_mps_entry` (`entryId` + câmpuri).
   8. **Loturi planificate**: `list_planned_lots` — loturi pre-producție din comenzi B2B sau cereri interne care necesită producție.
+- După ce planul e aprobat și lotul concret există, dar înainte de `exec_start_operation`, rulezi `get_batch_material_readiness`. Interpretezi astfel:
+  - `ready` → lotul are acoperire reală.
+  - `partial` → există stoc sau semifabricat candidat, dar lipsește link-ul explicit de staging/pegging sau lotul sursă nu e finalizat.
+  - `blocked` → ai deficit real (`shortage`) sau risc de unități (`unit_risk`) și nu pornești execuția.
 - **BOM explosion** (explozie de rețetă): `run_bom_explosion` (`recipeId`, `quantity`) — calculează totalul de materii prime necesare pentru o cantitate dată, cu conversie de unități. ⚠ E doar previzualizare — NU mișcă stoc.
 - **Stoc producție / semipreparate**: `get_production_stock_overview` (`productTypes`) — WIP + produse finite cu cantități/loturi/expirare/rezervări/cerere; `get_semipreparate_stock` () — stoc semifabricate (WIP).
 - Pagina: `/planificare-mps` (taburi Calendar Operații, Planificare MRP, Coproduse & Subproduse, Monitorizare, Trasabilitate, Bottleneck, Productivitate, Loturi Planificate, Flux Fabrică, Configurare).
@@ -143,6 +150,9 @@ Fluxul = lanțul de operații prin care trece un produs, cu cerințe, dependenț
 
 - **Citește**: `list_flow_versions` (`productId`, `status` draft/active/archived/all, `limit`); `get_flow_version_detail` (`flowVersionId`) — flux complet (operații, dependențe, materiale, ieșiri, QC).
 - **Creează flux**: `create_flow_version` (opțional `productId`, `productName`, `name`, `versionNumber`, `status`, `notes`, `sourceRecipeId`, `aiInstructions`). Sau dintr-un singur apel complet: `build_complete_flow` (`operations` = listă) — creează flux + operații + materiale + ieșiri + QC + dependențe.
+  - Pentru `build_complete_flow`, nu lăsa materialele/output-urile „generice": la materiale setează `requirementType` (`raw`, `semi_finished`, `packaging`, `consumable`, `from_flow`) și `sourceStrategy`; la ambalaje folosește `requirementType: "packaging"`.
+  - Când output-ul unei operații devine intrarea alteia, folosește indexuri 0-based în același payload: `outputs[].targetOperationIndex` și `materials[].sourceOperationIndex`. Nu inventa `operationId` înainte ca flow-ul să fie creat.
+  - La output-uri setează mereu `outputUnit` (nu doar `unit`) și `outputType` (`main_product`, `co_product`, `by_product`, `waste`), altfel verificarea fluxului și execuția shop-floor pot pierde unitatea sau tipul rezultatului.
 - **Gestionează versiuni**: `update_flow_version`, `activate_flow_version`, `archive_flow_version`, `clone_flow_version` (`flowVersionId`, `newName`, `newVersionNumber`).
 - **Operații** (tab General): `add_flow_operation` (`flowVersionId`, `name`, `operationOrder` + multe câmpuri: durate min/standard/max, setup, cleanup, container recomandat, condiție depozitare, `producesLot`, `skipIfStockAvailable`, `overlapAllowed`, `expectedYieldPercent`, instrucțiuni, `zoneId`, `equipmentId`, staff min/max/recomandat); `update_flow_operation` (`operationId`); `reorder_flow_operations` (`flowVersionId`, `ordering`); `auto_chain_operations` (`flowVersionId`) — leagă automat operațiile secvențial (Finish-Start).
 - **Dependențe**: `add_operation_dependency` (`flowVersionId`, `fromOperationId`, `toOperationId`, tip FS/SS/FF/SF); `remove_operation_dependency` (`dependencyId`).
@@ -235,7 +245,8 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 | „Statistici calitate / cele mai dese defecte" | `get_qc_stats` / `get_defect_pareto`. |
 | „Cât rebut/pierderi am avut" | `get_waste_report`. |
 | „Ce trebuie să produc săptămâna asta" | `get_orders_summary` + `get_stock_levels` + `get_mps_net_requirements`, apoi `get_manufacturing_readiness` pe produsele/rețetele care intră în plan. |
-| „Pot porni/programez produsul X?" | `get_manufacturing_readiness` (`productId`/`recipeId` sau `productName`, `quantity`, opțional `scheduledDate`) — verifică BOM, materiale, flux, echipamente/capacitate și QC. |
+| „Pot porni/programez produsul X?" | `get_manufacturing_readiness` (`productId`/`recipeId` sau `productName`, `quantity`, opțional `scheduledDate`) — verifică BOM, materiale, flux, echipamente/capacitate, scule/calibre, calibrare și QC. |
+| „Pot porni lotul X pe bune / are materialele gata de stație?" | `get_batch_material_readiness` (`batchId`, opțional `operationId`) — verifică stocul utilizabil, link-urile explicite de staging și loturile sursă upstream. |
 | „Pune în planul de producție rețeta X, 500 kg pe vineri" | Întâi `get_manufacturing_readiness`; dacă nu e `blocked`, `create_mps_entry` (`scheduledDate`, `plannedQty`). |
 | „Arată-mi programul MPS" | `list_mps_schedule` (`from`, `to`). |
 | „De câte materii prime am nevoie pentru 1000 buc din rețeta X" | `run_bom_explosion` (`recipeId`, `quantity`) — doar previzualizare. |
@@ -248,7 +259,7 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 | „Cum stă fabrica acum / dashboard" | `get_factory_dashboard`. |
 | „Care e randamentul / unde am gâtuiri" | `get_yield_trends` / `detect_production_bottlenecks` (`daysAhead`). |
 | „Sumarul zilei de azi" | `get_daily_production_summary` (`date`). |
-| „Construiește fluxul tehnologic pentru produsul nou" | `/ai-flow-builder` (conversațional) sau `build_complete_flow` (`operations`) / `create_flow_version` + `add_flow_operation`. |
+| „Construiește fluxul tehnologic pentru produsul nou" | `/ai-flow-builder` (conversațional) sau `build_complete_flow` (`operations` cu materiale/output-uri complete: `requirementType`, `outputUnit`, `sourceOperationIndex`, `targetOperationIndex`) / `create_flow_version` + `add_flow_operation`. |
 | „Adaugă un senzor de temperatură la frigider" | `create_haccp_sensor` (`name`, `sensorType`=fridge). |
 | „Printează etichetele lotului" | `print_production_labels` (`batchId`, `printerId`). |
 
@@ -267,5 +278,5 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 - **Clientul/inspectorul poate vedea un container fără cont?** → Da — pagina `/c/:codQR` e publică, se deschide la scanarea etichetei QR.
 
 ## Pentru acces SQL
-Tabele relevante: `production_batches` (loturi/șarje), `inventory_lots` (loturi de stoc), `genealogy_edges` (trasabilitate intrare→ieșire), `production_containers` (containere cu QR unic), `batch_material_links` (loturi alocate explicit pe șarjă), `operation_executions` (execuții shop-floor), `planned_lots` (loturi planificate), `quality_hold_events` (blocaje QC), `production_qc_inspections` (inspecții QC), `mps_schedule_entries` (plan MPS), `production_zones`/`production_equipment`/`equipment_recipe_capacities`/`zone_ingredient_warehouses` (infrastructură), `production_shifts` (ture), `haccp_sensors` (senzori), `inventory_documents` + liniile lor (documente consum/producție).
+Tabele relevante: `production_batches` (loturi/șarje), `inventory_lots` (loturi de stoc), `genealogy_edges` (trasabilitate intrare→ieșire), `production_containers` (containere cu QR unic), `batch_material_links` (loturi alocate explicit pe șarjă; esențial pentru staging/pegging real), `operation_executions` (execuții shop-floor), `planned_lots` (loturi planificate), `quality_hold_events` (blocaje QC), `production_qc_inspections` (inspecții QC), `mps_schedule_entries` (plan MPS), `production_zones`/`production_equipment`/`equipment_recipe_capacities`/`zone_ingredient_warehouses` (infrastructură), `production_shifts` (ture), `haccp_sensors` (senzori), `inventory_documents` + liniile lor (documente consum/producție).
 Exemple: „câte loturi am finalizat luna aceasta cu ce cantități", „ce loturi de materie primă au intrat în lotul X" (prin `genealogy_edges`), „ce loturi sunt acum în carantină", „care e utilizarea pe zone săptămâna asta".

@@ -2,6 +2,7 @@
 
 > Pentru linkul exact către orice pagină folosește `gaseste_in_aplicatie` — el e sursa autoritară de navigare.
 > Acest ghid = **cum CONSTRUIEȘTI și CONFIGUREZI site-ul public** (paginile, componentele, aspectul, catalogul pe site). Pentru **comenzi online / eMAG / feed-uri / retururi** vezi `ecommerce-magazin-online.md`. Pentru **portalul clienților** (aplicația de la masă, prin QR — meniu/comenzi/rezervări) vezi `portal-config.md`. Sunt lucruri DIFERITE: portalul = app-ul pentru clienții din local; website-ul = site-ul public, indexat de Google, cu magazin.
+> 📌 Pentru **copiere/replicare fidelă a unui site existent** citește și `website-copy-intake.md` — crawl multi-page, URL map/SEO, dropdown-uri, hero slider, pagini-cheie, componente noi și verificare vizuală.
 > ⭐ **Pentru CALITATE (ce face un magazin să convertească) + cum explici clientului fiecare alegere, citește `website-best-practices-2026.md`** — best-practice moderne (header pe 2 rânduri cu bară de categorii dedicată, megamenu cu grupuri + hover lin, search proeminent, anti-dead-end pe pagina de produs, „shop by age/occasion", bară de transport gratuit), fiecare cu cifra de conversie de citat clientului.
 > 🛍️ **Pentru PAGINA DE PRODUS completă (galerie, descriere lungă, specificații, preț redus, garanție, FAQ, accesorii, pachete, video) citește `website-builder-pdp.md`** — rețetă cu listă de bife + ce tool completează fiecare lucru pe pagină.
 
@@ -12,7 +13,7 @@ Symbai are un **builder de website** integrat: din catalogul de produse + meniul
 - **`site`** — site de prezentare (pentru restaurant/local: meniu, despre, rezervări, contact).
 
 **Capabilități cheie** (toate se setează prin tool-uri, fără click):
-- **Pagini** — Acasă, Magazin/Catalog, Despre, Contact + pagini de categorie (`/categorie/:id`) și produs (`/produs/:id`) generate automat.
+- **Pagini** — Acasă, Magazin/Catalog, Despre, Contact + pagini de categorie (`/categorie/<slug>`) și produs (`/produs/<slug>`) generate automat. URL-ul canonic e pe **slug** (SEO); `/...<id>` rămâne fallback și face redirect 301 spre slug.
 - **Componente (blocuri)** care se aranjează pe pagini: hero/banner, grilă de categorii, grilă de produse (cu filtre + faceted sidebar), branduri, carduri de avantaje, testimoniale, newsletter, bară de anunțuri sus, bloc de text, contact, blog.
 - **Ierarhie de categorii** — categorii părinte → subcategorii (drill-down). O pagină de categorie-părinte arată **grila de subcategorii + produsele din tot subarborele**.
 - **Filtre faceted** (sidebar tip magazin mare): preț, disponibilitate (în stoc), brand, material, vârstă, categorie de interes.
@@ -20,6 +21,7 @@ Symbai are un **builder de website** integrat: din catalogul de produse + meniul
 - **Promoții pe site** — bannere / pop-up-uri (header-strip, footer-strip, side-modal).
 - **Navigare** — meniul de sus, cu categoriile reale ca dropdown.
 - **Theming** — culoarea brandului, fonturi, mod dark.
+- **Blog public** — pagina `/blog` cu componenta `blog-listing` si articole reale din modulul Blog. La migrare de site vechi, articolele se importa ca entitati Blog (`create_blog_post` / `bulk_create_blog_posts`), nu ca simple carduri statice pe pagina.
 
 ## Concepte
 
@@ -36,13 +38,16 @@ Symbai are un **builder de website** integrat: din catalogul de produse + meniul
 > Toate cer brandul (`brandId`). Citește întâi `list_websites(brandId)` ca să afli dacă există deja un site și `id`-ul lui. Confirmă cu utilizatorul ÎNAINTE de `apply_website_template`/`confirmReplace` (rescrie structura).
 
 **Creare & structură de bază**
+- `analyze_external_website` — analizează read-only un URL public și întoarce `sourceBrief` pentru replicare rapidă: SEO, logo/favicon, culori/fonturi, nav, CTA-uri, imagini/video, secțiuni, JSON-LD și indicii de framework. Pentru copiere fidelă folosește `crawlPages:true, maxPages:12` și, dacă știi pagini critice, `pageUrls:["/meniu","/blog","/galerie",...]`; primești `crawl.pages`, `crawl.urlMap` și `crawl.canonicalSlugs`. Rulează-l primul când userul spune „copiază site-ul X" / „fă-mi site ca Y".
 - `create_website` — creează site-ul (params: `brandId`, `kind` shop/site, `name`, `makeDefault`). Leagă automat meniul → canalul web.
 - `apply_website_template` — populează structura (pagini, navigare, footer cu categorii reale) și preia **culoarea brandului**. `confirmReplace: true` ca să suprascrie.
 - `list_websites` — ce site-uri are brandul.
 
 **Pagini & componente**
-- `set_website_page_content` — editează o pagină (titlu/vizibilitate/componente). Înlocuiește lista de blocuri a paginii.
+- `set_website_page_content` — editează o pagină (titlu/vizibilitate/componente). Înlocuiește lista de blocuri a paginii. Pentru `createIfMissing:true` pe branduri cu mai multe website-uri, trimite obligatoriu `configId`/`websiteId` din `list_websites`.
 - `add_website_section` — inserează o componentă pe o pagină **fără** a înlocui restul (ex. mai adaugi o grilă de produse featured).
+- `list_website_component_catalog` — citește catalogul complet de componente, schema de `config` și exemplele. Rulează-l când nu ești sigur ce `type`/config trebuie folosit sau când vrei să vezi componenta `custom-html`.
+- `upsert_custom_website_component` — adaugă/actualizează o componentă custom HTML + CSS scoped pe o pagină. Folosește-l **doar după** ce ai verificat catalogul și componentele standard nu pot exprima cerința; nu te opri la „builderul nu are componenta”.
 - `delete_website_page` — șterge o pagină (util pentru pagini placeholder generice).
 - `set_hero` — setează banner-ul hero (imagine, titlu, subtitlu, buton + link, opacitate overlay).
 - `update_website_navigation` — meniul de sus. `rebuildCategoriesFromCatalog: true` reconstruiește dropdown-ul „Categorii" din categoriile reale **rădăcină** (scoate categoriile generice de template). Sau dă `items[]` pentru control total.
@@ -74,17 +79,58 @@ Symbai are un **builder de website** integrat: din catalogul de produse + meniul
 **Verificare (auto-check — folosește-l MEREU la final)**
 - `audit_shop_health` — auditează sănătatea magazinului și întoarce probleme (`error`/`warn`) + statistici: categorii goale/plate/gunoi, TVA în afara cotelor RO (0/11/21), % acoperire filtre (brand/material/vârstă), email placeholder în footer, navbar/footer cu prea multe categorii, hero fără imagine, produse fără poză. **Rulează-l după ce construiești/imporți un magazin și repară problemele `error` ÎNAINTE de a spune că e gata** — nu aștepta ca userul să-ți găsească greșelile.
 
+**Blog & migrare de articole**
+- `list_blog_posts` / `get_blog_post` / `list_blog_categories` — citeste ce exista deja in blogul brandului inainte de import; compara cu numarul de articole gasite pe sursa.
+- `create_blog_post` — creeaza un articol individual. Pentru `published` ai nevoie de `metaDescription` de cel putin 70 caractere si `coverImageUrl`.
+- `bulk_create_blog_posts` — import controlat pentru pana la 50 de articole per apel, cu `dryRun`, `slugConflictPolicy` (`skip`/`update`/`suffix`), `publishedAt`, `canonicalUrl`, `legacyPath`, `legacyDomain` si `brandWebsiteIds`; `legacyPath` creeaza redirect 301 catre `/blog/<slug>` cand e nevoie. Foloseste-l la WordPress/bloguri paginate.
+- `bulk_update_blog_posts` — operatii in masa dupa import: publish/archive/feature/unfeature.
+- Pagina publica a blogului se construieste cu `set_website_page_content` pe slug `/blog` si componenta `blog-listing` (nu `blog-list`): `{ title, subtitle, columns, postsPerPage, showCategories, showSearch, showFeatured }`. Daca o creezi cu `createIfMissing:true`, foloseste `configId` din `list_websites`.
+
 ## Componentele de pagină (blocuri) — ce ai la dispoziție
 
-Le pui prin `add_website_section`/`set_website_page_content` cu `type` + `config`:
+Le pui prin `add_website_section`/`set_website_page_content` cu `type` + `config`.
+
+**Regula de alegere:** încearcă întâi componentele existente din catalog (`hero-slider`, `feature-cards`, `product-grid`, `static-menu-board`, `cta-banner`, `faq`, `gallery`, `trust-badges`, etc.). Folosește `custom-html` numai când cerința e cu adevărat specifică și nu merită un deploy/componentă nouă de platformă.
+
+- **`custom-html`** — componentă complet custom pentru cazuri unde blocurile standard nu exprimă designul sau comportamentul cerut. Se adaugă preferabil cu `upsert_custom_website_component`; primește `html`, `css`, `maxWidth`, culori de secțiune și note. HTML-ul e script-free: nu folosi `<script>`, handler-e inline sau stil inline; pune stilul în `css`, iar pentru interacțiuni folosește acțiuni declarative `data-wb-action`.
 - **`hero-slider`** — banner mare (imagine/gradient, titlu, subtitlu, buton). Pe pagini fără imagine degradează elegant într-un header colorat în culoarea brandului.
+- **`hero-slider` cu `contentBoxStyle:"source-card"`** — pentru copiere fidelă de site-uri cu hero pe imagine + card text colorat per slide; suportă `boxColor`, `boxTextColor`, `buttonColor`, `buttonTextColor`, puncte și săgeți. Folosește-l când sursa are slider real, nu reduce la un singur banner.
+- **`static-menu-board`** — meniu restaurant importat static dintr-un site extern: bară orizontală de categorii, intro, carduri cu poză/preț/gramaj. Folosește-l pentru `/meniu` când catalogul POS nu e încă populat, ca să păstrezi URL-ul și aspectul sursei; `navStickyTop` ține bara de categorii sub headerul sticky; ulterior se poate înlocui cu `menu-section` legat la catalog.
 - **`category-grid`** — grilă de categorii (carduri cu poză + nr. produse). Se poate limita la anumite categorii (`selectedCategoryIds`) — folosit pe paginile părinte pentru subcategorii.
 - **`product-grid`** — grila de produse. Opțiuni: `showFilters` (chips de categorii + căutare + sortare), `showFacets` (sidebar faceted: preț/brand/material/vârstă/disponibilitate), `categoryNavMode` (`flat`/`two-level`/`drill-down`), `categoryFilterId` (fixează o categorie), `productsPerPage`, `columns`.
 - **`announcement-bar`** — bară de anunțuri sus (mesaje rotative cu iconițe: livrare/cadou/retur).
 - **`newsletter`** — abonare la newsletter (inline).
 - **`trust-badges`**, **`feature-cards`** — garanții / avantaje (plăți securizate, livrare rapidă, retur).
 - **`brand-logos`** — logo-uri de branduri/parteneri.
-- **`testimonials`**, **`text-block`**, **`contact`**, **`blog-list`** — recenzii, text liber, contact, articole de blog.
+- **`testimonials`**, **`text-block`**, **`contact`**, **`blog-listing`** — recenzii, text liber, contact, listare articole de blog din modulul Blog.
+
+### Componente custom (`custom-html`)
+
+Folosește `custom-html` când proprietarul cere o secțiune foarte specifică: layout copiat fidel din alt site, mini-calculator, tabel comparativ special, meniu static cu comportament diferit, landing section, FAQ/accordion custom, carduri cu logică de click, CTA-uri sau orice zonă pe care catalogul standard nu o acoperă bine. **Nu porni direct cu custom**: întâi caută o componentă standard sau o combinație de componente standard.
+
+Workflow:
+1. Citește `list_website_component_catalog(type:"custom-html", includeExamples:true)`.
+2. Dacă o componentă standard poate rezolva rezonabil cerința, folosește standardul. Dacă nu, scrie HTML semantic + CSS scoped. În CSS poți folosi `:host` ca selector de rădăcină; sistemul îl scopează pe secțiunea curentă.
+3. Pentru comportament, folosește atribute declarative, nu JavaScript:
+   - `data-wb-action="navigate"` + `data-wb-url="/magazin"` pentru navigare.
+   - `data-wb-action="open-cart"` pentru coș.
+   - `data-wb-action="add-to-cart"` + `data-wb-menu-item-id="123"` sau `data-wb-product-id="123"` pentru adăugare produs.
+   - `data-wb-action="open-product"` + `data-wb-menu-item-id` / `data-wb-product-id` / `data-wb-slug`.
+   - `data-wb-action="open-search"` sau `set-search` + `data-wb-query="termen"`.
+   - `data-wb-action="scroll-to"` + `data-wb-target="#sectiune"`.
+   - `data-wb-action="toggle-class"` + `data-wb-target="#faq1"` + `data-wb-class="is-open"` pentru accordion/tab-uri simple.
+   - `data-wb-action="track-lead"` pentru CTA/form lead tracking.
+4. Poți folosi token-uri: `{{siteName}}`, `{{tagline}}`, `{{primaryColor}}`, `{{secondaryColor}}`, `{{accentColor}}`, `{{cartCount}}`, `{{cartSubtotal}}`, `{{freeShippingRemaining}}`.
+5. Salvează cu `upsert_custom_website_component(brandId, pageSlug, sectionId?, html, css, ...)`, apoi verifică vizual pagina și rulează `audit_shop_health`.
+
+Checklist de siguranță înainte de salvare:
+- Nu folosi `<script>`, `onclick`/handler-e inline, `javascript:`/`data:`/`blob:` URLs sau `style=""` inline; sanitizerul le elimină, dar agentul trebuie să le evite.
+- Nu pune formulare care trimit date către site-uri externe; submit-ul custom este blocat și trebuie modelat prin `data-wb-action`.
+- Nu folosi iframe decât dacă utilizatorul cere explicit embed extern de încredere; `allowIframes:true` permite doar iframe-uri HTTP/HTTPS, sandboxed.
+- Nu folosi CSS care acoperă tot site-ul (`position:fixed` fullscreen, z-index uriaș) și nu folosi at-rule-uri CSS (`@media`, `@import`, `@supports`); pentru responsive folosește grid/flex/clamp în CSS scoped.
+- Nu introduce cod copiat de pe internet fără să-l reduci la HTML/CSS inert + acțiuni declarative.
+
+Limite de runtime: `<script>`, `<style>`, SVG/math executabil, object/embed/link/meta/base, handler-ele inline, stilurile inline, URL-urile nesigure, `srcdoc` și submit-ul extern sunt eliminate/blocate. CSS-ul e scoped pe secțiune; at-rule-urile CSS sunt eliminate, iar `position:fixed` este rescris defensiv ca `position:absolute`.
 
 ## Bara de încredere (trust bar) a magazinului
 

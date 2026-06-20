@@ -1,0 +1,4 @@
+interface:
+  display_name: "Website Agent Loop"
+  short_description: "Itereaza site-uri Symbai cu builder si reviewer"
+  default_prompt: "Use $website-agent-loop to run a guarded builder-reviewer loop for importing a website into Symbai."

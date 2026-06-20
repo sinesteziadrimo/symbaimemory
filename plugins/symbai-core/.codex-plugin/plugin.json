@@ -1,0 +1,43 @@
+{
+  "name": "symbai-core",
+  "version": "0.20.0+codex.20260620091111",
+  "description": "Asistentul Symbai pentru Codex: skill-uri, knowledge si MCP live pentru operare in POS/ERP Symbai.",
+  "author": {
+    "name": "Symbai",
+    "email": "support@symbai.app",
+    "url": "https://symbai.app"
+  },
+  "homepage": "https://github.com/sinesteziadrimo/symbaimemory#readme",
+  "repository": "https://github.com/sinesteziadrimo/symbaimemory",
+  "license": "MIT",
+  "keywords": [
+    "symbai",
+    "pos",
+    "erp",
+    "horeca",
+    "mcp",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Symbai Core",
+    "shortDescription": "Lucreaza in Symbai direct din Codex.",
+    "longDescription": "Skill-uri pas-cu-pas, biblioteca de cunostinte si conexiune MCP live pentru POS, stocuri, productie, marketing, website, CRM, financiar, livrari, hotel si operare Symbai cap-coada.",
+    "developerName": "Symbai",
+    "category": "Productivity",
+    "capabilities": [
+      "MCP",
+      "Read",
+      "Write",
+      "Knowledge",
+      "Workflow"
+    ],
+    "defaultPrompt": [
+      "Conecteaza Codex la Symbai si verifica list_brands.",
+      "Gaseste pagina din Symbai pentru o setare sau operatie.",
+      "Lucreaza MCP-first pe datele reale din Symbai."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

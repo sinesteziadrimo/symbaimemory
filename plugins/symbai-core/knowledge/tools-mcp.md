@@ -18,11 +18,11 @@ Fiecare apel e înregistrat în jurnalul de activitate (auditabil de proprietar)
 - **Pattern scriere → verificare**: confirmarea finală o dai pe baza unui tool de citire, nu a interfeței. O scriere repetată „ca să se prindă" creează duplicate.
 - **Date lipsă = întrebări, nu invenții**: la importuri nu inventa prețuri/gramaje/alergeni; cere sursa userului.
 
-## ⚠ Confirmare obligatorie (`confirm: true`) — 48 tool-uri 🔒
+## ⚠ Confirmare obligatorie (`confirm: true`) — 49 tool-uri 🔒
 
 Tool-urile marcate 🔒 cheltuie bani, trimit în masă, sunt externe sau ireversibile. La PRIMUL apel fără `confirm: true` întorc un mesaj de confirmare cu detaliile (sumă/nr. destinatari) și NU execută nimic. Fluxul corect: arăți utilizatorului ce se va întâmpla → ceri OK → reapelezi cu `confirm: true`. NU trimite `confirm: true` din prima fără acordul explicit al utilizatorului.
 
-Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_whatsapp_media`, `send_whatsapp_message`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
+Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `apply_quarterly_marketing_plan`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_whatsapp_media`, `send_whatsapp_message`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
 
 ## ⚠ Plafoane (limite) per token — opționale, setate din Hub
 
@@ -33,9 +33,9 @@ Proprietarul poate seta din portalul Hub → Acces AI plafoane pe token. Gol = f
 
 Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate mări/elimina plafonul din Hub → Acces AI (editează tokenul), sau folosește o valoare mai mică. Plafoanele se aplică PE LÂNGĂ permisiunea de modul — sunt o a doua plasă de siguranță.
 
-**TOTAL: 840 tool-uri** — Citire 338 · Speciale 5 · SQL 3 · Scriere per modul 494 (pe 19 module).
+**TOTAL: 852 tool-uri** — Citire 347 · Speciale 5 · SQL 3 · Scriere per modul 497 (pe 19 module).
 
-## Citire (fără permisiune de modul) — 338 tool-uri
+## Citire (fără permisiune de modul) — 347 tool-uri
 
 ### Vânzări, comenzi, casă & financiar — 42
 - `get_attribution_ltv_by_channel` — Valoarea pe viață (LTV) a clienților grupată după canalul de achiziție, pe o cohortă de N zile: nr. (parametri opționali: brandId, days)
@@ -153,8 +153,9 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `search_products_db` — Caută produse în baza de date după nume, SKU, cod de bare, categorie, tip, sau tag-uri. (parametri opționali: query, productType, storageZoneId, tagNames)
 - `search_products_for_tagging` — Previzualizează ce produse ar fi afectate de un set de filtre, FĂRĂ a asigna vreun tag. (parametri opționali: brandId, menuId, menuName, locationId)
 
-### Producție & trasabilitate — 39
+### Producție & trasabilitate — 46
 - `calculate_flow_bom` — Calculează BOM (Bill of Materials) complet pentru un flux: agregarea tuturor materialelor din toate operațiile. (necesită: flowVersionId)
+- `build_ingredient_declaration` — Construiește declarația de ingrediente pentru etichetă conform EU 1169/2011: rețetă explodată la materii prime, ordine descrescătoare după greutate, QUID/procente și alergeni de declarat. (parametri opționali: recipeId, productId, productName)
 - `exec_get_batch_progress` — Obține progresul complet al unui lot: pași de execuție, procent finalizare, materiale, output, pasul următor. (necesită: batchId)
 - `exec_get_container_info` — Obține informații detaliate despre un container: produs, lot, batch, operație curentă, zonă, istoric scanări, predări în așteptare. (necesită: qrCode)
 - `exec_get_operation_detail` — Obține detalii complete ale unei execuții de operație: materiale necesare, output-uri așteptate, cantități declarate. (necesită: operationExecutionId)
@@ -169,7 +170,13 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_equipment_utilization` — Obține utilizarea echipamentelor: câte loturi procesează, status (disponibil/în uz/mentenanță), capacitate. (parametri opționali: zoneId)
 - `get_flow_ai_context` — Obtine context AI complet pentru un produs cu flux tehnologic: instructiuni AI (flow-level + per operatie) si necesar personal (staffMin/staffMax/staffRecommended per operatie). (parametri opționali: productId, productName)
 - `get_flow_version_detail` — Obține detaliile complete ale unui flux: operații, dependențe, materiale, ieșiri, QC — totul într-un singur apel. (necesită: flowVersionId)
+- `forecast_production_demand` — Previziune cerere de producție make-to-stock din istoricul POS + B2B: cerere săptămânală, tendință, variabilitate și stoc de siguranță recomandat. (parametri opționali: productIds, lookbackWeeks, horizonWeeks, method, channel)
+- `get_material_availability` — ATP/free-to-promise: stoc fizic, stoc net utilizabil, rezervări de producție și cât mai poate fi promis fără să calci peste plan. (parametri opționali: productIds, onlyConstrained)
+- `get_material_requirements` — MRP multi-nivel pentru comenzi: explodează FG -> semipreparate -> materii prime, netează cu stocul disponibil și întoarce lipsurile de aprovizionat. (parametri opționali: orders, horizonDays, includeSafetyStock)
 - `get_mps_net_requirements` — Calculeaza necesarul net MPS/MRP: cerere, stoc fizic vs nettable pe loturi FEFO/QC, programat, deficit si recomandare lot-sizing per produs. (parametri opționali: horizonDays)
+- `get_order_pegging_impact` — Rețea de pegging și analiză impact: ce comenzi folosesc un semipreparat/material și ce comenzi cad dacă o sursă întârzie sau lipsește. (parametri opționali: orders, horizonDays, mode, target)
+- `get_production_cost_estimate` — Cost standard complet de producție ca SAP CK11N: material multi-nivel + manoperă + utilaj + overhead, cu cost/unitate și materiale fără preț. (parametri opționali: recipeId, productId, productName, quantity)
+- `get_production_dispatch` — Lista de dispecerizare shop-floor pe zi/tură/zonă/echipament: ce lot/operație se produce, cantitate și cine lucrează. (parametri opționali: date, dateFrom, dateTo)
 - `get_qc_stats` — Obține statistici QC: rata de pass/fail, tip defecte frecvente, inspecții pe perioadă. (parametri opționali: days)
 - `get_shift_detail` — Obține detaliile complete ale unei ture pentru o zi: angajați, operații, loturi, KPI-uri live (cantități, scrap, completion %). (necesită: shiftId, date)
 - `get_shift_history` — Obține istoricul productivității pe ture: matrice zile × ture cu operații, cantități, scrap, eficiență, timp mediu. (parametri opționali: daysBack)
@@ -310,7 +317,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `read_integration_memory_files` — Citește fișierele de memorie ale integrărilor. (parametri opționali: fileType, integrationKey)
 - `view_brand_media` — Arată-ți EFECTIV o imagine din Biblioteca Media (sau de la un URL) ca s-o VEZI și să alegi ce atașezi la o postare. (parametri opționali: mediaAssetId, url)
 
-### Diverse — 84
+### Diverse — 86
 - `analyze_external_website` — Analizeaza read-only un website public si intoarce un source brief pentru a construi/replica rapid site-ul in builder: SEO, logo/favicon, culori, fonturi, navigatie, CTA-uri, imagini/video, sectiuni, (necesită: url)
 - `analyze_food_costs` — Analizează food cost-ul produselor unui brand. (necesită: brandId)
 - `analyze_procurement` — Analizează aprovizionarea unui brand (furnizori, prețuri, lead time-uri). (necesită: brandId)
@@ -341,6 +348,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_pnl_snapshot` — Citeste un P&L salvat (snapshot): totalurile inghetate + ajustarile manuale si efectul lor. (necesită: snapshotId)
 - `get_presentation` — Citește o prezentare salvată — implicit un REZUMAT (meta + numărători). (necesită: presentationId)
 - `get_presentation_library_item` — Citește UN singur element din bibliotecă (o durere / soluție / întrebare discovery / dovadă / obiecție / calcul) — întreg, dar mic. (necesită: presentationId, kind, itemId)
+- `get_quarterly_marketing_plan` — Citește un plan strategic trimestrial complet plus campaniile lui; folosește planId sau brandId+quarter+year. (parametri opționali: brandId, planId, quarter, year)
 - `get_received_efactura_details` — Detaliul unei facturi de intrare: antetul (furnizor, sume, status, brand/locație/magazie, dacă are NIR) + câmpurile de deductibilitate (TVA/cheltuială/cheltuieli în avans 471) + TOATE liniile cu stare (necesită: invoiceId)
 - `get_sales_analytics` — Analitica pipeline-ului de vânzări (CRM) pentru un brand și o perioadă: rată de conversie, leaderboard per agent (câștigate/pierdute/valoare/ciclu mediu), valoare pipeline deschis, venit total câștiga (parametri opționali: brandId, from, to)
 - `get_sender_domain_status` — Starea domeniului propriu de expediere (dacă brandul trimite de pe domeniul lui, ex. (parametri opționali: brandId)
@@ -373,6 +381,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_presentation_library_items` — Listează SLIM (doar id + etichetă) elementele dintr-o colecție a bibliotecii unei prezentări, fără payload-ul mare. (necesită: presentationId, kind)
 - `list_presentation_templates` — Listează ȘABLOANELE de prezentare de vânzare disponibile pentru clonare (Symbai HoReCa 2026 = gold standard, plus verticale: sală evenimente, catering, cursuri online, servicii, produse, exemplu simpl
 - `list_presentations` — Listează prezentările de vânzare salvate pe un brand (id, titlu, vertical, versiune flux, nr. (parametri opționali: brandId)
+- `list_quarterly_marketing_plans` — Listează planurile trimestriale de marketing ale brandului cu status, buget și targeturi. (parametri opționali: brandId)
 - `list_printers` — Listează toate imprimantele configurate per locație. (parametri opționali: locationId, brandId)
 - `list_procurement_recommendations` — Recomandări de aprovizionare (reorder): ce produse au nevoie de comandă și de la ce furnizor (preț efectiv + lead-time). (parametri opționali: productId, limit)
 - `list_qr_field_presets` — Listează PRESETURILE de câmpuri QR (pagina Coduri QR): fiecare preset definește ce completează clientul când scanează QR-ul de masă (nume / prenume / email / telefon), dacă poate plăti DIRECT din tele (parametri opționali: brandId)
@@ -402,7 +411,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `describe_database_table` — PAS 2 din workflow eficient de citire BD — OBLIGATORIU înainte de SELECT * pe tabel necunoscut. (necesită: tableName)
 - `execute_sql_query` — PAS 3 (final) din workflow eficient de citire BD. (necesită: query, explanation)
 
-## Scriere per modul — 494 tool-uri (gated de writeModules pe token)
+## Scriere per modul — 497 tool-uri (gated de writeModules pe token)
 
 ### produse_meniu — Produse & Meniuri — 62 tool-uri
 - `add_menu_item` — Adaugă un produs într-un meniu cu preț de vânzare. (necesită: menuId, productId, price)
@@ -607,10 +616,11 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_reservation` — Actualizează o rezervare existentă (status, data, ora, nr persoane, note, etc.) (necesită: reservationId)
 - `update_waitlist_entry` — Actualizează o intrare din lista de așteptare (status, timp estimat, etc.) (necesită: entryId)
 
-### marketing_social — Marketing & Social Media — 53 tool-uri
+### marketing_social — Marketing & Social Media — 56 tool-uri
 - `add_material_elements` — Adaugă unul sau mai multe elemente (text/imagine/formă/linie/slot QR) pe o pagină a unui material existent. (necesită: designId, elements)
 - `add_seo_competitor` — Adaugă un concurent SEO la urmărire (după domeniu, ex. (necesită: domain)
 - `apply_brand_to_material` — Aplică identitatea de brand pe un material: recolorează la paleta brandului, setează fontul de brand și/sau inserează logo-ul brandului. (necesită: designId)
+- `apply_quarterly_marketing_plan` 🔒 — Aplică un plan trimestrial confirmat: creează drafturi de reclame și planuri lunare de conținut, apoi trece planul în status active. CONFIRM-FIRST. (necesită: planId)
 - `approve_social_post` — Aprobă sau respinge o postare social media aflată „în așteptare aprobare”. (necesită: postId, approvalStatus)
 - `arrange_material_elements` — Aranjează elemente la nivel înalt (fără să calculezi px): aliniere la coală (stânga/dreapta/sus/jos/centru), centrare (orizontal/vertical/ambele), distribuție egală (3+ elemente), ordine straturi (în (necesită: designId, action, ids)
 - `bulk_create_blog_posts` — Importa pana la 50 de articole de blog intr-un singur apel, cu dryRun si control pe conflictul de slug. (necesită: posts)
@@ -634,6 +644,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `gbp_reply_review` 🔒 — Publică un răspuns la o recenzie Google (vizibil public sub recenzie). (necesită: reviewId, comment)
 - `gbp_run_rank_scan` — Rulează o scanare de poziție pe hartă (geo-grid) pentru un cuvânt-cheie: verifică pe ce loc apare restaurantul pe Google Maps în jurul locației și calculează SoLV/poziție medie. (necesită: keyword)
 - `gbp_update_location` — Actualizează date de bază ale fișei Google Business: website, telefon, descriere. (parametri opționali: brandId, website, phone, description)
+- `generate_quarterly_marketing_plan` — Generează și salvează ca DRAFT un plan strategic trimestrial: OKR-uri, buget pe canale, 8-12 campanii, calendar sezonier și milestone-uri lunare. Costă un apel AI; prezintă planul înainte de aplicare. (necesită: quarter, year)
 - `generate_content_brief` — Generează (cu AI + analiză SERP + research web) un content brief pentru un articol existent: structură H2/H3 cu rațiune, top competitori din SERP, cuvinte-cheie semantice (LSI), întrebări FAQ și word (necesită: postId)
 - `generate_product_feed` — Regenerează conținutul găzduit al unui product feed (rulează generarea acum și actualizează fișierul public /feed/<slug>.xml|csv). (necesită: id)
 - `genereaza_link_conectare` 🌐 — Generează link-ul OAuth de conectare pentru o platformă socială (facebook, tiktok, youtube, linkedin, google_business) sau pentru contul de reclame Meta (meta_ads). (necesită: platforma)
@@ -644,6 +655,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `render_material_design` — Randează un material grafic (din designId) și ți-l ARATĂ ca imagine, ca să verifici că arată bine (texte, culori, poziții). (necesită: designId)
 - `reply_to_retail_review` 🌐 — Salvează un răspuns public la o recenzie externă (text + autor). (necesită: reviewId, replyText)
 - `resize_material_design` — Magic Resize: creează o COPIE a materialului scalată proporțional la alt format (ex din afiș A4 în story Instagram). (necesită: designId)
+- `review_quarterly_marketing_plan` — Revizuiește un plan activ: real vs așteptat pe venit/ROAS, delta și recomandări de realocare buget. (necesită: planId)
 - `run_marketing_automation` 🔒 🌐 — Rulează ACUM o automatizare de marketing: ori generează direct o postare draft (dacă are materiale proaspete), ori trimite cereri de conținut către personalul de pe tură (notificări REALE) și așteaptă. (necesită: automationId)
 - `run_rank_tracker` — Măsoară ACUM pozițiile în Google pentru cuvintele urmărite (capturează SERP-ul). (parametri opționali: brandId, keywordIds)
 - `schedule_social_post` 🌐 — Creează și programează o postare social media (Facebook, Instagram, TikTok, YouTube, LinkedIn, Google Business). (necesită: brandId, content, platforms)

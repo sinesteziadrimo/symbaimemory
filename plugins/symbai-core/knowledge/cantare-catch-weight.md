@@ -43,5 +43,6 @@ Dacă modelul nu apare ca suportat și nu vorbește protocolul ASCII standard, n
 ## Limite curente (onest)
 
 - Citirea **live, la cerere**, direct de la cântar, merge prin Print Agent compatibil. Dacă agentul este offline, pe o versiune veche sau cântarul nu răspunde în timp util, Symbai cade pe ultima stare raportată.
+- Citirile live sunt **serializate pe PC-ul cu Print Agent**: dacă ajung mai multe `capture_weight` pentru cântare legate de același PC, ele așteaptă una după alta ca să nu se bată pe portul serial/TCP. Pentru user: „am trimis citirea, următoarea intră imediat după prima", nu „dau refresh în paralel".
 - Driverele de cântar sunt marcate „beta" până la validarea pe hardware fizic — pentru un model nou, validarea se face împreună cu prima instalare reală.
 - Ștergerea cântarelor/modelelor se face din aplicație, nu prin conexiune.

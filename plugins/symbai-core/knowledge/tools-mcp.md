@@ -337,7 +337,13 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `view_brand_media` — Arată-ți EFECTIV o imagine din Biblioteca Media (sau de la un URL) ca s-o VEZI și să alegi ce atașezi la o postare. (parametri opționali: mediaAssetId, url)
 
 ### Diverse — 89
-- `analyze_external_website` — Analizeaza read-only un website public si intoarce un source brief pentru a construi/replica rapid site-ul in builder: SEO, logo/favicon, culori, fonturi, navigatie, CTA-uri, imagini/video, sectiuni, (necesită: url)
+- `analyze_external_website` — Analizeaza read-only un website public si intoarce un source brief pentru a construi/replica rapid site-ul in builder: SEO, logo/favicon, culori, fonturi, navigatie, CTA-uri, imagini/video, sectiuni, (necesită: url). NOTĂ: vede maxim 24 de pagini — pentru COPIEREA COMPLETĂ a unui site mare folosește uneltele de mai jos + skill-ul `copiaza-website`.
+- `discover_site_inventory` — Numitorul ONEST înainte de copiere: numără produse/categorii/blog/pagini din surse independente (sitemap-index + feed Shopify/WooCommerce + X-WP-Total), nu din ce vede agentul. Întoarce productDenominator + denominatorConfident (ca să nu declari «gata» la 20%). (necesită: url)
+- `start_site_clone_crawl` — Pornește copierea pe SERVER a unui site întreg (fundal, politicos anti-429, cache + extracție JSON-LD) — owner-ul poate închide laptopul. Întoarce jobId. (necesită: url; opțional brandId)
+- `get_clone_crawl_status` — Starea unui crawl de copiere: pagini cache/procesate/descoperite, denominator, dead-letter. (necesită: jobId)
+- `list_clone_crawl_pages` — Coada de lucru a copierii: URL-uri tipizate (product/category/blog/legal/page) + status, paginat/filtrabil. (necesită: jobId)
+- `get_cached_page` — Conținutul cache-uit + datele structurate extrase pentru O pagină (nume, SKU, preț, preț vechi, poze, descriere, breadcrumb). (necesită: jobId, url)
+- `clone_parity_diff` — POARTA de completitudine: compară setul de produse-sursă (chei SKU) cu cele importate → ID-urile care LIPSESC (nu un procent). PASS doar dacă numitorul e sigur ȘI nu lipsește nimic. (necesită: jobId, brandId)
 - `analyze_food_costs` — Analizează food cost-ul produselor unui brand. (necesită: brandId)
 - `analyze_procurement` — Analizează aprovizionarea unui brand (furnizori, prețuri, lead time-uri). (necesită: brandId)
 - `audit_shop_health` — Auditează SĂNĂTATEA magazinului online al unui brand și întoarce probleme (severity error/warn) + statistici. (necesită: brandId)

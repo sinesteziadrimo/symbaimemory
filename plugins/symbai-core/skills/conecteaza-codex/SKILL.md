@@ -14,15 +14,29 @@ Citeste si:
 
 ## Configurare
 
-Pluginul Codex foloseste `.mcp.json` din radacina pluginului si asteapta tokenul in variabila de mediu `SYMBAI_MCP_TOKEN` prin campul `bearer_token_env_var`. Nu scrie tokenul in fisierele pluginului, in git, in raspunsuri sau in memorii.
+> Pluginul **NU** mai contine un fisier `.mcp.json` propriu. Conexiunea live se configureaza per-client, **in afara pluginului** — altfel fiecare client ar fi trimis spre instanta gresita (un URL hardcodat), iar auto-update-ul pluginului ar suprascrie orice ajustare. Fiecare instanta are subdomeniul ei: `https://<subdomeniu>.symbai.app/mcp`.
 
-Pe Windows, userul poate seta tokenul o singura data cu PowerShell:
+Creeaza un fisier `.mcp.json` in **folderul tau de lucru** (radacina proiectului din care pornesti Codex — NU in folderul pluginului), cu subdomeniul TAU si tokenul citit dintr-o variabila de mediu (nu scrie tokenul direct in fisier):
+
+```json
+{
+  "mcpServers": {
+    "symbai": {
+      "type": "http",
+      "url": "https://<subdomeniu>.symbai.app/mcp",
+      "bearer_token_env_var": "SYMBAI_MCP_TOKEN"
+    }
+  }
+}
+```
+
+Pe Windows, seteaza tokenul o singura data cu PowerShell (tokenul `symbai_mcp_*` vine din Hub → Acces AI, se afiseaza o singura data la creare):
 
 ```powershell
 [Environment]::SetEnvironmentVariable("SYMBAI_MCP_TOKEN", "<tokenul-symbai_mcp>", "User")
 ```
 
-Dupa setare, Codex trebuie repornit sau trebuie pornit un thread nou care vede mediul actualizat. Daca instanta nu este Riverside, modifica in `.mcp.json` URL-ul `https://riverside.symbai.app/mcp` catre `https://<subdomeniu>.symbai.app/mcp`.
+Dupa setare, porneste Codex din nou (sau un thread nou) ca sa vada mediul si fisierul actualizat. Nu scrie tokenul in fisierele pluginului, in git, in raspunsuri sau in memorii.
 
 ## Verificare
 

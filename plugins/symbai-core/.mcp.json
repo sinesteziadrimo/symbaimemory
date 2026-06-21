@@ -1,9 +1,0 @@
-{
-  "mcpServers": {
-    "symbai": {
-      "type": "http",
-      "url": "https://riverside.symbai.app/mcp",
-      "bearer_token_env_var": "SYMBAI_MCP_TOKEN"
-    }
-  }
-}

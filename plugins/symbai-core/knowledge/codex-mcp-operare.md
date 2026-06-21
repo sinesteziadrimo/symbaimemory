@@ -19,20 +19,26 @@ Daca tool-urile lipsesc:
 - verifica instalarea pluginului;
 - verifica daca threadul a fost pornit dupa instalare;
 - verifica prezenta variabilei `SYMBAI_MCP_TOKEN` fara sa afisezi valoarea;
-- verifica URL-ul din `.mcp.json`;
+- verifica URL-ul din `.mcp.json`-ul din folderul tau de lucru (subdomeniul tau, nu al altui client);
 - porneste un thread nou dupa orice schimbare de plugin sau mediu.
 
 ## Autentificare
 
-Tokenul vine din Hub -> Acces AI si are forma `symbai_mcp_*`. Nu il copia in fisierele pluginului. `.mcp.json` foloseste `bearer_token_env_var`:
+Tokenul vine din Hub -> Acces AI si are forma `symbai_mcp_*`. Nu il copia in fisiere, in git sau in raspunsuri. Conexiunea se pune intr-un `.mcp.json` din **folderul tau de lucru** (NU in plugin — pluginul nu mai livreaza unul; vezi skill-ul `conecteaza-codex`), cu URL-ul instantei TALE si tokenul citit din variabila de mediu:
 
 ```json
 {
-  "bearer_token_env_var": "SYMBAI_MCP_TOKEN"
+  "mcpServers": {
+    "symbai": {
+      "type": "http",
+      "url": "https://<subdomeniu>.symbai.app/mcp",
+      "bearer_token_env_var": "SYMBAI_MCP_TOKEN"
+    }
+  }
 }
 ```
 
-Pentru alta instanta Symbai, schimba URL-ul MCP din `.mcp.json`.
+Fiecare instanta Symbai are subdomeniul ei — foloseste-l pe al tau, nu pe al altui client.
 
 ## Lucru sigur
 

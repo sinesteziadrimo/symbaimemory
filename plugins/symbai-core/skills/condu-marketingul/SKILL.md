@@ -34,11 +34,11 @@ Din campaniile planului, lansează concret — fiecare prin skill-ul lui, mereu 
 
 ## C. Revizuiește și realocă (lunar — bucla care face diferența)
 
-1. `list_quarterly_marketing_plans` → `review_quarterly_marketing_plan(planId)` — real vs așteptat pe venit + ROAS, delta, recomandări.
+1. `get_marketing_scorecard(days:30)` + `compare_attribution_models(days:30)` — tabloul executiv și atribuirea onestă înainte de realocări; apoi `list_quarterly_marketing_plans` → `review_quarterly_marketing_plan(planId)` pentru progresul planului.
 2. **Dacă ești sub target cu >15%** sau un canal a urcat CAC cu >25%:
-   - `get_attribution_report` (arată ≥2 perspective, nu doar last-click) + `get_ad_campaign_status` ca să vezi de unde vine problema.
+   - `get_ad_campaign_insights` pe campaniile active/slabe ca să vezi spend, CTR, CPC, CPA, conversii și ROAS. Folosește `get_ad_campaign_status` doar pentru status Meta/eroare.
    - `what_if_marketing_budget(brandId, baselineSplit, newSplit)` — simulează mutarea banilor de pe canalul slab pe cel cu ROAS mai bun ÎNAINTE să muți efectiv.
-   - Propune: pune pauză pe campaniile sub target (`pause_ad_campaign`), crește bugetul pe câștigătoare. **Confirmă cu utilizatorul** orice schimbare de buget.
+   - Propune: pune pauză pe campaniile sub target (`pause_ad_campaign`), crește bugetul pe câștigătoare cu `set_campaign_budget(confirm:true)`. **Confirmă cu utilizatorul** orice schimbare de buget.
 3. Dă-i utilizatorului un rezumat scurt: „luna asta ai făcut X, targetul era Y, mut Z lei de pe A pe B, motivul e ...". Pentru tabloul complet vezi skill-ul `masoara-marketing`.
 
 ## Reguli

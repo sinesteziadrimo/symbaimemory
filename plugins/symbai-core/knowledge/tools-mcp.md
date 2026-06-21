@@ -18,11 +18,11 @@ Fiecare apel e înregistrat în jurnalul de activitate (auditabil de proprietar)
 - **Pattern scriere → verificare**: confirmarea finală o dai pe baza unui tool de citire, nu a interfeței. O scriere repetată „ca să se prindă" creează duplicate.
 - **Date lipsă = întrebări, nu invenții**: la importuri nu inventa prețuri/gramaje/alergeni; cere sursa userului.
 
-## ⚠ Confirmare obligatorie (`confirm: true`) — 49 tool-uri 🔒
+## ⚠ Confirmare obligatorie (`confirm: true`) — 50 tool-uri 🔒
 
 Tool-urile marcate 🔒 cheltuie bani, trimit în masă, sunt externe sau ireversibile. La PRIMUL apel fără `confirm: true` întorc un mesaj de confirmare cu detaliile (sumă/nr. destinatari) și NU execută nimic. Fluxul corect: arăți utilizatorului ce se va întâmpla → ceri OK → reapelezi cu `confirm: true`. NU trimite `confirm: true` din prima fără acordul explicit al utilizatorului.
 
-Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `apply_quarterly_marketing_plan`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_whatsapp_media`, `send_whatsapp_message`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
+Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `apply_quarterly_marketing_plan`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_whatsapp_media`, `send_whatsapp_message`, `set_campaign_budget`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
 
 ## ⚠ Plafoane (limite) per token — opționale, setate din Hub
 
@@ -33,13 +33,15 @@ Proprietarul poate seta din portalul Hub → Acces AI plafoane pe token. Gol = f
 
 Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate mări/elimina plafonul din Hub → Acces AI (editează tokenul), sau folosește o valoare mai mică. Plafoanele se aplică PE LÂNGĂ permisiunea de modul — sunt o a doua plasă de siguranță.
 
-**TOTAL: 852 tool-uri** — Citire 347 · Speciale 5 · SQL 3 · Scriere per modul 497 (pe 19 module).
+**TOTAL: 857 tool-uri** — Citire 351 · Speciale 5 · SQL 3 · Scriere per modul 498 (pe 19 module).
 
-## Citire (fără permisiune de modul) — 347 tool-uri
+## Citire (fără permisiune de modul) — 351 tool-uri
 
-### Vânzări, comenzi, casă & financiar — 42
+### Vânzări, comenzi, casă & financiar — 44
 - `get_attribution_ltv_by_channel` — Valoarea pe viață (LTV) a clienților grupată după canalul de achiziție, pe o cohortă de N zile: nr. (parametri opționali: brandId, days)
 - `get_attribution_report` — Raport de atribuire marketing pe canale, pe ultimele N zile: conversii, venituri, cheltuieli (din reclame), CPA și ROAS per canal, conform unui model de atribuire ales (last_click implicit). (parametri opționali: brandId, days, model)
+- `compare_attribution_models` — Compară atribuirea pe modele multiple (last/first/linear/time_decay/position) pentru același interval, ca să nu decizi bugetul pe un singur model. (parametri opționali: brandId, days)
+- `get_marketing_scorecard` — Tablou executiv marketing: venit atribuit, cheltuială reclame, ROAS combinat, canale și LTV:CAC sub 3 pe ultimele N zile. (parametri opționali: brandId, days, model)
 - `get_cash_book_day` — Detaliile zilei de casă (deschidere/închidere, totaluri, status, înregistrările) pentru un registru la o dată. (necesită: registerId, businessDate)
 - `get_cash_register_balance` — Soldul curent al unui registru de casă (opțional la o anumită dată) — cât numerar e în casierie acum. (necesită: registerId)
 - `get_cash_register_closure_status` — Arată ce zile sunt închise/deschise/lipsă pentru un registru de casă (registru legal) — util pentru a vedea ce mai e de închis. (necesită: registerId)
@@ -317,7 +319,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `read_integration_memory_files` — Citește fișierele de memorie ale integrărilor. (parametri opționali: fileType, integrationKey)
 - `view_brand_media` — Arată-ți EFECTIV o imagine din Biblioteca Media (sau de la un URL) ca s-o VEZI și să alegi ce atașezi la o postare. (parametri opționali: mediaAssetId, url)
 
-### Diverse — 86
+### Diverse — 88
 - `analyze_external_website` — Analizeaza read-only un website public si intoarce un source brief pentru a construi/replica rapid site-ul in builder: SEO, logo/favicon, culori, fonturi, navigatie, CTA-uri, imagini/video, sectiuni, (necesită: url)
 - `analyze_food_costs` — Analizează food cost-ul produselor unui brand. (necesită: brandId)
 - `analyze_procurement` — Analizează aprovizionarea unui brand (furnizori, prețuri, lead time-uri). (necesită: brandId)
@@ -325,6 +327,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `audit_website_seo` — Audit SEO complet al SITE-ULUI/magazinului brandului (NU doar un articol de blog — pentru articol folosește seo_audit). (parametri opționali: brandId, maxIssues)
 - `build_recall_report` — Construiește RAPORTUL DE RETRAGERE (recall) pentru un lot — arborele complet de impact într-un singur apel: toate loturile descendente (în ce s-a transformat / unde a ajuns) și, opțional, cele ascende (necesită: lotId)
 - `check_efactura_status` 🌐 — Verifică la ANAF starea unei facturi trimise în e-Factura (acceptată / respinsă cu erori / în procesare) și actualizează statusul local. (necesită: invoiceId)
+- `check_contact_frequency_budget` — Verifică pentru un client câte mesaje de marketing a primit în ultimele 24h/7d pe email/SMS/WhatsApp/push și dacă mai poate primi pe fiecare canal. (necesită: customerId)
 - `check_presentation_health` — Verifica SANATATEA unei prezentari FARA s-o modifici (read-only). (necesită: presentationId)
 - `compare_pnl_periods` — Compara P&L pe mai multe perioade si explica DE CE s-a schimbat profitul (profit bridge: cat a adus venitul, cat au mancat COGS/personal/OpEx). (parametri opționali: mod, periods, brandId, locationId)
 - `compare_pnl_snapshots` — Compara DOUA P&L-uri salvate (snapshot-uri) linie cu linie — venituri, COGS, profit brut, personal, OpEx, profit net + marje — cu diferenta in RON si procent. (necesită: idA, idB)
@@ -332,6 +335,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `gbp_maps_score` — Scorul de optimizare Google Maps (0-100) al fișei Google Business + lista de recomandări prioritizate (ce să repari ca să apari mai sus pe hartă și să convertești mai mult). (parametri opționali: brandId)
 - `gbp_rank_summary` — Rezumatul ultimei scanări de poziție pe hartă (geo-grid) pentru un cuvânt-cheie: SoLV (% din zonă unde apari în top 3), poziția medie și acoperirea. (parametri opționali: brandId, keyword)
 - `generate_report` — Generează un raport financiar inline: food_cost (food cost per produs cu status EXCELENT/OK/ATENȚIE/CRITIC), sales_summary (sumar vânzări pe perioadă), stock_value (valoare stoc la cost și la preț vân (necesită: reportType)
+- `get_ad_campaign_insights` — Metricile reale ale unei campanii pe o perioadă: spend, afișări, click-uri, CTR, CPC, CPM, conversii, CPA, ROAS și defalcare pe zile. (necesită: campaignId)
 - `get_ad_campaign_status` — Verifică statusul unei campanii reîmprospătând din Meta (effective_status + motiv de respingere dacă a fost refuzată). (necesită: campaignId)
 - `get_content_brief` — Întoarce content brief-ul salvat al unui articol (outline H2/H3 + competitori SERP + cuvinte LSI + FAQ + word count țintă). (necesită: postId)
 - `get_day_at_a_glance` — Vederea de ansamblu a UNEI ZILE pentru gazdă/coordonator: toate rezervările din ziua respectivă, plus sloturile de joc, milestone-urile (masă/tort) și jocurile disponibile — totul într-un apel. (necesită: date)
@@ -823,7 +827,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_pos_device` — Actualizează un PC/terminal POS: nume, IP, locație, casa fiscală implicită (rutare fiscală per terminal), ecran KDS, restricții IP, activare. (necesită: deviceId)
 - `update_printer` — Actualizează o imprimantă EXISTENTĂ (redenumire, IP/port, tip, asociere cu PC-ul, casă fiscală, activare). (necesită: printerId)
 
-### reclame — Reclame (Meta / Google / TikTok) — 8 tool-uri
+### reclame — Reclame (Meta / Google / TikTok) — 9 tool-uri
 - `boost_post` 🔒 — Promovează (boost) o postare existentă pe Facebook/Instagram — creează ȘI publică reclama, fără wizard. (necesită: postId, dailyBudgetRon)
 - `create_calls_ad` 🔒 — Creează ȘI publică o reclamă cu buton de APEL — clienții sună direct la numărul tău dintr-un click. (necesită: phoneNumber, dailyBudgetRon)
 - `create_event_ad` 🔒 — Creează ȘI publică o reclamă pentru un EVENIMENT Facebook (petrecere, concert, lansare) — promovează evenimentul ca să vină mai multă lume. (necesită: eventId, dailyBudgetRon)
@@ -832,6 +836,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `create_traffic_ad` 🔒 — Creează ȘI publică o reclamă de TRAFIC (clienții dau click și ajung pe un site/meniu/pagină de rezervări) — fără wizard. (necesită: websiteUrl, dailyBudgetRon)
 - `pause_ad_campaign` — Pune pe PAUZĂ o campanie publicitară (oprește cheltuiala imediat). (necesită: campaignId)
 - `resume_ad_campaign` 🔒 — Repornește o campanie pusă pe pauză. (necesită: campaignId)
+- `set_campaign_budget` 🔒 — Schimbă bugetul zilnic al unei campanii publicitare. Cheltuială reală: confirm-first și respectă plafonul de buget din token. (necesită: campaignId, newDailyBudgetRon)
 
 ### comunicare — Comunicare (Email / WhatsApp / Push) — 18 tool-uri
 - `activate_email_flow` 🔒 🌐 — Activează o campanie de tip FLUX (drip automat) — IREVERSIBIL, începe să trimită automat către audiență. (necesită: campaignId)

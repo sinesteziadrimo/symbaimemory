@@ -4,7 +4,7 @@
 
 ## Pe scurt
 
-Acesta e manualul de agenție pentru reclame plătite în RON: cum construiești o pâlnie (rece → cald → recuperare), cât pui pe buget, când scalezi și de ce un singur ad set consolidat bate cinci fragmentate. Regula de aur 2026: **algoritmul are nevoie de ~50 de conversii pe săptămână per ad set ca să iasă din „învățare"** — la buget mic asta înseamnă să optimizezi pe un eveniment frecvent (mesaje/apeluri/click), nu pe „cumpărare" rară. Din chat (prin Symbai) faci azi reclamele Meta (trafic, mesaje, apeluri, eveniment, like-uri pagină, boost la postare) plus pauză/repornire și status; Google și TikTok se gestionează deocamdată din aplicație. Fii cinstit cu proprietarul despre ce se face din chat și ce din aplicație — nu promite ce nu poți livra.
+Acesta e manualul de agenție pentru reclame plătite în RON: cum construiești o pâlnie (rece → cald → recuperare), cât pui pe buget, când scalezi și de ce un singur ad set consolidat bate cinci fragmentate. Regula de aur 2026: **algoritmul are nevoie de ~50 de conversii pe săptămână per ad set ca să iasă din „învățare"** — la buget mic asta înseamnă să optimizezi pe un eveniment frecvent (mesaje/apeluri/click), nu pe „cumpărare" rară. Din chat (prin Symbai) faci azi reclamele Meta (trafic, mesaje, apeluri, eveniment, like-uri pagină, boost la postare), pauză/repornire, status, insight-uri reale și schimbarea bugetului zilnic cu confirmare; Google și TikTok se gestionează deocamdată din aplicație. Fii cinstit cu proprietarul despre ce se face din chat și ce din aplicație — nu promite ce nu poți livra.
 
 ## Concepte
 
@@ -34,12 +34,12 @@ Acesta e manualul de agenție pentru reclame plătite în RON: cum construiești
 4. **Strat rece** — `create_traffic_ad` (confirm:true) pe oraș + rază, buget consolidat într-o singură campanie, obiectiv frecvent.
 5. **Strat cald** — `create_messages_ad` (confirm:true) sau `boost_post` (confirm:true) pe vizitatori + cei din Messenger, cu o ofertă clară.
 6. Legi reclama de o ofertă reală: `preview_offer_margin` → `create_offer` (vezi mai jos day-part/LTO).
-7. După 7-10 zile: `get_ad_campaign_status` [citire] + `get_attribution_report` [citire] → scalezi cu +10-20% pe ce are ROAS peste prag (din aplicație ajustezi bugetul), `pause_ad_campaign` pe ce e sub.
+7. După 7-10 zile: `get_ad_campaign_insights` [citire] + `compare_attribution_models`/`get_marketing_scorecard` [citire] → scalezi cu +10-20% pe ce are ROAS/CAC peste prag (`set_campaign_budget(confirm:true)`), `pause_ad_campaign` pe ce e sub.
 
 ### 2) Optimizare săptămânală
-1. `list_ad_campaigns` [citire] (cele active) → `get_ad_campaign_status` [citire] per campanie.
+1. `list_ad_campaigns` [citire] (cele active) → `get_ad_campaign_insights` [citire] per campanie; `get_ad_campaign_status` doar pentru livrare/eroare Meta.
 2. Compari cu benchmark-urile 2026 (convertite în RON) → identifici 3 acțiuni: oprește ce nu merge, scalează câștigătorul, reîmprospătează creativul.
-3. Pe confirmarea proprietarului: `pause_ad_campaign` / `resume_ad_campaign` (confirm:true). Modificarea bugetului se face din aplicație.
+3. Pe confirmarea proprietarului: `pause_ad_campaign` / `resume_ad_campaign(confirm:true)` / `set_campaign_budget(confirm:true)`.
 4. `get_attribution_ltv_by_channel` [citire] → rezumat în limbaj simplu: ce canal aduce clienți cu valoare mare pe termen lung.
 
 ### 3) Umplerea orelor slabe (footfall)
@@ -64,7 +64,8 @@ Acesta e manualul de agenție pentru reclame plătite în RON: cum construiești
 Reclame (Meta, din chat — toate cele de scriere cer `confirm:true` pentru că **cheltuiesc bani reali**):
 - `list_ad_accounts` [citire] — ce conturi de reclame sunt conectate la brand.
 - `list_ad_campaigns` [citire] — campaniile existente și starea lor.
-- `get_ad_campaign_status` [citire] — rezultatele unei campanii (cheltuială, livrare, performanță).
+- `get_ad_campaign_status` [citire] — status Meta, livrare, motiv de respingere/eroare.
+- `get_ad_campaign_insights` [citire] — performanța reală: cheltuială, CTR, CPC, CPM, conversii, CPA, ROAS și trend pe zile.
 - `create_traffic_ad` [marketing, confirm:true] — reclamă de trafic către site/meniu; obiectiv bun pentru pâlnia rece la buget mic.
 - `create_messages_ad` [marketing, confirm:true] — reclamă care deschide conversații Messenger; eveniment frecvent, bun pentru pragul de 50/săptămână.
 - `create_calls_ad` [marketing, confirm:true] — reclamă cu apel direct (click-to-call) — util pentru rezervări/comenzi telefonice.
@@ -72,6 +73,7 @@ Reclame (Meta, din chat — toate cele de scriere cer `confirm:true` pentru că 
 - `create_page_likes_ad` [marketing, confirm:true] — crește audiența paginii (notorietate, nu vânzare directă).
 - `boost_post` [marketing, confirm:true] — promovează o postare organică existentă (cel mai simplu „cald"); `list_boostable_posts` [citire] arată ce postări poți promova.
 - `pause_ad_campaign` / `resume_ad_campaign` [marketing, confirm:true] — oprești/repornești o campanie.
+- `set_campaign_budget` [reclame, confirm:true] — modifică bugetul zilnic; folosește doar după insight-uri și acord explicit.
 
 Audiență, buget și dovadă (susțin deciziile de reclame):
 - `check_marketing_allowed` [citire] — ai voie să faci marketing pe brand?
@@ -94,14 +96,14 @@ Coordonare cross-canal (un singur canal/promoție/zi):
 | **Meta — reclamă apeluri / eveniment / like-uri** | da — `create_calls_ad`, `create_event_ad`, `create_page_likes_ad` | — |
 | **Meta — boost la postare** | da — `boost_post` (+ `list_boostable_posts`) | — |
 | **Meta — pauză / repornire** | da — `pause_ad_campaign`, `resume_ad_campaign` | — |
-| **Status și rezultate campanie** | da — `get_ad_campaign_status`, `list_ad_campaigns` | — |
-| **Modificare buget pe campanie (scalare)** | — | da (din pagina de reclame) |
+| **Status și rezultate campanie** | da — `list_ad_campaigns`, `get_ad_campaign_status`, `get_ad_campaign_insights` | — |
+| **Modificare buget pe campanie (scalare)** | da — `set_campaign_budget(confirm:true)` pentru Meta | da pentru Google/TikTok sau setări avansate |
 | **Audiențe personalizate / asemănătoare din lista CRM** | — (le pregătești segmentul cu `preview_guest_segment`) | da |
 | **Google Ads (Performance Max, Search)** | — | da |
 | **TikTok Ads (Smart+, Spark Ads)** | — | da |
 | **Conectare cont Meta / cont reclame** | — (vezi skill-ul `conecteaza-meta`) | da |
 
-Regula de onestitate: dacă proprietarul cere ceva ce nu se poate din chat (ex. „scalează bugetul Google", „fă audiență lookalike"), spune clar că **se face din aplicație** și ghidează-l acolo — nu inventa un tool și nu pretinde că ai făcut-o.
+Regula de onestitate: dacă proprietarul cere ceva ce nu se poate din chat (ex. „scalează bugetul Google", „fă audiență lookalike"), spune clar că **se face din aplicație** și ghidează-l acolo — nu inventa un tool și nu pretinde că ai făcut-o. Pentru Meta, bugetul zilnic se poate schimba din chat cu `set_campaign_budget(confirm:true)`.
 
 ## Întrebări frecvente și capcane
 
@@ -113,8 +115,8 @@ Regula de onestitate: dacă proprietarul cere ceva ce nu se poate din chat (ex. 
 - **Oferte cu fereastră de zi** — `create_offer` suportă acum interval orar: `timeStart`+`timeEnd`+`daysOfWeek` pentru un **Happy Hour** (ex. 15:00-18:00, Luni-Joi) și `startsAt`/`expiresAt` pentru o ofertă pe termen limitat (LTO). **Fără fereastră de timp, oferta rulează 24/7** — pune fereastra dacă vrei doar orele slabe.
 - **Atribuirea umflă ROAS** — cifrele raportate de platformă supraestimează ROAS-ul real în medie de ~2,3×. Judecă rentabilitatea pe `get_attribution_report` / `get_attribution_ltv_by_channel` (date din POS-ul tău), nu pe ce zice doar Meta/Google.
 - **Țintire geografică corectă** — pentru un local țintește orașul (Meta adaugă rază) sau rază 5-8 km în jurul punctului. Nu suprapune oraș + județ + țară (se respinge). Acoperire pe toată țara în UE cere date de plătitor/beneficiar verificate.
-- **Confirmare obligatorie la cheltuială** — orice tool de creare/pornire reclamă cheltuie bani reali; rulează cu `confirm:true` și spune-i clar proprietarului bugetul, durata și ținta înainte. Nu repeta comanda dacă ecranul nu s-a actualizat — verifică prin `get_ad_campaign_status`.
-- **Nu inventa tool-uri** — pentru Google, TikTok, audiențe personalizate și modificarea bugetului, spune cinstit „se face din aplicație" și ghidează acolo.
+- **Confirmare obligatorie la cheltuială** — orice tool de creare/pornire/scalare reclamă cheltuie bani reali; rulează cu `confirm:true` și spune-i clar proprietarului bugetul, durata și ținta înainte. Nu repeta comanda dacă ecranul nu s-a actualizat — verifică prin `get_ad_campaign_status`/`get_ad_campaign_insights`.
+- **Nu inventa tool-uri** — pentru Google, TikTok și audiențe personalizate spune cinstit „se face din aplicație" și ghidează acolo. Pentru Meta, folosește tool-urile existente (`set_campaign_budget` inclus).
 
 ## Vezi și
 

@@ -1,6 +1,6 @@
 # Măsurare Marketing și Atribuire
 
-> Pentru linkul exact către orice pagină folosește tool-ul `gaseste_in_aplicatie` — el e sursa autoritară de navigare. Pentru reclame vezi și `knowledge/reclame-meta-google-tiktok.md`, pentru email `knowledge/email-marketing.md`.
+> Pentru linkul exact către orice pagină folosește tool-ul `gaseste_in_aplicatie` — el e sursa autoritară de navigare. Pentru reclame vezi și `knowledge/reclame-playbook-2026.md`, pentru email `knowledge/email-marketing.md`.
 
 ## Pe scurt
 
@@ -23,9 +23,15 @@ Claude lucrează cu cifre, în lei, și spune onest unde e estimare și unde e d
 
 ## Fluxuri frecvente
 
+### 0. Tool order rapid (MCP live)
+1. „Cum stă marketingul?" → `get_marketing_scorecard(days, model?)` pentru venit atribuit, spend ads, ROAS combinat și canale cu LTV:CAC sub 3.
+2. „Care model de atribuire e corect?" → `compare_attribution_models(days)`; arată cel puțin două modele, de preferat last-click lângă time-decay.
+3. „Cum merge campania X?" → `get_ad_campaign_insights(campaignId, startDate?, endDate?)` pentru spend, CTR, CPC, CPA, conversii, ROAS și trend zilnic; `get_ad_campaign_status` rămâne pentru publicare/erori Meta.
+4. „Pot să contactez clientul X?" → `check_contact_frequency_budget(customerId, brandId?)` înainte de mesaj; respectă verdictul pe canal.
+
 ### 1. Scorecard săptămânal pentru patron (8 KPI de rezultat)
 1. `list_brands` → afli brandId.
-2. Tragi cifrele: `get_attribution_report` + `get_attribution_ltv_by_channel` (ROAS și calitate LTV pe canal) + `raport_vanzari` (venit POS real) + `get_pnl` (profit).
+2. Tragi cifrele: `get_marketing_scorecard` + `compare_attribution_models` + `raport_vanzari` (venit POS real) + `get_pnl` (profit). Dacă ai nevoie de detaliu pe canal, completează cu `get_attribution_report` + `get_attribution_ltv_by_channel`.
 3. `compare_pnl_periods` pentru **variația** față de perioada anterioară.
 4. Prezinți patronului 8 KPI cu semafor (verde/galben/roșu): ROAS combinat, CAC, LTV:CAC, marketing ca % din venit, mix client-nou-vs-revenit, RPR email, rezervări pe 7-14 zile, profit — fiecare cu „ce facem săptămâna asta".
 
@@ -54,7 +60,7 @@ Claude lucrează cu cifre, în lei, și spune onest unde e estimare și unde e d
 1. `get_attribution_ltv_by_channel` + `get_attribution_report` → calculezi split-ul curent și LTV:CAC pe canal.
 2. `get_pnl` + `compare_pnl_periods` → confirmi că profitul ține pasul, nu doar veniturile.
 3. Propui mutarea bugetului dinspre canalele saturate / cu iROAS mic spre cele cu LTV:CAC bun și payback rapid.
-4. Aplici noile bugete prin tool-urile de reclame ale canalului (vezi `knowledge/reclame-meta-google-tiktok.md`), cu confirmare.
+4. Aplici noile bugete prin tool-urile de reclame ale canalului (vezi `knowledge/reclame-playbook-2026.md`), cu confirmare.
 
 ## Tool-uri MCP utile
 
@@ -62,6 +68,10 @@ Toate sunt de **citire** [citire] — măsurarea nu cheltuie și nu trimite nimi
 
 - `get_attribution_report` — raport de atribuire pe canal (direcția: ce canal pare să aducă comenzi/venit). Param: brandId, perioadă. Pune-l mereu lângă un al doilea unghi.
 - `get_attribution_ltv_by_channel` — LTV și calitatea clienților aduși de fiecare canal; baza calculului LTV:CAC. Param: brandId, perioadă.
+- `get_marketing_scorecard` — scorecard executiv pe ultimele N zile: venit atribuit, spend ads, ROAS combinat, canale și semnal LTV:CAC < 3. Primul tool pentru „cum stă marketingul".
+- `compare_attribution_models` — comparație last/first/linear/time_decay/position pe aceleași date. Folosește-l ca să nu decizi bugetul pe un singur model.
+- `get_ad_campaign_insights` — metrici reale pe campanie: spend, afișări, click-uri, CTR, CPC, CPM, conversii, CPA, ROAS și defalcare pe zile. Primul tool înainte de pauză/scalare.
+- `check_contact_frequency_budget` — câte mesaje a primit un client în 24h/7d pe email/SMS/WhatsApp/push și dacă mai poți trimite pe canalul respectiv.
 - `get_email_conversion_attribution` — leagă click-urile din email de comenzile/rezervările POS, fereastră 7 zile; venit real, nu deschideri. Param: brandId/campaignId, fereastră.
 - `get_pnl` — profit și pierdere real, ca să măsori marketingul pe profit, nu doar pe venit. Param: brandId, perioadă.
 - `compare_pnl_periods` — compară două perioade pentru **variație** (lună vs. lună, an vs. an); inima dashboard-ului săptămânal. Param: brandId, cele două perioade.
@@ -69,7 +79,7 @@ Toate sunt de **citire** [citire] — măsurarea nu cheltuie și nu trimite nimi
 - `get_sales_analytics` — analiză de vânzări din zona **deal-uri / pipeline CRM** (oferte de evenimente, catering), NU bonuri POS. Folosește-l doar pentru lumea de vânzări B2B/evenimente.
 - `get_email_campaign_analytics`, `get_email_ab_test_report`, `reconcile_email_conversions` — KPI email post-MPP, varianta câștigătoare, recuperare click-fără-conversie.
 - `top_produse`, `vanzari_in_timp` — context de produs și evoluție în timp pentru stratul MMM-lite.
-- Pentru context strategic: `get_attribution_report` + `get_attribution_ltv_by_channel` intră direct în planul trimestrial (`generate_quarterly_marketing_plan`, `what_if_marketing_budget`) — vezi `knowledge/strategie-marketing-plan.md`.
+- Pentru context strategic: `get_marketing_scorecard` + `compare_attribution_models` + `get_attribution_ltv_by_channel` intră direct în planul trimestrial (`generate_quarterly_marketing_plan`, `what_if_marketing_budget`) — vezi `knowledge/strategie-marketing-plan.md`.
 
 ## Întrebări frecvente și capcane
 
@@ -85,7 +95,7 @@ Toate sunt de **citire** [citire] — măsurarea nu cheltuie și nu trimite nimi
 
 ## Vezi și
 
-- `knowledge/reclame-meta-google-tiktok.md` — benchmark-uri, CAPI, conversii offline, optimizare buget.
+- `knowledge/reclame-playbook-2026.md` — benchmark-uri, CAPI, conversii offline, optimizare buget.
 - `knowledge/email-marketing.md` — KPI email, livrabilitate, predictive sending, conversii atribuite.
 - `knowledge/strategie-marketing-plan.md` — planul trimestrial, 70/20/10, what-if buget pe baza atribuirii.
 - `knowledge/loialitate-fidelizare.md` — economia LTV, retenție, win-back măsurat cu holdout.

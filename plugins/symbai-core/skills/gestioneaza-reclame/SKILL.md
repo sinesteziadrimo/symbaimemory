@@ -55,12 +55,14 @@ Fluxul e identic: verifică contul (`list_ad_accounts`) → confirmă bugetul + 
 
 - **Vezi campaniile**: `list_ad_campaigns` (opțional `status`: active/paused/pending_review/error...). Întoarce status, buget zilnic, obiectiv, perioadă.
 - **Status detaliat / de ce a picat**: `get_ad_campaign_status(campaignId)`.
+- **Metrici reale / performanță**: `get_ad_campaign_insights(campaignId, startDate?, endDate?)` înainte să recomanzi pauză, scalare sau schimbare de buget. Uită-te la spend, CTR, CPC, CPA, conversii, ROAS și trend pe zile.
 - **Pune pe pauză** (oprește cheltuiala imediat): `pause_ad_campaign(campaignId)` — acțiune sigură, nu cere confirmare.
 - **Repornește**: `resume_ad_campaign(campaignId, confirm:true)` — reia cheltuiala, deci cere confirmarea utilizatorului.
+- **Schimbă bugetul zilnic**: `set_campaign_budget(campaignId, newDailyBudgetRon, confirm:true)` — bani reali. Întâi arată metricile, suma nouă în RON/zi și motivul, apoi cere OK explicit. Respectă plafonul adsDailyBudgetCap; dacă Meta refuză, nu promite că s-a schimbat.
 
 ## Reguli (IMPORTANT — bani reali)
 
-- **Mereu confirmă bugetul + postarea înainte de `boost_post`/`resume`** (pune `confirm:true` doar după „da"-ul utilizatorului). Pauza NU cere confirmare.
+- **Mereu confirmă bugetul + postarea înainte de `boost_post`/`resume`/`set_campaign_budget`** (pune `confirm:true` doar după „da"-ul utilizatorului). Pauza NU cere confirmare.
 - **Respectă plafonul**: dacă proprietarul a setat un buget max/zi sau max/campanie pe token (Hub → Acces AI), tool-ul refuză sumele peste plafon cu un mesaj clar. Nu insista — propune o sumă ≤ plafon sau roagă proprietarul să mărească plafonul din portal.
 - **Durată**: pentru un buget total mărginit, dă `durationDays` (≥2). Altfel campania rulează cu buget zilnic până o pui pe pauză — spune-i clar utilizatorului.
 - **Minim 5 RON/zi** (cerința Meta).

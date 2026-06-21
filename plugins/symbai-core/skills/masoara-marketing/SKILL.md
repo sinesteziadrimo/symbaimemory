@@ -9,6 +9,13 @@ Acest skill îți dă **rezumatul de proprietar în sub 2 minute**: 8 indicatori
 
 Citește întâi `knowledge/masurare-marketing-atribuire.md` (creierul deciziei: LTV:CAC, payback, de ce platformele umflă ROAS-ul). Toate cifrele sunt în RON.
 
+## Tool order live (2026)
+
+- Pentru „cum stă marketingul / ce canal aduce bani": începe cu `get_marketing_scorecard(days, model?)`. Îți dă venitul atribuit, cheltuiala ads, ROAS combinat și canalele cu LTV:CAC sub 3.
+- Pentru „arată-mi atribuirea onest": `compare_attribution_models(days)` înainte de concluzii; arată last/first/linear/time_decay/position dacă există date. Nu lua decizia pe un singur model.
+- Pentru „cum merge campania X": `get_ad_campaign_insights(campaignId, startDate?, endDate?)`, nu doar `get_ad_campaign_status`. Statusul spune dacă rulează; insights spune spend, CTR, CPC, CPA, conversii, ROAS și trend pe zile.
+- Pentru „pot să-i trimit clientului X încă un mesaj": `check_contact_frequency_budget(customerId, brandId?)` înainte de orice mesaj/retargeting 1-la-1. Respectă verdictul `canSend`.
+
 ## A. Tabloul de bord săptămânal (rutina de fiecare luni)
 
 1. **Context:** `list_brands` + `list_locations` (afli `brandId`/`locationId`). `read_brand_memories(brandId)` dacă vrei tonul/poziționarea în rezumat.
@@ -44,7 +51,7 @@ Când proprietarul întreabă „ce canal îmi aduce bani":
 
 ## C. Adâncește pe canal (când un indicator e roșu)
 
-- **Reclame slabe:** `get_ad_campaign_status` — vezi care campanie trage ROAS-ul în jos înainte să tai. (Pauză/realocare buget → skill-ul `condu-marketingul`, cu confirmarea proprietarului.)
+- **Reclame slabe:** `list_ad_campaigns` → `get_ad_campaign_insights` pentru campaniile active/slabe; folosește `get_ad_campaign_status` doar pentru publicare/eroare Meta. Pauza sau schimbarea de buget trec la `condu-marketingul`/`gestioneaza-reclame` și cer confirmarea proprietarului.
 - **Email — măsoară-l CORECT:** `get_email_campaign_analytics` + `get_email_conversion_attribution` (fereastră 7 zile). **Raportează pe click, RPR (venit per destinatar), comenzi plasate, plângeri** — NICIODATĂ pe „deschideri" (Apple le umflă cu 15-20 puncte; o rată reală de 28% apare ca 52%). Reper sănătos: email aduce ~45 lei la 1 leu cheltuit.
 - **Oferte/promoții:** `get_offer_scorecard` — întrebarea corectă nu e „câți au folosit cuponul", ci „câți NU ar fi venit oricum". O ofertă bună aduce clienți incrementali, nu subvenționează clienți care veneau oricum.
 

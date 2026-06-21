@@ -4,7 +4,7 @@
 
 ## Pe scurt
 
-Clientul tau primeste email, WhatsApp si notificari push de la tine — dar in capul lui sunt UN singur brand, nu trei canale separate. Daca le tratezi separat, ajunge sa ia acelasi mesaj pe trei cai in cateva ore si se enerveaza: 23% dintr-un public renunta la un brand care comunica prea des. Acest fisier arata cum orchestrezi cele trei canale (plus social pentru descoperire) ca un ciclu unic anti-oboseala: un mesaj per persoana per fereastra, un buget total de frecventa, fiecare canal pe momentul lui. Lucrezi MCP-first: citesti permisiunile reale (`check_marketing_allowed`, `comms_get_status`), faci un plan, ceri confirmare in cuvinte si abia apoi trimiti.
+Clientul tau primeste email, WhatsApp si notificari push de la tine — dar in capul lui sunt UN singur brand, nu trei canale separate. Daca le tratezi separat, ajunge sa ia acelasi mesaj pe trei cai in cateva ore si se enerveaza: 23% dintr-un public renunta la un brand care comunica prea des. Acest fisier arata cum orchestrezi cele trei canale (plus social pentru descoperire) ca un ciclu unic anti-oboseala: un mesaj per persoana per fereastra, un buget total de frecventa, fiecare canal pe momentul lui. Lucrezi MCP-first: citesti permisiunile reale (`check_marketing_allowed`, `check_contact_frequency_budget`, `comms_get_status`), faci un plan, ceri confirmare in cuvinte si abia apoi trimiti.
 
 ## Concepte
 
@@ -50,7 +50,7 @@ Clientul tau primeste email, WhatsApp si notificari push de la tine — dar in c
 
 ### 4. Poarta de control inainte de orice trimitere in masa
 1. `check_marketing_allowed` + `comms_get_status` → permisiuni si stare canale.
-2. Verifica **consimtamantul per canal** + orele de liniste 21:00–08:00 + **bugetul de frecventa** (1–2/zi, 3–5/sapt cumulat pe toate canalele — daca au primit deja ceva azi, NU mai trimite).
+2. Verifica **consimtamantul per canal** + orele de liniste 21:00–08:00 + **bugetul de frecventa** cu `check_contact_frequency_budget(customerId, brandId?)` (1–2/zi, 3–5/sapt cumulat pe toate canalele — daca au primit deja ceva azi, NU mai trimite).
 3. `preview_email_audience` / `preview_push_audience` / `preview_guest_segment` `[citire]` pentru reach-ul exact.
 4. Lasa 10% holdout (control) la fluxurile de retentie ca sa masori liftul real.
 5. Abia apoi trimite cu `confirm:true`, apoi `get_attribution_report` dupa.
@@ -73,7 +73,7 @@ Clientul tau primeste email, WhatsApp si notificari push de la tine — dar in c
 ## Întrebări frecvente și capcane
 
 - **De ce nu trimit acelasi promo pe email + push + WhatsApp ca sa fiu sigur ca ajunge?** Pentru ca clientul primeste trei notificari la acelasi mesaj in cateva ore si se dezaboneaza. 23% renunta la un brand care comunica prea des; 46% dintre useri se dezaboneaza de la push la 2–5 mesaje/saptamana. Un mesaj bine tintit pe UN canal bate cinci la rand. Foloseste secventiere (email → push → WhatsApp pe zile diferite), nu repetare in aceeasi zi.
-- **Care e bugetul total de mesaje?** 1–2 marketing/client/zi si 3–5/saptamana — **cumulat pe toate canalele**, nu pe fiecare separat. Inainte de orice trimitere in masa verifica daca persoanele alea au primit deja ceva azi.
+- **Care e bugetul total de mesaje?** 1–2 marketing/client/zi si 3–5/saptamana — **cumulat pe toate canalele**, nu pe fiecare separat. Inainte de orice trimitere 1-la-1 verifica `check_contact_frequency_budget`; inainte de trimitere in masa, fa preview/audienta si respecta plafonul de destinatari.
 - **Cu ce canal incep?** Cu emailul (cel mai ieftin si bogat). Pushul vine ca reminder scurt DOAR catre cei care n-au reactionat la email. WhatsApp e pentru caldura/conversatie, la final, pe segmentul cald.
 - **Push la ora 22:00 daca am o oferta tare?** Nu. Orele de liniste 21:00–08:00 in fusul clientului sunt respectate de sistem — nu le suprascrie. Pranzul (10:30–13:00) si cina (16:30–18:00), weekend 17:00–20:00 sunt ferestrele bune.
 - **Consimtamantul e unul singur pe client?** Nu — e per canal. Cineva poate accepta emailul si refuza pushul. Verifica opt-in-ul fiecarui canal (`check_marketing_allowed`, segmentele cu opt-in) inainte sa trimiti pe acel canal.

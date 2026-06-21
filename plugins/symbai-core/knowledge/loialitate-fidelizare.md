@@ -25,31 +25,32 @@ Programul de loialitate îți răsplătește clienții fideli: ei acumulează pu
 
 ## Fluxuri pas-cu-pas
 
-1. **Pornești programul**: /loyalty → Setări → setezi regula de acumulare (ex: 1 punct/leu), valoarea de răscumpărare, nivelurile cu praguri, bonusurile (zi de naștere, înscriere). De acum punctele se acumulează automat la fiecare vânzare către un client identificat.
-2. **Adaugi un nivel nou**: în Setări → Niveluri → definești numele, pragul de puncte și beneficiile. (Prin conexiune: `create_loyalty_tier`.)
-3. **Adaugi o recompensă în catalog**: Setări → Recompense → tip (produs/reducere/cadou), cost în puncte, condiții. (Prin conexiune: `create_loyalty_reward`.)
-4. **Acorzi puncte manual** (corecție, gest comercial, compensare): din fișa clientului. (Prin conexiune: `award_loyalty_points` — specifici clientul, numărul de puncte, motivul.)
-5. **Răscumperi puncte** pentru un client (la casă sau manual): `redeem_loyalty_points`.
-6. **Recalculezi RFM / segmentele**: după o perioadă, ca să ai segmentele la zi → `recompute_loyalty_rfm` (global) sau `recompute_guest_loyalty` (hotel). De obicei rulează automat; folosește manual dacă vrei o reîmprospătare imediată.
-7. **Reactivezi clienții în scădere**: `evaluate_loyalty_drop_alerts` îți dă lista clienților buni care s-au răcit → le trimiți o ofertă (vezi ghidul de oferte / campanii email).
+1. **POS — vezi configul actual**: `get_pos_loyalty_config`. Dacă nu e configurat, explică pe scurt regula propusă (ex: 1 punct/leu, 100 puncte = 5 lei, bonus înscriere) și confirmă valorile cu userul.
+2. **POS — pornești/setezi programul**: `set_pos_loyalty_settings(active:true, earnRate, redeemValue, signupBonusPoints?, birthdayBonusActive?...)`. De acum punctele se acumulează automat la fiecare vânzare către client identificat. Nivelurile/recompensele avansate se ajustează în `/loyalty?tab=settings`.
+3. **POS — verifici/acorzi puncte unui client**: `get_customer_loyalty(customerId)` → dacă e corecție/gest comercial, `award_customer_loyalty_points(customerId, points, reason)`. Punctele negative sunt plafonate la soldul existent; raportează `pointsChanged` (ce s-a aplicat real).
+4. **Hotel — adaugi un nivel nou**: `create_loyalty_tier(name, pointsThreshold?, nightsThreshold?, earnMultiplier?, benefits[])`.
+5. **Hotel — adaugi o recompensă în catalog**: `create_loyalty_reward(name, pointsCost, rewardType?, rewardValue?, minTierKey?)`.
+6. **Hotel — acorzi/răscumperi/expiri puncte**: `award_loyalty_points(guestProfileId, points, reason)`, `redeem_loyalty_points(guestProfileId, redemptionId)`, `expire_loyalty_points()`.
+7. **RFM / win-back**: pentru hotel, `recompute_loyalty_rfm`, `recompute_guest_loyalty`, `evaluate_loyalty_drop_alerts`; pentru POS/CRM, folosește `list_nba_suggestions`, `get_customer_timeline`, `get_crm_funnel` și campanii respectând consimțământul.
 
 ## Tool-uri MCP utile
 
-- Citire: `get_guest_loyalty_detail` (soldul + istoricul unui client), `get_hotel_loyalty_overview` (privire loialitate hotel).
-- Scriere (modulul **Rezervări & Clienți** pe token): `create_loyalty_tier`, `create_loyalty_reward`, `award_loyalty_points`, `redeem_loyalty_points`, `expire_loyalty_points`, `recompute_loyalty_rfm`, `recompute_guest_loyalty`, `evaluate_loyalty_drop_alerts`.
+- POS (restaurant/retail): `get_pos_loyalty_config`, `set_pos_loyalty_settings`, `get_customer_loyalty`, `award_customer_loyalty_points`.
+- Hotel: `get_guest_loyalty_detail`, `get_hotel_loyalty_overview`, `create_loyalty_tier`, `create_loyalty_reward`, `award_loyalty_points`, `redeem_loyalty_points`, `expire_loyalty_points`, `recompute_loyalty_rfm`, `recompute_guest_loyalty`, `evaluate_loyalty_drop_alerts`.
+- Scrierea cere modulul **Rezervări & Clienți** pe token; citirile merg fără modul de scriere.
 - Permisiunea exactă a fiecărui tool e în catalogul din `tools-mcp.md`. Dacă un tool întoarce „permisiune insuficientă", modulul nu e bifat pe token → portal Hub → Acces AI.
 
 ## Întrebări frecvente
 
 - **De ce nu urcă clientul de nivel?** Verifică pragul nivelului în Setări și soldul clientului (Clienți cu puncte). Avansarea poate fi pe puncte cumulate sau pe puncte din ultima perioadă — vezi regula configurată.
 - **Expiră punctele?** Da, dacă ai setat expirare. `expire_loyalty_points` aplică expirarea; o poți rula și manual.
-- **Pot da puncte „din mână" unui client?** Da — `award_loyalty_points` cu motiv (rămâne în istoric, auditat).
+- **Pot da puncte „din mână" unui client?** Da. Pentru POS: `award_customer_loyalty_points(customerId, points, reason)`. Pentru hotel: `award_loyalty_points(guestProfileId, points, reason)`. Motivul rămâne în istoric, auditat.
 - **Loialitatea hotelului e aceeași cu cea de la restaurant?** NU. Hotelul are program separat (pe nopți), în /hotel/crm. Punctele nu se amestecă decât dacă ai configurat explicit.
 - **Ce e RFM și de ce-mi trebuie?** Îți spune automat cine-s clienții valoroși (cheltuie des și mult, recent) ca să-i tratezi preferențial, și cine pleacă, ca să-i reactivezi.
 
 ## Capcane
 
-- **Loialitate POS ≠ loialitate hotel** — sunt două sisteme; nu căuta punctele de cazare în /loyalty.
+- **Loialitate POS ≠ loialitate hotel** — sunt două sisteme; nu căuta punctele de cazare în /loyalty și nu folosi `create_loyalty_tier` pentru niveluri POS.
 - **GDPR**: înainte de a trimite oferte/campanii către segmente de loialitate, opt-out-ul per canal (email/SMS/WhatsApp) trebuie respectat — vezi ghidul „GDPR & date clienți".
 - **După ce modifici reguli prin conexiune**, datele sunt salvate, dar interfața arată valorile vechi până la **refresh** (cache în browser). Confirmă cu un tool de citire, nu repeta scrierea.
 - Punctele se acumulează doar pentru clienți **identificați** la vânzare (telefon/card de fidelitate); vânzările anonime nu acumulează.

@@ -5,12 +5,12 @@
 ## Regula de aur a construcției prin MCP
 **Scaffold + datele „grele" prin MCP (completezi JSON), apoi ARĂȚI rezultatul în Chrome schimbând tab-urile.** Nu te chinui să dai click pentru fiecare câmp — pui JSON-ul printr-un `patch_presentation`, apoi navighezi în pagină DOAR ca să-i arăți userului ce-a ieșit (și ca să rulezi Preview-ul în fața lui).
 
-## Cele 6 tool-uri de BAZĂ (recap)
-> (+ 5 tool-uri GRANULARE de bibliotecă — `list_/get_/patch_/add_/remove_presentation_library_item` — vezi secțiunea `libraryOverride` mai jos. Total 11.)
+## Tool-urile de BAZĂ (recap)
+> Ai 6 tool-uri de scaffold/citire/scriere top-level, tool-uri granulare de bibliotecă și quick actions pentru operații frecvente (badge durere, intro vizibil, reveal/follow-up, slide design).
 - `list_presentation_templates()` — șabloane de pornit (`symbai_horeca_2026` = gold standard, +6 verticale).
 - `list_presentations(brandId)` — ce există pe brand.
 - `get_presentation(brandId, presentationId, section?)` — CITEȘTE. `section`: `summary`(default)/`intro`/`slides`/`offers`/`theme`/`flow`/`typologies`/`library`/`full`. **Citește secțiunea ÎNAINTE de a o modifica** (patch înlocuiește cheia întreagă — ai nevoie de conținutul curent ca să nu pierzi nimic).
-- `create_presentation_from_template(brandId, title, templateKey? | fromPresentationId?+fromBrandId?, introTitle?, introDescription?, vertical?)` — clonează. Primești un id nou (`pres_xxx`).
+- `create_presentation_from_template(brandId, title, templateKey? | fromPresentationId?+fromBrandId?, introTitle?, introDescription?, vertical?, coverImageUrl?, coverImageObjectPosition?)` — clonează. Primești un id nou (`pres_xxx`). `coverImageUrl` apare pe ecranul de start și pe primul slide cover.
 - `patch_presentation(brandId, presentationId, patch:{...})` — modifică una sau mai multe **chei top-level**.
 - `save_presentation(brandId, presentation)` — UPSERT config COMPLET (construire de la zero / înlocuire integrală).
 
@@ -24,6 +24,13 @@
 
 **Ușoare (mici → le pui direct prin MCP, ideal):** `title/introTitle/introDescription/vertical` (string-uri), `theme`, `offers`, `flowV2`, `introFields`, `typologies`, `autoDeriveRules`, `slides`.
 **Grea (vezi secțiunea libraryOverride):** `libraryOverride` (dureri/soluții/discovery/dovezi/obiecții/calcule — poate fi sute de KB).
+
+## Cover / primul slide / intro vizibil
+
+- **Imagine cover:** pune `coverImageUrl` la `create_presentation_from_template` sau prin `patch_presentation(patch:{coverImageUrl, coverImageObjectPosition})`. Aceeași imagine apare pe ecranul de start și pe primul slide de tip cover generat de etapa intro.
+- **Focalizare imagine:** `coverImageObjectPosition` e CSS object-position (ex. `"50% 35%"`) și se folosește atât la start screen, cât și la slide-ul cover.
+- **Ascunde primul slide:** `set_presentation_intro_visible(presentationId, visible:false)` setează `flowV2.showIntro=false` fără să retrimiți tot `flowV2`. E eficient pe prezentările Flow V2; dacă prezentarea e încă pe v1, tool-ul întoarce warning și trebuie folosit editorul/fluxul potrivit.
+- **Verificare:** `get_presentation(section:"flow")` → `showIntro:false`, apoi Preview în Chrome ca să vezi că primul pas e discovery/următorul pas dorit.
 
 ---
 
@@ -60,6 +67,26 @@ Forma unui câmp (CONFIRMATĂ):
 - ⚠ Pentru `boost`/`potential` cheia numerică exactă o vezi cel mai sigur clonând o întrebare existentă cu `get_presentation` — în 90% din cazuri folosești `direct`.
 
 Patch: trimite TOT array-ul (cele existente + ce adaugi). Citește întâi cu `get_presentation(section:"intro")`.
+
+---
+
+## Badge-ul unei DURERI → `set_pain_badge` (fără patch mare)
+
+Pe slide-urile de durere, eticheta mică de deasupra titlului nu trebuie să rămână mereu „Problema ta". O poți schimba per durere, prin tool dedicat:
+
+```json
+set_pain_badge({
+  "presentationId": "pres_xxx",
+  "painId": "pain_costuri_ascunse",
+  "badgeLabel": "RISC ASCUNS",
+  "showBadge": true
+})
+```
+
+- `badgeLabel:""` șterge eticheta custom și revine la implicit.
+- `showBadge:false` ascunde badge-ul pe durerea respectivă.
+- Începe cu `list_presentation_library_items(kind:"pain")` ca să iei `painId`, apoi verifică în Preview pe un scenariu unde durerea chiar apare.
+- Folosește acest tool în loc să retrimiți tot `libraryOverride.pains`.
 
 ---
 
@@ -164,6 +191,8 @@ Pe un calcul de tip **Listă cheltuieli** (`comparative-list`) ai 3 câmpuri noi
 2. Faza 2 (after): un AL DOILEA `comparative-list` cu `currentCostOnly:false`, `placement:"after-offer"`, `comparativeItemsFromCalculationId:"<id-faza-1>"` (preia aceleași cheltuieli) + `symbaiCost` setat → arată economia.
 3. `flowV2.calculationAfterOffer = { enabled:true, calculationId:"<id-faza-2>" }`.
 Cheltuielile introduse live în faza 1 supraviețuiesc până în faza 2 fără nimic de salvat (sunt în același runner).
+
+✅ 2026-06-21: slide-ul de calcul **după ofertă** se emite chiar dacă formula nu are încă valori la generare (cheltuielile fazei 1 se completează live în runner). Nu încerca workaround-uri de tip „pun un cost fals ca să apară slide-ul"; configurează faza 2 cu `placement:"after-offer"` + `comparativeItemsFromCalculationId` și verifică în Preview după ce adaugi liniile în faza 1.
 
 ⚠ **Recalc live**: dacă raportul e „cifrele nu se actualizează când adaug linii în calculator" — bug-ul de recalc a fost reparat pe 2026-06-19 (guard pe sume). Dacă persistă pe instanța clientului, e versiune veche → cere deploy.
 

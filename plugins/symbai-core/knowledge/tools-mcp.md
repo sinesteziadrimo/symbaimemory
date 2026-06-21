@@ -33,9 +33,9 @@ Proprietarul poate seta din portalul Hub → Acces AI plafoane pe token. Gol = f
 
 Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate mări/elimina plafonul din Hub → Acces AI (editează tokenul), sau folosește o valoare mai mică. Plafoanele se aplică PE LÂNGĂ permisiunea de modul — sunt o a doua plasă de siguranță.
 
-**TOTAL: 857 tool-uri** — Citire 351 · Speciale 5 · SQL 3 · Scriere per modul 498 (pe 19 module).
+**TOTAL: 863 tool-uri** — Citire 353 · Speciale 5 · SQL 3 · Scriere per modul 502 (pe 19 module).
 
-## Citire (fără permisiune de modul) — 351 tool-uri
+## Citire (fără permisiune de modul) — 353 tool-uri
 
 ### Vânzări, comenzi, casă & financiar — 44
 - `get_attribution_ltv_by_channel` — Valoarea pe viață (LTV) a clienților grupată după canalul de achiziție, pe o cohortă de N zile: nr. (parametri opționali: brandId, days)
@@ -213,7 +213,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_employees` — Listează angajații activi cu nume, rol, departament, poziție, salariu orar. (parametri opționali: includeInactive, department)
 - `list_leave_requests` — Listează cererile de concediu/învoire ale angajaților, cu tip, perioadă, motiv și status (în așteptare/aprobat/respins/anulat). (parametri opționali: employeeId, brandId, status)
 
-### Rezervări, clienți, loialitate & CRM — 31
+### Rezervări, clienți, loialitate & CRM — 33
 - `check_game_availability` — Verifică disponibilitatea unui joc la o dată/oră/nr jucători. (necesită: gameId, date, time, partySize)
 - `check_marketing_allowed` — Verifică dacă unui client retail i se poate trimite marketing pe un canal: opt-out dur + plafon anti-spam (max N în 30 zile). (necesită: customerId)
 - `export_customer_gdpr_data` — Exportă toate datele personale ale unui CLIENT retail (comenzi, fidelitate, comunicări, consimțăminte) pentru o cerere GDPR (Articol 20). (necesită: customerId)
@@ -227,6 +227,8 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_game_details` — Obține detalii complete despre un joc: informații de bază, program pe zile, prețuri, excepții de date, rezervări existente. (necesită: gameId)
 - `get_guest_loyalty_detail` — Detaliul de fidelitate al unui oaspete anume: puncte curente/lifetime, tier, segment RFM, ultimele tranzacții de puncte (ledger) și răscumpărările. (necesită: guestProfileId)
 - `get_hotel_loyalty_overview` — Privire de ansamblu a programului de fidelitate hotel: membri activi, puncte restante (datorate) și lifetime, distribuție pe tier-uri și pe segmente RFM. (parametri opționali: brandId, locationId)
+- `get_pos_loyalty_config` — Vezi programul de fidelitate POS (puncte pe bon): activ/inactiv, rata de câștig, valoarea de răscumpărare, bonusuri și excluderi.
+- `get_customer_loyalty` — Punctele, nivelul și ultimele tranzacții de fidelitate ale unui client POS. (necesită: customerId)
 - `get_marketing_automation_logs` — Istoricul de execuții al automatizărilor de marketing: status (completed/waiting_media/escalated/error), eventuale erori, postarea creată. (parametri opționali: brandId, automationId, limit)
 - `get_retail_reviews_summary` — Nota medie și distribuția recenziilor externe (Google / Trustpilot / Trusted Shops) pentru un brand. (parametri opționali: brandId, platform)
 - `list_crm_playbooks` — Listează playbook-urile CRM de ciclu de viață client (zi de naștere, win-back, cere review etc.): trigger, pași, dacă sunt active, statistici de rulare. (parametri opționali: brandId)
@@ -415,7 +417,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `describe_database_table` — PAS 2 din workflow eficient de citire BD — OBLIGATORIU înainte de SELECT * pe tabel necunoscut. (necesită: tableName)
 - `execute_sql_query` — PAS 3 (final) din workflow eficient de citire BD. (necesită: query, explanation)
 
-## Scriere per modul — 497 tool-uri (gated de writeModules pe token)
+## Scriere per modul — 502 tool-uri (gated de writeModules pe token)
 
 ### produse_meniu — Produse & Meniuri — 62 tool-uri
 - `add_menu_item` — Adaugă un produs într-un meniu cu preț de vânzare. (necesită: menuId, productId, price)
@@ -593,10 +595,11 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_time_entry` — Actualizează o pontare existentă (după timeEntryId) — tipic pentru a închide un pontaj deschis (trimite clockOut) sau a corecta ore/pauză. (necesită: timeEntryId)
 - `upsert_employee_monthly_salary` — Înregistrează (creează sau actualizează) salariul lunar al unui angajat pentru un an+lună dat: brut, net și bonusuri. (necesită: employeeId, year, month)
 
-### rezervari_clienti — Rezervări & Clienți — 25 tool-uri
+### rezervari_clienti — Rezervări & Clienți — 27 tool-uri
 - `add_customer_group_member` — Adaugă un client ca membru într-o grupare, cu sold wallet/credite/puncte și tier inițial. (necesită: groupId, portalUserId, firstName, lastName)
 - `anonymize_guest` 🔒 — GDPR dreptul la ștergere (Articol 17) pentru un OASPETE hotel: anonimizează PII (nume/email/telefon/adresă), PĂSTREAZĂ agregatele fiscale. (necesită: guestProfileId)
 - `apply_milestone_template` — Aplică un ȘABLON de program (milestone template) pe o rezervare, INTELIGENT: potrivește item-urile de tip joc cu sloturile reale disponibile în acea zi și pregătește produsele pre-comandate. (necesită: reservationId, templateId)
+- `award_customer_loyalty_points` — Acordă sau corectează puncte de fidelitate unui client POS; valorile negative sunt plafonate la soldul existent și se scrie ledger auditat. (necesită: customerId, points)
 - `award_loyalty_points` — Acordă sau ajustează manual puncte de fidelitate unui oaspete. (necesită: guestProfileId, points)
 - `bulk_update_reservations` — Modifică ÎN MASĂ mai multe rezervări care îndeplinesc un filtru — un singur apel în loc de zeci de editări manuale. (necesită: filter, set)
 - `cancel_reservation` — Anulează una sau mai multe rezervări (parametri opționali: reservationId, reservationIds, reason)
@@ -614,6 +617,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `recompute_guest_loyalty` — Recalculează statisticile (vizite, sume) și tier-ul unui oaspete după modificări de date. (necesită: guestProfileId)
 - `recompute_loyalty_rfm` — Recalculează segmentele RFM (recency/frequency/monetary) pentru toți oaspeții unei locații. (parametri opționali: brandId, locationId)
 - `redeem_loyalty_points` — Răscumpără o recompensă din catalog pentru un oaspete: scade punctele și generează un voucher. (necesită: guestProfileId, redemptionId)
+- `set_pos_loyalty_settings` — Pornește/configurează programul de fidelitate POS (puncte pe bon): active, earnRate, redeemValue, bonusuri și excluderi. Schimbă doar câmpurile trimise.
 - `set_reservation_game_slots` — Atașează sau scoate RUNDE DE JOC (sloturi de atracție) pe o rezervare/eveniment EXISTENT — exact ca tab-ul 'Jocuri' din fișa evenimentului. (necesită: reservationId)
 - `set_reservation_milestones` — Gestionează MILESTONE-urile (jaloanele pe oră) ale fișei de eveniment: sosire, welcome drink, masă, tort, cadouri, plecare etc. (necesită: action)
 - `set_reservation_products` — Setează PRODUSELE PRE-COMANDATE pe fișa unui eveniment (BEO) într-un singur apel — inima unui BEO, în loc de ~30 de clicuri. (necesită: reservationId)
@@ -720,7 +724,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_reception_note` — Actualizează o notă de recepție existentă (status, rezoluție, descriere). (necesită: noteId)
 - `update_supplier` — Actualizează datele unui furnizor existent (adresă, termeni plată, IBAN, zile livrare, etc.) (necesită: supplierId)
 
-### setari — Setări & Configurare — 105 tool-uri
+### setari — Setări & Configurare — 107 tool-uri
 - `add_cooling_reading` — Adaugă o citire de temperatură la o sesiune de răcire rapidă în curs. (necesită: sessionId, tempCelsius)
 - `add_physical_menu_page_element` — Adaugă un element FREEFORM pe o pagină (Imagine/Text/Separator/Formă) — peste produse. (necesită: configId, pageIndex, element)
 - `add_presentation_library_item` — Adaugă un element NOU în bibliotecă (durere/soluție/întrebare/dovadă/obiecție/calcul). (necesită: presentationId, kind, item)
@@ -769,7 +773,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `create_payment_method` — Configurează o metodă de plată (necesită: name, type, brandId)
 - `create_physical_menu_design` — Creează un design NOU de meniu fizic (tipărit/PDF) pentru un meniu. (necesită: brandId, menuId, name)
 - `create_pos_device` — Înregistrează un PC/terminal POS nou (tabela devices). (necesită: name)
-- `create_presentation_from_template` — Creează o prezentare NOUĂ într-un brand, clonând fie un ȘABLON built-in (templateKey — vezi list_presentation_templates), fie o prezentare EXISTENTĂ (fromPresentationId, opțional din alt brand prin fr (necesită: title)
+- `create_presentation_from_template` — Creează o prezentare NOUĂ într-un brand, clonând fie un ȘABLON built-in (templateKey — vezi list_presentation_templates), fie o prezentare EXISTENTĂ; poate seta și `coverImageUrl` / `coverImageObjectPosition` pentru ecranul de start + primul slide. (necesită: title)
 - `create_printer` — Configurează o imprimantă (termică, fiscală, de rețea) (necesită: name, type, brandId)
 - `create_tag_routing_rule` — Creeaza o regula de rutare la nivel de LOCATIE in tag_routing_rules (FALLBACK in routing-resolver — folosita doar daca tagul nu are override pe zona). (parametri opționali: tagId, tagName, printerId, printerName)
 - `delete_floor_config_date_override` — Șterge o excepție de dată (override) pentru planul de sală (sub-entitate). (necesită: overrideId)
@@ -799,10 +803,12 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `set_floor_table_geometry` — Mută / redimensionează / rotește O masă pe planul de sală, fără să o tragi cu mouse-ul. (necesită: tableId)
 - `set_game_date_override` — Setează o excepție de dată pentru un joc: închis, program custom, capacitate diferită. (necesită: gameId, date)
 - `set_option_reveal` — Setează (sau șterge) REVEAL-ul (text/imagine de impact PESTE slide-ul curent) pe O SINGURĂ opțiune de răspuns, fără să retrimiți tot array-ul options. (necesită: presentationId, questionId, optionId)
+- `set_pain_badge` — Setează/șterge eticheta mică (badgeLabel) de pe slide-ul unei dureri sau ascunde badge-ul, fără să retrimiți toată biblioteca. (necesită: presentationId, painId)
 - `set_physical_menu_category_fields` — Setează/resetează ORICE câmp al unei CATEGORII din meniul fizic (name, sortOrder, visible, titleHidden, culori, accentColor, pageBreakBefore, description, offset-uri titlu...). (necesită: configId, categoryId)
 - `set_physical_menu_config_fields` — Setează/resetează ORICE câmp GLOBAL al unui design de meniu fizic (culori, fonturi, margini, photoLayout/photoSizeGlobal, columns, copertă, footer, QR, fundal, border... (necesită: configId)
 - `set_physical_menu_item_fields` — Setează/resetează ORICE câmp pe UNUL sau MAI MULTE produse din meniul fizic — cele ~80 de câmpuri per-item (poză: photoLayout/photoAspectRatio/photoSize/photoRotation/photoMaskShape/photoOpacity/showP (necesită: configId)
 - `set_physical_menu_item_photo` — Setează MĂRIMEA pozei unui produs în meniul fizic: 'big' (poză mare sus, photoLayout=top), 'medium', 'small' (thumbnail lateral) sau 'hidden' (fără poză). (necesită: configId, productId, size)
+- `set_presentation_intro_visible` — Arată/ascunde primul slide cover al unei prezentări Flow V2 prin `flowV2.showIntro`; util pentru „scoate primul slide”. (necesită: presentationId, visible)
 - `set_physical_menu_page_fields` — Setează/resetează ORICE câmp de OVERRIDE pe o PAGINĂ anume (pageOverrides[pageIndex]): columns, photoLayout, background, culori, spacing, locked, hidden, template... (necesită: configId, pageIndex)
 - `set_qr_field_preset_fields` — Modifică un PRESET de câmpuri QR la nivel de câmp — controlează ce completează clientul când scanează QR-ul de masă (nume / prenume / email / telefon: vizibil + obligatoriu), dacă poate plăti DIRECT d (necesită: id)
 - `set_slide_background_image` — Pune (sau inlocuieste) imaginea hero/fundal pe un slide existent, fara re-compunerea blocurilor — muta un bloc image pe prima pozitie (asa devine fundal full-bleed pe cover, sau imagine laterala pe ce (necesită: presentationId, slideId, imageUrl)

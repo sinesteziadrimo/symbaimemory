@@ -1,6 +1,6 @@
 ---
 name: gestioneaza-loialitate
-description: Gestionează programul de fidelitate / loialitate prin conexiune (MCP) + navigare vizuală — niveluri (tier-uri), recompense, acordarea/răscumpărarea/expirarea punctelor, segmente RFM, alerte de scădere (win-back) și fișa de puncte a unui client. Acoperă DOUĂ programe SEPARATE: loialitatea hotel (pe nopți, /hotel/crm — cu tool-uri de scriere complete) și loialitatea POS/restaurant (pe lei cheltuiți, /loyalty — citire + configurare în pagină). Folosește la „cum stă programul de fidelitate", „câți membri am / câte puncte datorez", „câte puncte are clientul X", „adaugă un nivel Gold / Platinum", „adaugă o recompensă în catalog", „dă-i 500 de puncte clientului ca gest comercial", „scade niște puncte", „răscumpără o recompensă", „expiră punctele vechi", „recalculează RFM / segmentele", „cine sunt VIP-urii mei", „ce clienți buni au început să plece / cine pleacă / win-back", „de ce nu urcă clientul de nivel", „pornește programul de fidelitate".
+description: Gestionează programul de fidelitate / loialitate prin conexiune (MCP) + navigare vizuală — niveluri (tier-uri), recompense, acordarea/răscumpărarea/expirarea punctelor, segmente RFM, alerte de scădere (win-back) și fișa de puncte a unui client. Acoperă DOUĂ programe SEPARATE: loialitatea hotel (pe nopți, /hotel/crm — cu tool-uri de scriere complete) și loialitatea POS/restaurant-retail (pe lei cheltuiți, /loyalty — configurare program + sold/puncte client prin MCP, niveluri/recompense avansate în pagină). Folosește la „cum stă programul de fidelitate", „câți membri am / câte puncte datorez", „câte puncte are clientul X", „adaugă un nivel Gold / Platinum", „adaugă o recompensă în catalog", „dă-i 500 de puncte clientului ca gest comercial", „scade niște puncte", „răscumpără o recompensă", „expiră punctele vechi", „recalculează RFM / segmentele", „cine sunt VIP-urii mei", „ce clienți buni au început să plece / cine pleacă / win-back", „de ce nu urcă clientul de nivel", „pornește programul de fidelitate".
 ---
 
 # Gestionează loialitatea — niveluri, recompense, puncte, RFM, win-back prin MCP + navigare
@@ -16,7 +16,7 @@ Symbai are **două programe de fidelitate complet separate** — nu le amesteca,
 | Pe ce se câștigă | **nopți de cazare** + venituri folio | **lei cheltuiți** la vânzare |
 | Pagina | **`/hotel/crm`** | **`/loyalty`** (Fidelizare & Recompense) |
 | Entitatea | **oaspete** (`guestProfileId`) | **client** (`customerId`) |
-| Scriere prin MCP | **DA — set complet** (vezi tabelul) | **NU dedicat** — citire + configurare în pagină |
+| Scriere prin MCP | **DA — set complet** (vezi tabelul) | **DA — configurare program + sold/puncte client; niveluri/recompense avansate rămân în pagină** |
 
 **Întreabă-te / întreabă userul:** are hotel? Vorbește despre nopți, oaspeți, camere, folio → **hotel**. Vorbește despre clienți la masă, telefon de fidelitate, lei cheltuiți, recompense la restaurant/magazin → **POS**. La dubiu, întreabă scurt. Restul skill-ului tratează separat fiecare.
 
@@ -50,32 +50,40 @@ Aici ai tool-uri de scriere reale. **Intenție → tool:**
 - `award_loyalty_points`: **pune mereu `reason`** — rămâne în ledger și e auditat. `expiresAt`: lipsă = expirare implicită (2 ani), `null` = fără expirare.
 - Reguli de acumulare puncte (câte puncte / noapte / leu, multiplicatori) = tab `rules` — **se editează în pagină** (nu există tool dedicat de scriere a regulii). Ghidează userul acolo.
 
-## B) Loialitate POS / restaurant — citire prin MCP, configurare în pagină
+## B) Loialitate POS / restaurant — configurare și puncte client prin MCP + pagină
 
-⚠ **NU există tool-uri MCP dedicate de scriere pentru programul POS** (`create_loyalty_tier`/`award_loyalty_points` etc. sunt **doar pentru hotel**). Aici lucrezi astfel:
+Acum există tool-uri MCP dedicate pentru programul POS. Folosește-le întâi pentru citire/scriere punctuală; deschide pagina `/loyalty` pentru dovadă vizuală, niveluri/recompense avansate și verificări de layout.
 
-**Ce ARĂȚI / CITEȘTI prin MCP:**
-- Cine sunt clienții valoroși / cine merită contactat acum → `list_nba_suggestions` (coada Next-Best-Action: hot lead, `win_back`, `upsell`, `review_request`, birthday — cu scor 0-100 și motivul). Asta e răspunsul tău la „cine pleacă / pe cine reactivez / cine-s VIP-urii".
-- Ce s-a întâmplat cu un client (inclusiv puncte/comunicări) → `get_customer_timeline(customerId)`.
+**Ce CITEȘTI prin MCP:**
+- Configul programului POS → `get_pos_loyalty_config` (activ/inactiv, rata de câștig, valoarea de răscumpărare, bonusuri, excluderi).
+- Soldul unui client POS → `get_customer_loyalty(customerId)` (puncte, nivel, ultimele 15 tranzacții din ledger). Pentru „câte puncte are clientul X".
+- Cine sunt clienții valoroși / cine merită contactat acum → `list_nba_suggestions` (coada Next-Best-Action: hot lead, `win_back`, `upsell`, `review_request`, birthday — cu scor 0-100 și motivul).
+- Ce s-a întâmplat cu un client (comenzi/comunicări/context) → `get_customer_timeline(customerId)`.
 - Cum merge conversia per surse → `get_crm_funnel`.
-- Soldul/segmentele unui client în general → `execute_sql_query` (SELECT-only) pe `guest_profiles`/`loyalty_transactions` dacă userul vrea o cifră exactă care nu iese din tool-urile de mai sus.
+- SQL SELECT-only doar ca ultim fallback; pentru puncte POS preferă `get_customer_loyalty`, nu interoga brut `loyalty_transactions`.
 
-**Ce CONFIGUREZI (în pagină — ghidezi userul sau apeși tu prin Chrome):**
-- `navigate("/loyalty?tab=settings")` — **Setări**: regula de acumulare (ex. 1 punct/leu), valoarea de răscumpărare (ex. 100 pct = 5 lei), **nivelurile** cu praguri + beneficii, **recompensele**, bonus de zi de naștere / înscriere.
-- `navigate("/loyalty?tab=customers")` — **Clienți cu puncte**: soldul fiecăruia, istoric, filtrare pe nivel.
-- `navigate("/loyalty?tab=overview")` — **Privire de ansamblu**: puncte emise/răscumpărate, top clienți.
+**Ce SCRII prin MCP:**
+- Pornești/oprești și setezi programul → `set_pos_loyalty_settings(active?, earnRate?, redeemValue?, signupBonusPoints?, onlinePaymentBonusPoints?, birthdayBonusActive?, birthdayBonus?, happyHourActive?, excludeTax?, excludeTip?, excludeDelivery?)`. Confirmă verbal valorile-cheie înainte să schimbi regula, fiindcă afectează punctele viitoare.
+- Acordare/corecție puncte client POS → `award_customer_loyalty_points(customerId, points, reason)`. `points` pozitiv adaugă, negativ scade; motivul rămâne în ledger. Dacă scazi mai mult decât soldul, tool-ul plafonează la soldul existent și întoarce `requestedPoints` + `pointsChanged` (valoarea aplicată real).
+- După orice scriere POS: verifică prin `get_pos_loyalty_config` sau `get_customer_loyalty`, apoi deschide `/loyalty?tab=settings` sau `/loyalty?tab=customers` și spune userului să dea refresh dacă browserul ține cache.
+
+**Ce rămâne în pagină (Chrome / ghidare):**
+- `navigate("/loyalty?tab=settings")` — niveluri/tier-uri POS, recompense, campanii speciale și verificarea vizuală a setărilor.
+- `navigate("/loyalty?tab=customers")` — clienți cu puncte, solduri, istoric, filtrare pe nivel.
+- `navigate("/loyalty?tab=overview")` — privire de ansamblu: puncte emise/răscumpărate, top clienți.
 - Link live: `gaseste_in_aplicatie("fidelizare")` sau `gaseste_in_aplicatie("loialitate")` → întoarce `/loyalty`.
 
-Pentru „pornește programul de fidelitate" la POS: du-l pe `/loyalty?tab=settings`, ajută-l să seteze regula + valoarea + nivelurile + bonusurile; de acolo punctele se acumulează automat la fiecare vânzare către un client **identificat** (telefon / card de fidelitate — vânzările anonime NU acumulează).
+Pentru „pornește programul de fidelitate" la POS: citește întâi `get_pos_loyalty_config`, propune regula (ex. 1 punct/leu, 100 puncte = 5 lei, bonus înscriere), confirmă cu userul, apoi `set_pos_loyalty_settings(active:true, ...)`. Nivelurile și recompensele le arăți/completezi în `/loyalty?tab=settings`. Punctele se acumulează automat la vânzări către client **identificat** (telefon/card de fidelitate); vânzările anonime NU acumulează.
 
 ## Cele câteva locuri cu click (nu există tool)
-- **Regulile de acumulare** (puncte/leu sau puncte/noapte, multiplicatori, bonus zi de naștere/înscriere) — atât la POS (`/loyalty?tab=settings`) cât și la hotel (`/hotel/crm?tab=rules`): se editează în pagină. Conduci tu prin Chrome sau dictezi userului.
-- **Configurarea POS-loialitate în întregime** (nivele/recompense restaurant) — pagină, vezi secțiunea B.
+- **Nivelurile/recompensele POS avansate** — pagină (`/loyalty?tab=settings`), vezi secțiunea B. Configul de bază și ajustările de puncte au tool-uri MCP.
+- **Regulile de acumulare hotel** (puncte/noapte, multiplicatori) — `/hotel/crm?tab=rules`, se editează în pagină.
 - **Ștergerea** unui nivel/recompense/client — nu prin conexiune; ghidează userul să șteargă din aplicație.
 
 ## Reguli (cele care contează)
-- **POS ≠ hotel.** Nu căuta punctele de cazare în `/loyalty` și nici clienții de restaurant în `/hotel/crm`. Tool-urile `create_loyalty_*`/`award`/`redeem`/`expire`/`recompute_*`/`drop_alerts` operează pe **oaspeți hotel** (`guestProfileId`). Dacă userul cere „adaugă un nivel" și are restaurant fără hotel → e configurare în `/loyalty?tab=settings`, NU `create_loyalty_tier`.
+- **POS ≠ hotel.** Nu căuta punctele de cazare în `/loyalty` și nici clienții de restaurant în `/hotel/crm`. Tool-urile hotel `create_loyalty_*`/`award_loyalty_points`/`redeem_loyalty_points`/`expire`/`recompute_*`/`drop_alerts` operează pe **oaspeți hotel** (`guestProfileId`). Tool-urile POS sunt `get_pos_loyalty_config`, `set_pos_loyalty_settings`, `get_customer_loyalty`, `award_customer_loyalty_points` și operează pe **clienți POS** (`customerId`). Dacă userul cere „adaugă un nivel" și are restaurant fără hotel → e configurare în `/loyalty?tab=settings`, NU `create_loyalty_tier`.
 - **`award_loyalty_points` cu motiv, mereu.** Rămâne auditat în ledger. Folosește valori negative pentru corecții/scăderi.
+- **`award_customer_loyalty_points` cu motiv, mereu.** Pentru POS, valorile negative sunt plafonate la soldul existent; raportează utilizatorului punctele aplicate real (`pointsChanged`), nu doar ce a cerut.
 - **Confirmă cu citire, nu repeta scrierea.** După o scriere, interfața poate arăta valori vechi până la refresh (cache browser). Re-citește cu `get_hotel_loyalty_overview`/`get_guest_loyalty_detail`, nu da scrierea din nou.
 - **„De ce nu urcă clientul de nivel?"** Verifică pragul nivelului (tab Tier-uri / Setări) vs soldul clientului. La hotel, după modificări de date rulează `recompute_guest_loyalty(guestProfileId)`; segmentele RFM se reîmprospătează cu `recompute_loyalty_rfm`.
 - **GDPR înainte de campanii.** Înainte să trimiți oferte/win-back către segmente de loialitate, respectă opt-out-ul per canal (email/SMS/WhatsApp). Vezi `knowledge/gdpr-clienti-oaspeti.md`.

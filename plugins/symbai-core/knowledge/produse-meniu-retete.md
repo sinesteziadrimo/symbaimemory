@@ -133,7 +133,7 @@ Modulul acoperă tot ce se vinde și din ce se face: catalogul de produse, meniu
 - `add_menu_item` / `update_menu_item` acceptă acum și `menuCategoryId`, `description`, `gramaj` — categoria se oglindește automat și pe produs.
 
 **Scriere — oferte care reduc nota (modul `produse_meniuri`):** asistentul POATE gestiona ofertele din chat (nu mai sunt doar din pagină):
-- `create_offer` — creează o ofertă de auto-discount care chiar reduce nota la POS (happy hour, -X%, sumă fixă, 1+1 / cadou la X lei) — cu tip, produse/categorii, zile, fereastră orară și canale.
+- `create_offer` — creează o ofertă de auto-discount care chiar reduce nota la POS (happy hour, -X%, sumă fixă, 1+1 / cadou la X lei). Pentru **Happy Hour / interval orar** dă `timeStart`+`timeEnd` (ex. 15:00–18:00) și opțional `daysOfWeek` (0=Duminică..6=Sâmbătă) — **fără ele oferta rulează NON-STOP și pierzi marjă**. Pentru ofertă pe perioadă limitată (LTO) dă `startsAt`/`expiresAt`. `priority` decide oferta câștigătoare la suprapunere. Rețete și reguli: `knowledge/oferte-promotii-horeca.md`.
 - `update_offer` — modifică oferta (valoare, scope, plafon, activă/inactivă etc.); dezactivarea (`active=false`) ține loc de „oprire".
 - `preview_offer_margin` — **Margin Guardrail ÎNAINTE de creare**: îți spune în lei dacă oferta vinde sub cost (cere-l mereu înainte de `create_offer`).
 - `list_offers` — ofertele active ale brandului. `list_offer_suggestions` — propuneri sigure pe marjă de la Sym (din datele reale). `get_offer_scorecard` — verdictul „Păstrează / Oprește" pentru o ofertă, în lei.

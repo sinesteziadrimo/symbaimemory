@@ -39,6 +39,18 @@ Pentru fiecare URL copiat, noteaza rapid:
 
 Regula de oprire: inainte sa spui "am copiat pagina", compara numarul de sectiuni extrase cu numarul de componente locale. Daca local ai 2-3 blocuri si sursa are 10+, munca NU este gata.
 
+## Capcane de mapare a componentelor (paritate de design) — citeste inainte de a mapa
+Capcane reale care au stricat o clona (drimoland.ro, Strapi/Next). Bifeaza-le pe FIECARE sectiune:
+- **Culorile sunt SEMANTICE.** Nu vopsi o sectiune intreaga cu o culoare-accent. Calibreaza pe culorile COMPUTED ale site-ului real (inspecteaza in Chrome: ex. `bg-blue`=#13235b navy, `bg-lightblue`=#d0ebf6). Navy = eroi, light-blue = benzi de continut, roz/galben = ACCENTE (boxuri, benzi de recenzii), niciodata erou full-bleed. O culoare de „box" din sursa (DarkTextBox `boxColor`) e boxul din spatele IMAGINII, nu fundalul sectiunii (sectiunea e navy cand textul e alb). Un text+imagine fara culoare → fundal light-blue implicit, FARA box inventat.
+- **Poza e des in camp neevident.** `image` e gol; reala in `imageMask`, `picture` (ImageCards), `heroSectionSliderItems[]` (hero), `backgroundImage` (scroll-list). Probeaza TOATE campurile de imagine inainte sa spui „fara poza". Cutia decorativa din spate = o IMAGINE (`imageBackgroundMask`), nu o culoare. Banda colorata de sectiune = camp real (`backgroundColor`/`box`+`boxColor`) → seteaza `sectionBg` + `sectionTextColor`.
+- **Blog = Markdown** (renderul de blog nu afiseaza HTML brut) → converteste HTML→Markdown; restaureaza entitatile dublu-escapate (`&amp;nbsp;`→`&nbsp;`).
+- **Link-uri in corpul rich-text / `descriptionHtml` / `custom-html`** NU trec prin localizatorul de href → rescrie-le MANUAL la slug-ul intern (altfel clickul pleaca de pe clona).
+- **Recenzii doar-imagine** (`reviewItems[]` fara text, screenshot in `authorPicture`) → `gallery`, nu testimoniale goale. Recenzii cu text+poza → carduri image-top (testimonials `style:"photo"`), nu avatar mic.
+- **Tabele de pret** (`PriceSection.priceItems[]`) → componenta `pricing`. **Liste „scroll list"** (`ScrollListSection`): itemele in `boxes[].boxCards[]`, poza de sectiune in `backgroundImage`. **`ProductsList`** ca sectiune de pagina → imaginea de `menu`.
+- **Navbar = meniul REAL** al sursei (itemi de top + dropdown-uri + href-uri), reconstruit 1:1 cu `update_website_navigation items[]` (`children[]` = dropdown). Nu lasa lista auto „o intrare per pagina". Ascunde butonul CTA din dreapta daca originalul n-are: `navbarSettings:{ctaButton:{visible:false}}`.
+- **NU activa „extra"-uri decorative implicite** pe care sursa nu le are: blog `showSidebar`/newsletter, badge „Popular"/„Recomandat", toggle de facturare, „featured hero". Un element IN PLUS strica fidelitatea la fel ca unul lipsa.
+- **Fiecare ruta randeaza continutul EI** (acasa ≠ meniu; `/blog` = listarea blogului). Fallback tacut la home = pagina LIPSA. Verifica prin **citire** (`get_website_page`) + **vizual in Chrome** langa original; re-importa dupa ORICE fix de mapare inainte de re-verificare.
+
 ## Meniu restaurant / produse importate din site
 
 Pentru pagini de meniu restaurant nu copia doar cateva produse manuale. Daca sursa este Next.js/Strapi, cauta in `__NEXT_DATA__` dupa componente de tip `ComponentCmsDataProductsList` sau echivalent si extrage toate categoriile si produsele.

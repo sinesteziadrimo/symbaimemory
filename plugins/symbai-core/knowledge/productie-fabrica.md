@@ -127,6 +127,7 @@ Aceasta e calea industrială, pe tabletă (`/workstation-tablet`) sau din `/prod
 - **BOM explosion** (explozie de rețetă): `run_bom_explosion` (`recipeId`, `quantity`) — calculează totalul de materii prime necesare pentru o cantitate dată, cu conversie de unități. ⚠ E doar previzualizare — NU mișcă stoc.
 - **Stoc producție / semipreparate**: `get_production_stock_overview` (`productTypes`) — WIP + produse finite cu cantități/loturi/expirare/rezervări/cerere; `get_semipreparate_stock` () — stoc semifabricate (WIP).
 - Pagina: `/planificare-mps` (taburi Calendar Operații, Planificare MRP, Coproduse & Subproduse, Monitorizare, Trasabilitate, Bottleneck, Productivitate, Loturi Planificate, Flux Fabrică, Configurare).
+- În Calendar Operații, cardul **Alerte Planificare** grupează aparițiile repetate după identitate reală (mesaj + dată + echipament pentru suprapuneri, dependență + mesaj pentru dependențe) și arată „N probleme distincte (M apariții)". Badge-ul `×count` nu înseamnă probleme noi, ci același conflict repetat pe mai multe loturi/operații; lista vizibilă e limitată și scrollabilă. Pentru cauză și soluție folosește tot `get_production_schedule_feasibility` / `schedule_production_orders(commit:false)`, nu copia manual toate rândurile din UI.
 
 ## Cost de fabricație, MRP multi-nivel și Dosar Electronic de Lot (EBR)
 Acestea sunt capabilitățile „de paritate SAP" — cele care diferențiază Symbai de un POS obișnuit. Sunt esențiale pentru o fabrică reală: BOM pe mai multe niveluri, costing înainte de producție, eliberare de lot cu semnătură QA și trasabilitate inviolabilă.
@@ -260,6 +261,8 @@ Pagina `/factory-dashboard` (taburi Vedere generală, Live, Alerte, Lipsuri, Blo
 - **OEE** = (Disponibilitate × Performanță × Calitate) / 10000. Disponibilitate = echipamente folosite / total; Performanță = minute productive / minute disponibile; Calitate = 100 − rata de waste. Orice componentă 0 → OEE 0.
 - **FPY (First Pass Yield)** = qtyGood / (qtyGood + qtyScrap + qtyRework) × 100. Atenție: FPY ignoră waste-ul; Yield îl include — sunt perspective diferite.
 - **On-Time Delivery**, **Waste rate**, plus rebut și retușări în kg.
+
+În UI, cardurile de sus au tooltip-uri pe etichete (Planificat, Produs, WIP, Yield, OEE, On-Time, Waste, FPY). Dacă userul întreabă „cum am Yield 98% dar OEE 1%?", nu trata cifrele ca fiind contradictorii: Yield măsoară cantitatea obținută vs planificat, iar OEE scade separat dacă utilajele stau, dacă operațiile depășesc mult timpul standard sau dacă există waste. Pentru dovadă vizuală, deschide `/factory-dashboard` în browser și arată tooltip-ul/cardul relevant; pentru cifrele live folosește `get_factory_dashboard`.
 
 **Analitice dedicate** (toate citire):
 - `get_daily_production_summary` (`date` YYYY-MM-DD) — sumarul unei zile (loturi, cantități, QC, waste, angajați activi).

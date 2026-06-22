@@ -124,6 +124,8 @@ Unele raspunsuri MCP sunt **slim intentionat** ca sa ramana sub limita de payloa
 
 Nu interpreta lipsa acestor blob-uri ca stergere sau bug. Pentru `list_operation_requests`, `get_table_status`, `get_employee_activity` si `get_order_timeline`, raspunde din campurile usoare plus `itemSummary`; nu cauta `cartSnapshot`/`items` in payload ca dovada. Explica userului pe scurt ca raspunsul este optimizat, verifica rezultatul cu tool-ul de citire potrivit sau deschide pagina relevanta daca trebuie vazut continutul complet.
 
+`list_operation_requests` este doar fluxul de aprobari POS pentru ospatari/manageri; exclude `shadow_order_conflict` inclusiv din total/count. Pentru conflicte tehnice cloud-edge sau Viva, foloseste `list_shadow_order_conflicts` si trimite managerul la Control Operational (`/operations`) daca are nevoie de decizie vizuala.
+
 ## Email Marketing — Standardul Nou
 
 Pentru email, Claude Code trebuie sa fie mai bun decat un CRM generic deoarece are MCP + date POS:

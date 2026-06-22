@@ -205,7 +205,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_operation_materials` — Listează cerințele de material ale unei operații sau ale întregului flux. (parametri opționali: operationId, flowVersionId)
 - `list_operation_outputs` — Listează ieșirile unei operații sau ale întregului flux. (parametri opționali: operationId, flowVersionId)
 - `list_operation_qc` — Listează cerințele QC ale unei operații. (necesită: operationId)
-- `list_operation_requests` — Jurnalul cererilor de aprobare din POS — anulări, retururi, discounturi, comps «din partea casei», transferuri de masă/ospătar, împărțiri de notă. (parametri opționali: employeeName, status, type, brandId)
+- `list_operation_requests` — Jurnalul cererilor de aprobare din POS — anulări, retururi, discounturi, comps «din partea casei», transferuri de masă/ospătar, împărțiri de notă. Exclude la sursă `shadow_order_conflict`; pentru acelea folosește `list_shadow_order_conflicts`, nu compara totalurile între cele două fluxuri. (parametri opționali: employeeName, status, type, brandId)
 - `list_provisional_shifts` — Listează schimburile provizorii (temporare) active. (parametri opționali: dateFrom, dateTo)
 - `list_qc_inspections` — Listează inspecțiile de control calitate (QC) — rezultat, tip, defect, lot asociat. (parametri opționali: batchId, result, days, limit)
 - `list_shadow_order_conflicts` — Listează conflictele tehnice cloud-edge din Control Operațional (`shadow_order_conflict`), separate de cererile normale de aprobare. Folosește la conflicte Viva/sync; read-only, rezolvarea rămâne în `/operations`. (parametri opționali: status, orderId, brandId, locationId, dateFrom, dateTo, includeAutoResolvedRecent)

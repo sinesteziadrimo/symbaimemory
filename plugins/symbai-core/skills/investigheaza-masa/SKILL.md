@@ -24,7 +24,7 @@ Pentru istoricul complet al unei comenzi anume de pe masă, treci la `get_order_
 - Pentru comparația între ospătari (cine a vândut cel mai mult) → `performanta_ospatari`.
 
 ### 3. „Ce trebuie să aprob?" → `list_operation_requests`
-`list_operation_requests(status: "pending")` — vezi toate cererile în așteptare cu tot ce-ți trebuie ca să decizi: tip, ospătar, masă, produse, valoare, motiv. Filtre utile: `type` (return/house/discount/customer/...), `employeeName` (toate cererile unui ospătar), `dateFrom`/`dateTo`. Întoarce și un rezumat (câte pe fiecare tip, top aprobatori).
+`list_operation_requests(status: "pending")` — vezi toate cererile în așteptare cu tot ce-ți trebuie ca să decizi: tip, ospătar, masă, produse, valoare, motiv. Filtre utile: `type` (return/house/discount/customer/...), `employeeName` (toate cererile unui ospătar), `dateFrom`/`dateTo`. Întoarce și un rezumat (câte pe fiecare tip, top aprobatori). Nu include `shadow_order_conflict` nici în listă, nici în total; pentru acelea mergi la pasul 3b.
 
 ### 3b. „Am conflict de sincronizare / shadow / Viva" → `list_shadow_order_conflicts`
 `list_shadow_order_conflicts(status: "active")` — citește conflictele tehnice cloud-edge din Control Operațional. Sunt separate de cererile normale de aprobare și NU se aprobă cu `respond_operation_request`.

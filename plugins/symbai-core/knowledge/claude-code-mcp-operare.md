@@ -119,10 +119,10 @@ Cand un tool poate returna multe rezultate:
 Unele raspunsuri MCP sunt **slim intentionat** ca sa ramana sub limita de payload si sa nu cada tot raspunsul:
 
 - produse: pot lipsi embedding-uri, campuri personalizate, variante/jsonb grele si metadata de imagini; datele operationale usoare raman;
-- cereri de aprobare / timeline comanda: `cartSnapshot` si `items` pot fi omise, dar primesti `itemSummary` pentru explicatia catre manager;
+- cereri de aprobare / timeline comanda: `cartSnapshot` si `items` nu sunt contract de output; lucreaza cu `itemSummary` pentru produse/valoare si cere doar detaliul necesar;
 - campanii/template-uri/secvente email: HTML-ul complet, design JSON si pasii mari pot fi omise din raspunsurile de write/listare.
 
-Nu interpreta lipsa acestor blob-uri ca stergere sau bug. Explica userului pe scurt ca raspunsul este optimizat, verifica rezultatul cu tool-ul de citire potrivit sau deschide pagina relevanta daca trebuie vazut continutul complet.
+Nu interpreta lipsa acestor blob-uri ca stergere sau bug. Pentru `list_operation_requests`, `get_table_status`, `get_employee_activity` si `get_order_timeline`, raspunde din campurile usoare plus `itemSummary`; nu cauta `cartSnapshot`/`items` in payload ca dovada. Explica userului pe scurt ca raspunsul este optimizat, verifica rezultatul cu tool-ul de citire potrivit sau deschide pagina relevanta daca trebuie vazut continutul complet.
 
 ## Email Marketing — Standardul Nou
 

@@ -157,7 +157,7 @@ Acestea sunt capabilitățile „de paritate SAP" — cele care diferențiază S
 
 ### Cost de fabricație înainte de producție (ca SAP CK11N)
 - `get_production_cost_estimate` (`recipeId` SAU `productId` SAU `productName`; `quantity` default 1; opțional `laborRatePerHour`, `machineRatePerHour`, `overheadPercent`) — calculează **costul standard COMPLET**, defalcat pe componente în `costComponents`:
-  - **Material**: BOM multi-nivel explodat la materii prime × `receptionPrice`, cu conversie automată din unitatea rețetei în unitatea de stoc a produsului și cu `scrap_percent` acolo unde e setat — pierderea de proces.
+  - **Material**: BOM multi-nivel explodat la materii prime × costul stoc canonic (avg/FIFO, aceeași sursă ca food-cost-ul și `costPerUnit` pe rețetă), cu conversie automată din unitatea rețetei în unitatea de stoc a produsului și cu `scrap_percent` acolo unde e setat — pierderea de proces. Nu explica acest cost ca `receptionPrice`: la materii prime lot-costate poate lipsi, iar la marfă poate fi preț de raft.
   - **Manoperă**: din fluxul tehnologic (durate operații × personal recomandat) × tarif orar. Tariful = `laborRatePerHour` dacă-l dai, altfel **media tarifelor orare ale angajaților activi**.
   - **Utilaj**: minute-mașină × `machineRatePerHour` (amortizare+energie/oră) — dă-l ca să-l incluzi.
   - **Overhead (regie)**: `overheadPercent` % din material+manoperă+utilaj.

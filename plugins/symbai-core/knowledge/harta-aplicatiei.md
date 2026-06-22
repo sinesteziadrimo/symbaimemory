@@ -362,6 +362,7 @@
 - **Tablou Fabrică** (`/factory-dashboard`) — Dashboard MES read-only «Control Tower». Sus: 8 mini-KPI (Planificat/Produs/WIP tone, Yield, OEE, On-Time, Waste, FPY) + countdown refresh 15s. 11 taburi: Vedere generală, Live, Alerte, Lipsuri, Blocaje, QC, KPI, Pipeline, Trasabilitate, Livrări, Schimburi. Drill-down pe alerte/loturi.
 - **Factory AI Chat** (`/factory-ai`) — Chat AI dedicat operațiunilor de fabrică
 - **AI Flow Builder** (`/ai-flow-builder`) — Constructor vizual fluxuri tehnologice cu AI
+- **Plan Fabrică 2D** (`/factory-floor-plan`) — Designer vizual al halei/fabricii: nivele, echipamente, zone de producție, magazii, zone de depozitare, pereți/culoare și conexiuni de flux material/personal. Legat de entități reale, cu status echipament și stoc sumar pe zone.
 - **Tabletă Stație Lucru** (`/workstation-tablet`) — Interfață tabletă pentru stația de producție — scanare container, progres, QC
 - **Producție Evenimente** (`/productie-evenimente`) — Pagina PRINCIPALĂ de producție restaurant. Titlu adaptiv (Producție / Producție & Evenimente / Producție & Rețete). Taburi: Calendar & Capacitate, Loturi Producție (creezi/pornești/finalizezi loturi+evenimente), Rețete. +Operații/+Echipamente la mod restaurant_events; +Fluxuri Tehnologice la mod fabrică. Butoane: Adaugă Lot Producție, Adaugă Eveniment.
 - **Fluxuri Tehnologice** (`/fluxuri-tehnologice`) — Fluxuri tehnologice de producție — operații, dependențe, BOM, QC

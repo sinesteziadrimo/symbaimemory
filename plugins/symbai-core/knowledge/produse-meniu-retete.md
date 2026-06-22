@@ -109,8 +109,8 @@ Modulul acoperă tot ce se vinde și din ce se face: catalogul de produse, meniu
 **Citire (fără permisiune de modul):**
 - `list_menus`, `list_menu_items`, `list_menu_categories` — meniurile, articolele și categoriile, cu prețuri.
 - `search_products_db`, `get_product_details` — căutare în catalog și fișa completă a unui produs (taguri, gestiune, rețetă).
-- `list_recipes`, `get_recipe_details`, `list_recipe_ingredients`, `run_bom_explosion` — rețete, ingrediente, necesar de materii prime la o cantitate dată.
-- `analyze_food_costs`, `analyze_recipes`, `generate_report` (tip `food_cost`) — analiza costurilor și completitudinii rețetelor.
+- `list_recipes`, `get_recipe_details`, `list_recipe_ingredients`, `run_bom_explosion` — rețete, ingrediente, necesar de materii prime la o cantitate dată. Dacă userul întreabă pe un brand/unitate anume, dă `brandId`: `list_recipes` întoarce rețetele acelui brand + rețetele globale (`brandId` gol), nu tot tenantul.
+- `analyze_food_costs`, `analyze_recipes`, `generate_report` (tip `food_cost`) — analiza costurilor și completitudinii rețetelor. Pentru `analyze_recipes`, folosește `brandId` explicit; cifrele sunt pe brand + globale, nu agregate peste toate brandurile.
 - `list_product_types`, `get_product_type_details` — tipurile de produs cu proprietăți și conturi.
 - `list_vat_rates`, `list_tags`, `list_untagged_products` — cote TVA, etichete, produse fără etichetă.
 - `top_produse` — cele mai vândute produse pe perioadă.

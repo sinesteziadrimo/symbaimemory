@@ -97,6 +97,8 @@ Consumul personalului **nu trebuie ținut obligatoriu, legal, distinct în conta
 
 Schimbi modul cu `set_staff_benefit_accounting_mode(mode)`. Recomandare: lasă „Intern" dacă nu ți-a cerut contabilul explicit altceva. *(La modul „Separat", înregistrarea efectivă în platforma de Contabilitate poate necesita și activare acolo — întreabă dacă nu apare.)*
 
+Important pentru explicația către contabil: valoarea trimisă distinct (`staffBenefitValue`) este **valoarea beneficiului acordat** și se folosește pentru reclasificare/raportare ca avantaj în natură. Nu o prezenta ca o cheltuială suplimentară care se postează încă o dată peste COGS — stocul și costul mărfii au curs deja prin fluxul normal.
+
 ## Ce face asistentul prin conexiune (MCP) vs. în aplicație
 
 **Prin conexiune (MCP)** — dacă tool-urile de staff-benefits sunt active pe instanța clientului:

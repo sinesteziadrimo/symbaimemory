@@ -61,15 +61,21 @@ Din `/reports/pnl`, butonul **„Salvează P&L"** îngheață raportul pe perioa
 
 Export PDF / Excel atât pentru raportul live cât și pentru snapshot.
 
+## P&L pe produs și P&L pe livrări
+
+**P&L pe produs/SKU** vine din raportul live `/reports/pnl` și este reconciliat cu P&L-ul total. Prin MCP, folosește `get_product_pnl(perioada, mode, limit, brandId?, locationId?)`. Explică-l managerial: venit net, cost direct, alocări de manoperă/overhead, profit net, produse pe pierdere, produse fără cost și concentrarea profitului. Când un produs apare roșu, verifică `warnings`, `methodology` și `data.config`: ponderea de alocare sau pragul poate fi setare de business, nu bug.
+
+**P&L pe livrări** este un segment configurabil salvat în `organization_settings.pnlSettings.deliverySegments`. Proprietarul alege brandul/locația de livrare, angajații a căror manoperă intră și regulile de cheltuieli (fix, procent din CA, 100% sau procent dintr-o categorie reală). Workflow agent: `list_delivery_pnl_segments` → `get_delivery_pnl(configId|segmentName, perioada)`. Dacă nu există segment, poți rula ad-hoc cu `brandId`, dar acel calcul este doar venit minus marfă; pentru manoperă și cheltuieli trebuie configurat segmentul în `/reports/pnl-livrari`.
+
 ## Ce poate face asistentul prin conexiune (MCP) vs. ce se face în aplicație
 
 **Prin conexiune (MCP) — citire și configurare P&L:**
-- **Citire/explicare:** `get_pnl` (P&L complet cu semafor), `compare_pnl_periods` (perioade + profit bridge), `get_pnl_config` (cum e configurat), `list_pnl_kpis` (KPI live), `list_pnl_snapshots` / `get_pnl_snapshot`.
+- **Citire/explicare:** `get_pnl` (P&L complet cu semafor), `get_product_pnl` (profit pe produs/SKU + pierderi + reconciliere), `list_delivery_pnl_segments` + `get_delivery_pnl` (profit pe livrări segmentate), `compare_pnl_periods` (perioade + profit bridge), `get_pnl_config` (cum e configurat), `list_pnl_kpis` (KPI live), `list_pnl_snapshots` / `get_pnl_snapshot`.
 - **Configurare:** `apply_pnl_industry_template` (template de industrie — primul pas pt. client nou), `set_pnl_thresholds` (praguri semafor), `create_pnl_category`, `configure_pnl_revenue_grouping`.
 - **Închidere de lună:** `create_pnl_snapshot` (îngheață raportul), `add_pnl_snapshot_adjustment` (adaugă o cheltuială/venit suplimentar pe snapshot).
 - **Clasificarea (manela):** `create_product_type`, `update_product_type`, `update_product_type_accounts_per_unit` — leagă tipurile de produs la categorii (ce decide unde cad banii). Plus `raport_vanzari`, `analyze_food_costs`, `get_accounting_overview`, `execute_sql_query` (read-only).
 
-**Ce rămâne în aplicație** (ghidează cu `gaseste_in_aplicatie` + deschide pagina dacă extensia Chrome e conectată): legarea fină tip-produs↔categorie cu bifare vizuală, mod avansat conturi↔categorie, lock cu parolă pe snapshot, adăugarea de angajați manuali și evenimente în snapshot, export PDF/Excel. Dacă un tool nu există încă pe instanța clientului (server mai vechi), fă fallback la pagină.
+**Ce rămâne în aplicație** (ghidează cu `gaseste_in_aplicatie` + deschide pagina dacă extensia Chrome e conectată): legarea fină tip-produs↔categorie cu bifare vizuală, mod avansat conturi↔categorie, configurarea vizuală a segmentelor de livrări (`/reports/pnl-livrari`), lock cu parolă pe snapshot, adăugarea de angajați manuali și evenimente în snapshot, export PDF/Excel. Dacă un tool nu există încă pe instanța clientului (server mai vechi), fă fallback la pagină.
 
 ## Întrebări frecvente
 

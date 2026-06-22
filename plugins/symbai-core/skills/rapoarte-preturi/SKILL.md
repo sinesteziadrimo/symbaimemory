@@ -1,6 +1,6 @@
 ---
 name: rapoarte-preturi
-description: Răspunde la întrebări despre rapoarte, vânzări, KPI, food cost, marjă, prețuri, ȘI despre configurarea P&L (categorii, KPI, praguri, grupări venituri, template-uri industrie) + P&L salvat (snapshot peste care adaugi cheltuieli/venituri/angajați/evenimente suplimentare). Folosește la „cât am vândut", „top produse", „care e food cost-ul", „ce marjă am la X", „de ce scade profitul", „cât datorez furnizorului", „cum îmi configurez P&L-ul", „categorii P&L", „de ce apare la Nealocate", „salvează P&L", „închidere de lună", „adaugă o cheltuială/un venit/un angajat în P&L", ȘI comparații pe perioade — „cum merge luna trecută vs acum 2 luni", „an vs an", „compară lunile/perioadele", „evoluția profitului".
+description: Răspunde la întrebări despre rapoarte, vânzări, KPI, food cost, marjă, prețuri, P&L pe produs/SKU și P&L pe livrări, ȘI despre configurarea P&L (categorii, KPI, praguri, grupări venituri, template-uri industrie) + P&L salvat (snapshot peste care adaugi cheltuieli/venituri/angajați/evenimente suplimentare). Folosește la „cât am vândut", „top produse", „care e food cost-ul", „ce marjă am la X", „ce produse pierd bani", „cât profit fac din livrări", „de ce scade profitul", „cât datorez furnizorului", „cum îmi configurez P&L-ul", „categorii P&L", „de ce apare la Nealocate", „salvează P&L", „închidere de lună", „adaugă o cheltuială/un venit/un angajat în P&L", ȘI comparații pe perioade — „cum merge luna trecută vs acum 2 luni", „an vs an", „compară lunile/perioadele", „evoluția profitului".
 ---
 
 # Rapoarte, cifre și prețuri
@@ -22,7 +22,8 @@ Folosește ÎNTÂI tool-urile dedicate de raport (funcționează FĂRĂ acces SQ
 Pentru P&L NU mai trimite doar la pagină — ai tool-uri dedicate care întorc EXACT cifrele din pagina `/reports/pnl`:
 
 - „arată-mi P&L-ul / care e profitul lunii / cum stau cu marja, food cost, prime cost" → **`get_pnl`** (acceptă `perioada` + opțional `brandId`/`locationId`). Întoarce venituri nete, COGS, profit brut, personal, OpEx, profit net + marjă, și food/labor/prime cost cu **semafor verde/galben/roșu** pe pragurile clientului. Explică-i pe scurt ce e bun/rău și de ce.
-- Pentru întrebări despre **marja/profitul pe produs**, citește și `data.productPnl.config`, `methodology`, `warnings` și `reconciliation`: pragurile și ponderile de alocare pot veni din `organization_settings.pnlSettings.productPnl`, deci un produs poate fi roșu din setarea clientului, nu dintr-un bug de calcul.
+- „care produse îmi aduc profit / ce produse pierd bani / P&L per produs" → **`get_product_pnl`** (read-only; `mode: profit|loss|revenue|margin`, `limit`). Citește și `data.config`, `methodology`, `warnings` și `reconciliation`: pragurile și ponderile de alocare pot veni din `organization_settings.pnlSettings.productPnl`, deci un produs poate fi roșu din setarea clientului, nu dintr-un bug de calcul.
+- „cât profit fac din livrări / merg livrările pe profit" → **`list_delivery_pnl_segments`** (dacă există segmente salvate) → **`get_delivery_pnl(configId|segmentName)`**. Dacă nu există segment, poți calcula ad-hoc cu `brandId` (venit minus marfă), dar spune clar că manopera și cheltuielile alese intră doar după configurarea segmentului în `/reports/pnl-livrari`.
 - „cum e configurat P&L-ul / ce categorii am / de ce apare la «Nealocate»" → **`get_pnl_config`** (categorii pe secțiuni, grupări de venituri, KPI, template-uri aplicate, praguri).
 - „ce KPI am / arată-mi indicatorii live / care KPI e pe roșu" → **`list_pnl_kpis`** (cu `evaluate: true` calculează valorile live pe perioadă, cu semafor).
 
@@ -48,7 +49,7 @@ Acum ai tool-uri MCP pentru configurare (nu mai e „doar în aplicație"):
 4. **`set_pnl_thresholds`** — pragurile semafor (foodCostTargetPct, laborTargetPct, primeCostTargetPct, opexTargetPct, netMarginTargetPct, +Warn/+Crit).
 5. **Legarea tipurilor de produs la categorii** (ce decide unde cad banii) rămâne pe `create_product_type` / `update_product_type` / `update_product_type_accounts_per_unit`, sau în aplicație (pagina „Conturi pe Tip Produs"). Dacă ceva apare la „Nealocate", aici se repară.
 
-Rețeta pt. client nou: `get_pnl_config` → `apply_pnl_industry_template` → leagă tipurile de produs la categorii → `set_pnl_thresholds` → verifici cu `get_pnl`.
+Rețeta pt. client nou: `get_pnl_config` → `apply_pnl_industry_template` → leagă tipurile de produs la categorii → `set_pnl_thresholds` → verifici cu `get_pnl`. Pentru fabrică/retail cu multe SKU, verifică apoi `get_product_pnl(mode:"loss")` ca să vezi produse pe pierdere și produse fără cost. Pentru livrări dedicate, configurează segmentul în `/reports/pnl-livrari`, apoi verifică `get_delivery_pnl`.
 
 ## P&L salvat (snapshot) + cheltuieli/venituri suplimentare
 
@@ -65,7 +66,7 @@ Când clientul întreabă „luna trecută vs acum 2 luni", „iunie anul ăsta 
 - Explică-i **„de ce s-a schimbat profitul"** din `profitBridge`: cât a adus venitul și cât au mâncat COGS/personal/OpEx (pozitiv = a ajutat, negativ = a scăzut profitul).
 - Capcane onest: luna **curentă incompletă** nu se compară corect cu una completă → preferă `an_vs_an` sau `ytd`; lunile au lungimi diferite → uită-te și la venitul/zi.
 
-Pentru vederea vizuală bogată (heatmap, bridge grafic), pagina e `/reports/pnl-compare-periods` — deschide-o (vezi mai jos). **Dacă `compare_pnl_periods` nu există pe instanță** (server mai vechi), fallback: rulează `get_pnl` (sau `raport_vanzari`) pe fiecare perioadă și compară tu.
+Pentru vederea vizuală bogată (heatmap, bridge grafic), pagina e `/reports/pnl-compare-periods`; pentru livrări segmentate pagina e `/reports/pnl-livrari`; pentru detaliul pe produs folosește drill-down-ul din `/reports/pnl`. Deschide pagina când extensia Chrome e conectată (vezi mai jos). **Dacă tool-ul MCP nu există pe instanță** (server mai vechi), fallback: rulează `get_pnl`/`raport_vanzari` și dă linkul paginii.
 
 ## Arată vizual clientului (nu doar text)
 

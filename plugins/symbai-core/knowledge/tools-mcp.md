@@ -371,6 +371,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_content_brief` — Întoarce content brief-ul salvat al unui articol (outline H2/H3 + competitori SERP + cuvinte LSI + FAQ + word count țintă). (necesită: postId)
 - `get_day_at_a_glance` — Vederea de ansamblu a UNEI ZILE pentru gazdă/coordonator: toate rezervările din ziua respectivă, plus sloturile de joc, milestone-urile (masă/tort) și jocurile disponibile — totul într-un apel. (necesită: date)
 - `get_deal` — Citește un deal/lead complet după id (toate câmpurile: client, valoare, etapă, status, eveniment, avans, contract, notițe, scor AI, tag-uri, date). (necesită: dealId)
+- `get_delivery_pnl` — P&L read-only pe segmentul de livrări: venituri livrare minus marfă, manoperă și cheltuieli configurate de owner. Folosește `list_delivery_pnl_segments` întâi dacă sunt mai multe segmente. (parametri opționali: perioada, startDate, endDate, configId, segmentName, brandId)
 - `get_event_fiche` — Citește fișa unui EVENIMENT/REZERVARE (dintr-un deal CRM convertit) — secțiunea cerută. Pentru BEO/summary ascunde date sensibile de angajat, contract și linkuri/tokenuri de plată. (necesită: reservationId, section)
 - `get_factory_dashboard` — Obține dashboard-ul fabricii: pipeline loturi, status echipamente, livrări azi/mâine, probleme QC, lipsuri materie primă, KPI-uri globale.
 - `get_keyword_rankings` — Istoricul de poziții al unui cuvânt-cheie urmărit (evoluția în Google pe ultimele N zile). (necesită: id)
@@ -381,6 +382,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_offer_scorecard` — Verdictul «Păstrează / Oprește» pentru o ofertă (auto-discount de pe bon) — a meritat sau nu, în lei, ONEST. (necesită: offerId)
 - `get_pnl` — Raportul P&L (profit si pierdere) COMPLET pe o perioada, gata de aratat si explicat in chat: venituri nete, COGS, profit brut + marja, cost personal, OpEx, profit operational, profit net + marja neta, (parametri opționali: perioada, startDate, endDate, brandId)
 - `get_pnl_snapshot` — Citeste un P&L salvat (snapshot): totalurile inghetate + ajustarile manuale si efectul lor. (necesită: snapshotId)
+- `get_product_pnl` — P&L managerial pe produs/SKU: venit, cost direct, alocări de manoperă/overhead, profit net, pierderi, produse fără cost și reconciliere cu P&L-ul total. (parametri opționali: perioada, startDate, endDate, brandId, locationId, mode, limit)
 - `get_presentation` — Citește o prezentare salvată — implicit un REZUMAT (meta + numărători). (necesită: presentationId)
 - `get_presentation_library_item` — Citește UN singur element din bibliotecă (o durere / soluție / întrebare discovery / dovadă / obiecție / calcul) — întreg, dar mic. (necesită: presentationId, kind, itemId)
 - `get_quarterly_marketing_plan` — Citește un plan strategic trimestrial complet plus campaniile lui; folosește planId sau brandId+quarter+year. (parametri opționali: brandId, planId, quarter, year)
@@ -402,6 +404,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_bulk_import_questions` — Listează TOATE întrebările de clarificare NERĂSPUNSE dintr-o sesiune de import în masă (Sym Import), peste toate fișierele — ca să le poți răspunde prin conexiune, fără să deschizi fiecare întrebare v (necesită: sessionId)
 - `list_cleaning_tasks` — Listează sarcinile de curățenie (checklist HACCP), cu status și scadență. (parametri opționali: locationId, status)
 - `list_deals` — Listează lead-urile/deal-urile din pipeline-ul de vânzări (CRM) — forma compactă: id, titlu, client, valoare, etapă, status (open/won/lost), agent asignat, dată eveniment. (parametri opționali: brandId, stageId, assignedTo, status)
+- `list_delivery_pnl_segments` — Listează segmentele P&L de livrări salvate: id, nume, brand/locație, angajați și reguli de cheltuieli. Rulează înainte de `get_delivery_pnl`.
 - `list_dynamic_qr_codes` — Listează QR-urile DINAMICE (pagina Coduri QR → tab «QR dinamice»): coduri scurte fixe care redirecționează (302) la o destinație editabilă — un link extern (https://…) sau o pagină internă (/…).
 - `list_entities` — Listare rapidă a oricărui tip de entitate (produse, angajați, roluri, meniuri, gestiuni, facturi etc.) cu filtrare pe brand. (necesită: entityType, brandId)
 - `list_failed_deliveries` — Comenzile cu livrare eșuată într-un interval, cu motivul și livratorul — pentru analiză/relivrare. (parametri opționali: brandId, locationId, from, to)
@@ -594,7 +597,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `update_production_zone` — Actualizează o zonă de producție. (necesită: zoneId)
 - `update_provisional_shift` — Actualizează un schimb provizoriu existent. (necesită: provisionalShiftId)
 
-### personal — Personal & Ture — 34 tool-uri
+### personal — Personal & Ture — 43 tool-uri
 - `assign_task` — Atribuie o sarcină unui angajat (după taskId + employeeId). (necesită: taskId)
 - `bulk_assign_section_to_schedules` — Asignează un raion pe TOATE turele care se potrivesc unui filtru, dintr-un singur apel (ex. (necesită: sectionName)
 - `bulk_create_employees` — Creează mai mulți angajați dintr-o dată (import din revisal, Excel, etc.) (necesită: brandId, employees)
@@ -609,6 +612,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `create_leave_request` — Creează o cerere de concediu/învoire pentru un angajat (status inițial 'în așteptare'). (necesită: employeeId, type, startDate, endDate)
 - `create_role` — Creează un rol nou cu permisiuni (necesită: name, brandId)
 - `create_shift` — Creează o tură în modelul de PONTAJ/RUNTIME (tabelul shifts — pontaj, predare de tură, snapshot vânzări). (necesită: employeeId, date, startTime, endTime, brandId, locationId)
+- `create_staff_benefit_rule` — Creează o regulă de beneficiu personal (mâncare/băutură angajați): discount %, sumă fixă, preț special sau buget. Confirmă discovery-ul și valorile înainte de scriere. (necesită: name, ruleType)
 - `create_staff_schedule` — Creeaza o intrare de program planificat — sablon de tura recurenta. (necesită: employeeId, scheduledStart, scheduledEnd)
 - `create_targeted_task` — Creează o SARCINĂ într-o listă, cu câmpurile noi: atribuire pe nume, prioritate, scadență (dată + oră HH:MM), tip de DOVADĂ la finalizare (foto/notă/număr/semnătură), cerere de verificare manager, min (necesită: taskListId, title)
 - `create_targeted_task_list` — Creează o LISTĂ de sarcini (checklist) cu ȚINTĂ FUNCȚIONALĂ și/sau RECURENȚĂ. (necesită: title)
@@ -616,14 +620,22 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `create_task_list` — Creeaza o lista de sarcini (checklist operational). (necesită: title, brandId)
 - `create_time_entry` — Creează o pontare (clock-in / clock-out) pentru un angajat. (necesită: employeeId)
 - `delete_staff_schedule` — Șterge o intrare de rotă (staff_schedules) după ID — utilă ca să cureți/recreezi rota fără duplicate. (necesită: scheduleId)
+- `diagnose_staff_benefit_rule` — Explică de ce o regulă de beneficiu personal se aplică sau nu: eligibili, ture active, produse acoperite, buget și aplicatori. (necesită: ruleId)
 - `generate_contract_document` — Genereaza un DOCUMENT de contract in modulul /contracts (status ciorna) pornind de la un contract HR (employee_contract). (parametri opționali: employeeContractId, employeeId, templateId, title)
+- `get_staff_benefit_budget` — Arată bugetul rămas/consumat al unui angajat pe regulile de beneficiu personal de tip buget. (necesită: employeeId)
+- `get_staff_benefit_report` — Raport read-only de consum beneficii personal, grupat pe angajat/regulă/produs/zi; folosește-l pentru costul mesei personalului. (parametri opționali: from, to, groupBy, brandId, locationId)
+- `list_staff_benefit_rules` — Listează regulile de beneficiu personal și dacă funcția este activă global; folosește înainte de diagnostic/configurare. (parametri opționali: brandId, locationId)
 - `seed_default_roles` — Creeaza automat setul complet de roluri prestabilite pentru un tip de business. (necesită: brandId, businessType)
 - `set_role_permissions` — Actualizeaza permisiunile unui rol — poate adauga, sterge sau seta complet lista de permisiuni. (necesită: roleId)
+- `set_staff_benefit_accounting_mode` — Alege dacă masa personalului rămâne doar internă (`internal_only`) sau se trimite distinct la Accounting ca valoare informativă de avantaj în natură (`separate_benefit`). Explică diferența înainte de schimbare. (necesită: mode)
+- `set_staff_benefit_employee_budget` — Setează/suprascrie bugetul individual al unui angajat pentru o regulă de beneficiu personal de tip buget. (necesită: ruleId, employeeId, budgetAmount)
+- `toggle_staff_benefits` — Activează/dezactivează global funcția Beneficii Personal; când e oprită, butonul nu apare pe masa POS. (necesită: enabled)
 - `update_employee` — Actualizează un angajat existent (nume, rol, poziție, salariu, date contract, PIN, etc.) (necesită: employeeId)
 - `update_employee_contract` — Actualizează un contract de muncă existent (după contractId): tip, salariu, valabilitate, status activ/inactiv, alocări și bonusuri. (necesită: contractId)
 - `update_leave_request` — Schimbă statusul unei cereri de concediu (după leaveRequestId): approved=aprobă, declined=respinge, cancelled=anulează, pending=repune în așteptare. (necesită: leaveRequestId)
 - `update_role` — Actualizează un rol existent (nume, permisiuni) (necesită: roleId, brandId)
 - `update_shift` — Actualizeaza o tura existenta — schimba orele, locatia, sectiunea sau statusul. (necesită: shiftId)
+- `update_staff_benefit_rule` — Actualizează o regulă de beneficiu personal; listele trimise (roluri/angajați/produse/aplicatori) înlocuiesc listele existente. (necesită: ruleId)
 - `update_staff_schedule` — Editează o intrare de rotă existentă (staff_schedules) după ID — fără a o șterge și recrea (recrearea duplică). (necesită: scheduleId)
 - `update_task` — Actualizează o sarcină existentă (după taskId): titlu, descriere, status (pending/in_progress/completed), atribuire (assignedTo; null = dez-atribuie), prioritate, scadență (dată + oră), dovadă cerută, (necesită: taskId)
 - `update_task_list` — Actualizează o listă de sarcini existentă (după taskListId): titlu, țintă (rol/tură/raion), recurență, oră-limită, culoare, activă/inactivă, șablon. (necesită: taskListId)

@@ -88,11 +88,20 @@ Pe masă → meniul „Acțiuni Masă" (cele 3 puncte) → **„Beneficiu Person
 - **Buget per angajat** — cât a consumat fiecare din plafon, pe perioada curentă.
 - **Jurnal** — `jurnal_activitate` arată „oferit gratis / beneficiu" cine-când-cât.
 
+## Ce ajunge la contabilitate — fiecare restaurant alege
+
+Consumul personalului **nu trebuie ținut obligatoriu, legal, distinct în contabilitate** — stocul consumat scade oricum normal (intră în costul mărfii/COGS ca orice consum), iar asta ajunge la contabilitate prin fluxul obișnuit de stoc. Ce alegi tu e dacă vrei să apară **separat** ca avantaj în natură:
+
+- **„Intern" (`internal_only`, implicit)** — consumul personalului rămâne în raportul tău intern (P&L → „Costuri Personal"). La contabilitate ajunge **doar fluxul normal de stoc/COGS**, nimic distinct despre cine a mâncat. Majoritatea restaurantelor stau bine aici.
+- **„Separat" (`separate_benefit`)** — pe lângă stoc, POS-ul trimite la contabilitate și **valoarea distinctă** a beneficiilor (avantaj în natură), ca să poată fi înregistrată separat (util dacă contabilul tău vrea asta, ex. pentru salarizare/impozitare).
+
+Schimbi modul cu `set_staff_benefit_accounting_mode(mode)`. Recomandare: lasă „Intern" dacă nu ți-a cerut contabilul explicit altceva. *(La modul „Separat", înregistrarea efectivă în platforma de Contabilitate poate necesita și activare acolo — întreabă dacă nu apare.)*
+
 ## Ce face asistentul prin conexiune (MCP) vs. în aplicație
 
 **Prin conexiune (MCP)** — dacă tool-urile de staff-benefits sunt active pe instanța clientului:
 - *Citire/explicare:* `list_staff_benefit_rules` (regulile + acoperirea lor), `diagnose_staff_benefit_rule` („de ce nu se aplică"), `get_staff_benefit_budget` (buget per angajat), `get_staff_benefit_report` (consum agregat, feed de P&L).
-- *Configurare:* `create_staff_benefit_rule`, `update_staff_benefit_rule`, `set_staff_benefit_employee_budget`, `toggle_staff_benefits` (activarea globală). Necesită modulul de scriere **Personal / Setări** pe token.
+- *Configurare:* `create_staff_benefit_rule`, `update_staff_benefit_rule`, `set_staff_benefit_employee_budget`, `toggle_staff_benefits` (activarea globală), `set_staff_benefit_accounting_mode` (ce ajunge la contabilitate — vezi mai jos). Necesită modulul de scriere **Personal / Setări** pe token.
 - Context întâi: `list_brands` + `list_locations` (brandId/locationId), `list_entities(entityType:"roles")` pentru roluri, `list_tags` / `list_product_types` pentru scope-ul pe produse.
 
 **Rămâne în aplicație** (ghidează cu `gaseste_in_aplicatie` + deschide pagina prin Chrome dacă e conectat): **aplicarea efectivă pe o notă** (e acțiune de ospătar la POS, nu se face prin conexiune), bifarea fină a produselor/etichetelor în editorul de reguli, și citirea vizuală a panoului „Stare regulă".

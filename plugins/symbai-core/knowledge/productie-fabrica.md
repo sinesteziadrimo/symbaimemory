@@ -195,6 +195,18 @@ Fluxul = lanțul de operații prin care trece un produs, cu cerințe, dependenț
 - **Cu AI**: `/ai-flow-builder` — descrii procesul în chat și AI-ul construiește fluxul. (Cere modul fabrică.)
 - Pagina manuală: `/fluxuri-tehnologice`.
 
+### Exemplu de referință — un flux COMPLET (Écler cu cremă, patiserie)
+Un flux „complet" nu e o rețetă reambalată: are operații pe stații/echipamente, fiecare cu **materialele consumate exact la pasul ăla**, output, QC/CCP, durată și personal. Exemplu real construit cu `build_complete_flow`:
+1. **Preparare pâte à choux** (zona Patiserie, Aragaz patiserie) — opărește apă+unt, încorporează făina, gătește; QC temperatură; produce SF Pâte à choux.
+2. **Dresare / turnare** (Poș dozare cremă) — toarnă aluatul pe tăvi.
+3. **Coacere** (Cuptor patiserie ventilat) — CCP temperatură miez, QC blocant; nu deschide cuptorul în timpul coacerii.
+4. **Răcire** — la temperatura camerei până la temperatura de umplere.
+5. **Umplere cu cremă** (Poș dozare cremă) — consumă SF Cremă patisieră, care la rândul ei are CCP: pasteurizare cremă ≥85°C + răcire rapidă la ≤4°C (siguranță alimentară pe ouă).
+6. **Glazurare** (Cuvă glazurare) — consumă SF Glazură fondant.
+7. **Ambalare & detector metale** (zona Ambalare & Etichetare) — CCP detector metale; consumă cutie + etichetă; produce Écler-ul (output principal `isPrimary`).
+
+Reguli care fac fluxul corect: (a) materialele se consumă la operația REALĂ (ambalajele la ambalare, ingredientul principal la procesare); (b) **doar operația care produce lotul are output principal** — nu pune produsul finit ca ieșire pe operațiile intermediare (ar crea buclă în BOM); (c) sub-produsele reale se declară unde apar (ex. zerul la coagularea brânzei); (d) leagă operațiile cu `auto_chain_operations` (FS) sau `add_operation_dependency` (SS pentru pași paraleli), apoi `validate_flow_consistency` înainte de `activate_flow_version`; (e) pentru ca echipamentul să apară cu productivitate în pagina Echipamente (widget „Productivitate Fluxuri"), folosește `assign_flow_to_equipment` (Buc/oră per operație).
+
 ## Controlul calității (QC, carantină, HACCP)
 Două sisteme paralele: **Quality Holds** (blochezi un LOT) și **QC Inspections** (rezultatul unui test pe un BATCH). Un fix pe unul NU se propagă la celălalt.
 

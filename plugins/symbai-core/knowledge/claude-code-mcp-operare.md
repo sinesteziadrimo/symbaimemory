@@ -116,6 +116,14 @@ Cand un tool poate returna multe rezultate:
 - pentru campanii mari, foloseste planuri: audienta, livrabilitate, send-time;
 - pentru importuri, lasa motorul de import sa parseze, apoi verifica/corecteaza cu MCP.
 
+Unele raspunsuri MCP sunt **slim intentionat** ca sa ramana sub limita de payload si sa nu cada tot raspunsul:
+
+- produse: pot lipsi embedding-uri, campuri personalizate, variante/jsonb grele si metadata de imagini; datele operationale usoare raman;
+- cereri de aprobare / timeline comanda: `cartSnapshot` si `items` pot fi omise, dar primesti `itemSummary` pentru explicatia catre manager;
+- campanii/template-uri/secvente email: HTML-ul complet, design JSON si pasii mari pot fi omise din raspunsurile de write/listare.
+
+Nu interpreta lipsa acestor blob-uri ca stergere sau bug. Explica userului pe scurt ca raspunsul este optimizat, verifica rezultatul cu tool-ul de citire potrivit sau deschide pagina relevanta daca trebuie vazut continutul complet.
+
 ## Email Marketing — Standardul Nou
 
 Pentru email, Claude Code trebuie sa fie mai bun decat un CRM generic deoarece are MCP + date POS:

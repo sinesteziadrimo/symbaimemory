@@ -39,7 +39,7 @@ Modulul acoperă serviciul la masă: planul de sală (desenat în designer, afi�
 **1. Deschizi o masă și trimiți comanda la bucătărie**
 1. În POS Mobile, ecranul cu mesele → atingi masa.
 2. Adaugi produse din meniu (cu fel/curs, observații, per client/scaun dacă vrei).
-3. „Trimite la bucătărie" → bonurile apar pe ecranele de bucătărie (KDS) și/sau ies pe imprimante.
+3. „Trimite la bucătărie" → bonurile apar pe ecranele de bucătărie (KDS) și/sau ies pe imprimante. În aplicația nativă **Symbai POS**, apăsarea pe **Trimite** dă feedback imediat, blochează dublul tap și face refresh-ul de sală/comenzi/KDS în fundal după succes; dacă revine rapid la sală, verifică în timeline/jurnal înainte să presupui că s-a pierdut comanda.
 4. Odată trimise, produsele NU mai pot fi șterse direct — doar prin cerere de retur/anulare aprobată de manager. Produsele netrimise se pot șterge liber.
 
 **2. Încasezi o masă**

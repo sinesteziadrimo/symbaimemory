@@ -363,7 +363,7 @@
 - **Factory AI Chat** (`/factory-ai`) — Chat AI dedicat operațiunilor de fabrică
 - **AI Flow Builder** (`/ai-flow-builder`) — Constructor vizual fluxuri tehnologice cu AI
 - **Plan Fabrică 2D** (`/factory-floor-plan`) — Designer vizual al halei/fabricii: nivele, echipamente, zone de producție, magazii, zone de depozitare, pereți/culoare și conexiuni de flux material/personal. Legat de entități reale, cu status echipament și stoc sumar pe zone.
-- **Explorează Fabrica** (`/factory-explorer`) — Vizualizator live read-only al halei: hartă, căutare, Gantt pe utilaje și panouri clickabile pentru zonă, magazie/raft, utilaj, operator și produs. Pentru investigații și dovadă vizuală; pentru editare folosește Plan Fabrică 2D.
+- **Explorează Fabrica** (`/factory-explorer`) — Vizualizator live read-only al halei: hartă, căutare, Gantt pe utilaje cu scrubber de timp și panouri clickabile pentru zonă, magazie/raft, utilaj, operator și produs. Pentru investigații, întrebări la o oră anume și dovadă vizuală; pentru editare folosește Plan Fabrică 2D.
 - **Tabletă Stație Lucru** (`/workstation-tablet`) — Interfață tabletă pentru stația de producție — scanare container, progres, QC
 - **Producție Evenimente** (`/productie-evenimente`) — Pagina PRINCIPALĂ de producție restaurant. Titlu adaptiv (Producție / Producție & Evenimente / Producție & Rețete). Taburi: Calendar & Capacitate, Loturi Producție (creezi/pornești/finalizezi loturi+evenimente), Rețete. +Operații/+Echipamente la mod restaurant_events; +Fluxuri Tehnologice la mod fabrică. Butoane: Adaugă Lot Producție, Adaugă Eveniment.
 - **Fluxuri Tehnologice** (`/fluxuri-tehnologice`) — Fluxuri tehnologice de producție — operații, dependențe, BOM, QC

@@ -90,7 +90,16 @@ Pentru dev/local, dacă userul spune „Senneville”, „ARCA” sau „fabrica
 
 ## Factory Explorer si calificari
 
-Pentru „arata-mi fabrica live", „ce se intampla pe zona/magazie/utilaj", „vreau sa vad hala", foloseste traseul Fabrică si citeste datele MCP intai (`get_factory_plan`, `get_factory_dashboard`, `exec_list_active_operations`, `get_staffing_coverage`). Deschide `/factory-explorer` in browser doar pentru dovada vizuala/screenshot sau navigare cu userul. `/factory-explorer` este read-only; pentru desenare foloseste `/factory-floor-plan` si skill-ul `plan-fabrica`.
+Pentru „arata-mi fabrica live", „ce se intampla pe zona/magazie/utilaj", „ce are Ion de facut azi", „unde se face produsul X", „vreau sa vad hala", foloseste traseul Fabrică si citeste datele MCP intai (`get_factory_plan`, `get_factory_dashboard`, `get_production_dispatch`, `exec_list_active_operations`, `get_staffing_coverage`). Deschide `/factory-explorer` in browser doar pentru dovada vizuala/screenshot sau navigare cu userul.
+
+`/factory-explorer` este read-only si are panouri cross-linkate:
+- zona = utilaje, operatii, produse, responsabili, operatori calificati/programati;
+- magazie/zona/raft = stoc acum, miscari azi, intrari asteptate si iesiri/documente nepostate;
+- utilaj = ce poate produce, ce a produs azi, ce ruleaza acum, ce urmeaza;
+- operator = ture, statie, sarcini, utilaje calificate, zone responsabile;
+- produs = unde se produce, pe ce utilaje, stoc pe magazii/zone si miscari recente.
+
+Pentru desenare/mutare foloseste `/factory-floor-plan` si skill-ul `plan-fabrica`. Pentru porniri/opriri, alocari, QC sau stoc, foloseste tool-urile MCP dedicate; nu prezenta clickul din Explorer ca actiune de scriere.
 
 Pentru „cine are voie sa faca faza X", „pune QC doar la responsabili", „cine poate face fluxul", foloseste calificari pe faze: `set_operation_phase_qualification` pentru o operatie, `set_flow_phase_qualification_defaults` + `apply_flow_phase_defaults_to_operations` pentru defaulturi pe flux, `list_operation_phase_qualifications` pentru verificare si `get_flow_staffing_rollup` pentru acoperire pe flux. Confirma cu managerul inainte de orice scriere care schimba autorizari, ture sau responsabilitati.
 
@@ -151,6 +160,7 @@ Pentru „cine are voie sa faca faza X", „pune QC doar la responsabili", „ci
 | „Numărul de lot apare de mai multe ori" | Normal — identificatorul unic e codul QR al containerului, nu numărul lotului. |
 | „Food cost / stoc absurd la producție" | Verifică unitatea rețetei vs unitatea produsului (g/kg, ml/l) — unitate greșită = eroare tăcută ×1000. |
 | „Explică-mi ziua de producție / cum a mers azi" | Fabrică: `explain_production_day` (`date` opțional, implicit azi) — rezumat narativ pe românește: ansamblu (loturi, calitate) → ce se produce & cine lucrează pe ture → producția zilei (cantități, randament) → puncte de atenție (QC, carantină, echipamente oprite). |
+| „Arată-mi fabrica live / ce se întâmplă pe utilaj, zonă, magazie, operator sau produs" | Fabrică: citește întâi MCP (`get_factory_plan`, `get_production_dispatch`, `exec_list_active_operations`, `get_staffing_coverage` după caz), apoi pentru dovadă vizuală deschide `/factory-explorer`, caută/selectează obiectul și arată panoul + Gantt. Read-only; nu editează layout și nu scrie operații. |
 | „Explică-mi / arată-mi fluxul unui produs" | Fabrică: deschide diagrama în `/fluxuri-tehnologice` și apasă **„Explică-mi"** (tur ghidat pas cu pas, de la materia primă la produsul finit). Diagrama se aranjează singură („Aranjează automat"), cu benzi pe zonă/echipament/schimb; dacă vrea să vadă oamenii, arată schimburile și operatorii din noduri cu screenshot. |
 | „Desenează/aranjează hala fabricii / plan 2D" | Fabrică: folosește skill-ul `plan-fabrica`. MCP-first: creezi/verifici entitățile reale, apoi `list_factory_plans` / `create_factory_plan` → `get_factory_plan_palette` → `build_factory_floor` sau `place_factory_object` + `connect_factory_objects` + `update_factory_object`; verifici cu `get_factory_plan`. Browserul pe `/factory-floor-plan` este pentru dovadă vizuală/screenshot, nu pentru lucru manual obligatoriu. |
 | „De ce a ieșit lotul mai scump / unde am pierdut bani" | `get_production_cost_variance(batchId)` — standard vs actual pe lot, cu abatere de preț vs cantitate/randament; dacă lotul e incomplet, nu prezenta cifrele ca finale. |

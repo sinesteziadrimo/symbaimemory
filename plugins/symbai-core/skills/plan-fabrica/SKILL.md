@@ -18,6 +18,7 @@ Planul 2D este un editor vizual DEDICAT fabricii (separat de Plan Sală de resta
 - Vrea rafturi/bin-uri, etichete QR pentru zone sau o pagină mobilă unde operatorul vede conținutul live al unei zone scanate.
 - Vrea să importe un plan scanat/imagine de fundal sau să deseneze rapid camere/ziduri în editor.
 - Vrea „ce rulează acum în fabrică" direct pe harta halei: operații active, loturi, operatori și containere pe utilaje.
+- Vrea o investigație vizuală read-only: ce urmează pe utilaj, ce intră/iese din magazie, ce are un operator de făcut sau unde se produce un produs. Atunci folosește `/factory-explorer`, nu editorul.
 - Vrea să știe **cine poate lucra pe un utilaj**, cine răspunde de o zonă sau unde lipsește operator calificat pe tura de azi/mâine.
 
 ## Reguli de aur
@@ -57,6 +58,8 @@ Tipuri de obiecte: `production_equipment`, `production_zone`, `warehouse`, `stor
 
 **Pas 7b — Live Fabrică (execuție curentă pe plan).** Dacă userul întreabă „ce rulează acum pe utilaje / unde e lotul / cine lucrează", deschide `/factory-floor-plan`, activează **Live Fabrică** și arată screenshot cu planul plus panoul „Acum în fabrică". UI-ul face polling ușor din `/api/factory-floor/live-execution` și suprapune operațiile pe echipamente: status, lot, produs, cantități, operatori de tură/execuție și containere aflate pe utilaj/zonă. Este read-only, nu salvează layout. Pentru cifre sau audit, verifică și prin tool-uri de citire (`get_production_dispatch`, `exec_list_active_operations`, `exec_get_batch_progress`, `get_factory_plan`), apoi explică diferența: planul arată locul fizic, dispatch-ul arată programarea/execuția.
 
+**Pas 7c — Explorează Fabrica (investigație read-only).** Dacă userul nu vrea să editeze planul, ci să înțeleagă ce se întâmplă, folosește `/factory-explorer`: search după zonă/utilaj/om/magazie, selector de zi, Gantt „Operațiile zilei" și panouri clickabile. Zona arată utilaje/operații/operatori; magazia/zona/raftul arată stoc, intrări așteptate și ieșiri/documente nepostate; utilajul arată ce a produs/rulează/urmează; operatorul arată ture/sarcini/calificări; produsul arată unde se face și unde are stoc. Citește datele prin MCP înainte, apoi folosește browser-control doar pentru screenshot/dovadă vizuală.
+
 **Pas 8 — Metadate HACCP (opțional, dar valoros).** La zone poți seta clasa de aer (grade_a…d), zona de igienă (high_care/low_care/raw/waste), alergeni și interval de temperatură — colorează zonele și ajută la verificarea separării. Folosește `update_factory_object` sau câmpurile din `build_factory_floor`.
 
 **Pas 9 — Verifică + arată.** `get_factory_plan` → confirmă obiectele, conexiunile și datele LIVE: status echipament, fluxurile care folosesc fiecare utilaj și câte operații are azi, rolul/turele de azi pentru operatori, stocul real pe fiecare zonă de depozitare + agregat pe magazie. Apoi `gaseste_in_aplicatie("plan fabrica 2D")` / deschide `/factory-floor-plan` în browser și fă screenshot. Dacă pornești dintr-o diagramă de producție, echipamentele au scurtătura **Vezi pe plan**; când diagrama/API-ul îți dă `factoryPlanId`, folosește URL-ul exact `/factory-floor-plan?plan=<planId>&focusEquipment=<equipmentId>` ca să deschizi planul corect cu utilajul selectat și centrat. Dacă nu ai `planId`, fallback-ul `/factory-floor-plan?focusEquipment=<equipmentId>` caută utilajul în primul plan încărcat.
@@ -78,3 +81,4 @@ Pentru oameni, `get_factory_plan` arată și operatorii calificați pe utilaje, 
 - Să confunzi Plan Fabrică 2D cu Plan Sală (restaurant) — sunt editoare separate.
 - Să salvezi o simulare fără confirmare — modul **Simulare** e doar probă vizuală. Mutările reale se aplică separat, după acord.
 - Să tratezi **Live Fabrică** ca sursă de scriere — este doar overlay read-only pe execuție curentă. Pentru modificări reale pornești/oprești operații cu tool-urile `exec_*` sau schimbi layout-ul cu `update_factory_object`, după confirmare.
+- Să tratezi **Explorează Fabrica** ca editor — `/factory-explorer` este pentru investigație, căutare, panouri și Gantt. Pentru mutări folosește `/factory-floor-plan`; pentru porniri/opriri/alocări/QC/stoc folosește tool-urile MCP dedicate cu confirmare.

@@ -192,6 +192,8 @@ Pe un calcul de tip **Listă cheltuieli** (`comparative-list`) ai 3 câmpuri noi
 3. `flowV2.calculationAfterOffer = { enabled:true, calculationId:"<id-faza-2>" }`.
 Cheltuielile introduse live în faza 1 supraviețuiesc până în faza 2 fără nimic de salvat (sunt în același runner).
 
+**Calea rapidă:** prin MCP rulezi `setup_two_phase_calculation(presentationId, calculationId)` pe calculul de fază 1. În UI există paritate: Configurare prezentare → tab **Calcule** → deschide un calcul „Listă cheltuieli" → buton **Configurează calcul în 2 faze**. După oricare cale, verifică `check_presentation_health` și Preview; dacă faza 2 nu are încă `symbaiCost`, economia poate apărea artificial 100%.
+
 ✅ 2026-06-21: slide-ul de calcul **după ofertă** se emite chiar dacă formula nu are încă valori la generare (cheltuielile fazei 1 se completează live în runner). Nu încerca workaround-uri de tip „pun un cost fals ca să apară slide-ul"; configurează faza 2 cu `placement:"after-offer"` + `comparativeItemsFromCalculationId` și verifică în Preview după ce adaugi liniile în faza 1.
 
 ⚠ **Recalc live**: dacă raportul e „cifrele nu se actualizează când adaug linii în calculator" — bug-ul de recalc a fost reparat pe 2026-06-19 (guard pe sume). Dacă persistă pe instanța clientului, e versiune veche → cere deploy.

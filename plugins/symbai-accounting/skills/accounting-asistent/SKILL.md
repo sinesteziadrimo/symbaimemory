@@ -29,6 +29,13 @@ Dacă tool-urile NU apar în sesiune → folosește skill-ul `conecteaza-account
 4. **Țara contează**: cotele de TVA și formatul declarațiilor depind de țara firmei (RO/DE/FR/...). Verifică, nu presupune cote.
 5. **Verifică prin re-citire**: după o scriere, citește înapoi rezultatul și confirmă utilizatorului cu dovada (id-ul creat, soldul nou etc.). Nu raporta „gata" fără să fi verificat.
 
-## Orientare pe module
+## Orientare pe knowledge
 
-Vezi `knowledge/00-overview.md` (hartă pe module) și `knowledge/tools-mcp.md` (catalog de capabilități pe arii). Pentru conectare/depanare → `conecteaza-accounting`.
+- `knowledge/00-overview.md` = harta modulelor și regulile generale pentru asistență MCP-first.
+- `knowledge/tools-mcp.md` = catalogul de capabilități pe arii; folosește-l când alegi primul tool.
+- `knowledge/01-plan-de-conturi-monografii.md` = plan de conturi RO, monografii uzuale, reguli pentru `post_journal_entry`.
+- `knowledge/02-tva.md` = TVA RO, cote orientative, TVA la încasare, D300/D390/D394.
+- `knowledge/03-declaratii-fiscale.md` = ce declarații fiscale există, când sunt relevante și cum pregătești datele.
+- `knowledge/04-salarizare-si-regimuri.md` = salarizare, contribuții, REGES/Revisal și micro/profit la nivel orientativ.
+
+Pentru conectare/depanare → `conecteaza-accounting`.

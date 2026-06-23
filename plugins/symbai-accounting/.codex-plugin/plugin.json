@@ -1,7 +1,7 @@
 {
   "name": "symbai-accounting",
-  "version": "0.1.0+codex.20260622212600",
-  "description": "Asistentul Symbai Accounting pentru Codex: skill-uri si knowledge pentru contabilitate MCP-first.",
+  "version": "0.2.0+codex.20260623043000",
+  "description": "Asistentul Symbai Accounting pentru Codex: skill-uri si cunostinte RO despre plan de conturi, monografii, TVA, declaratii, salarizare si catalogul MCP live pentru contabilitate MCP-first.",
   "author": {
     "name": "Symbai",
     "email": "support@symbai.app",
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "Symbai Accounting",
     "shortDescription": "Lucreaza in contabilitatea Symbai din Codex.",
-    "longDescription": "Skill-uri si cunostinte pentru facturi, jurnal, declaratii fiscale, parteneri, stocuri, salarizare, banca si casa in Symbai Accounting. Conectarea MCP live se configureaza din aplicatia de contabilitate.",
+    "longDescription": "Skill-uri si cunostinte pentru facturi, jurnal, plan de conturi, monografii contabile, TVA, declaratii fiscale, parteneri, stocuri, salarizare, banca si casa in Symbai Accounting. Conectarea MCP live se configureaza din aplicatia de contabilitate.",
     "developerName": "Symbai",
     "category": "Productivity",
     "capabilities": [

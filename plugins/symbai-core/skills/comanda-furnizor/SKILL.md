@@ -1,6 +1,6 @@
 ---
 name: comanda-furnizor
-description: Ciclul de aprovizionare — recomandări de ce și de la cine cumperi, compararea prețurilor între furnizori, furnizor nou + catalog, crearea și recepția comenzilor (PO), analiză aprovizionare. Folosește la „ce trebuie să comand", „de la care furnizor e mai ieftin", „adaugă furnizor nou", „compară prețuri furnizori", „generează comandă furnizor", „creează comandă de aprovizionare", „recepție pe comandă", „raport aprovizionare / cât cheltui pe marfă", „stoc scăzut la X".
+description: Ciclul de aprovizionare — recomandări de ce și de la cine cumperi, compararea prețurilor între furnizori, furnizor nou + catalog, crearea și recepția comenzilor (PO), analiză aprovizionare și risc P&L pe furnizor. Folosește la „ce trebuie să comand", „de la care furnizor e mai ieftin", „adaugă furnizor nou", „compară prețuri furnizori", „generează comandă furnizor", „creează comandă de aprovizionare", „recepție pe comandă", „raport aprovizionare / cât cheltui pe marfă", „ce furnizor îmi riscă marja", „stoc scăzut la X".
 ---
 
 # Comandă de la furnizor (aprovizionare) — de la necesar la recepție
@@ -70,7 +70,8 @@ Ești asistentul Symbai al unui proprietar/manager — vorbește simplu, fără 
 ### F. Analiză aprovizionare
 1. `analyze_procurement(brandId)` → furnizori, prețuri medii, lead-time-uri, tendințe.
 2. `get_purchases_summary(dateFrom, dateTo, supplierId?)` → cât s-a cheltuit, câte recepții, câți furnizori.
-3. `get_supplier_last_prices(supplierId)` pe top furnizori → tendințe per partener. Concluzii de cost (ex. „A ieftin la brânză, B la legume").
+3. `get_supplier_pnl(perioada|startDate/endDate, brandId?, limit?)` → cât din achiziții vine de la fiecare furnizor, materiale fără alternativă și margin-at-risk la scumpire 5%/10%. E read-only și bun pentru „ce furnizor îmi riscă marja"; spune că sensibilitatea e direcțională, nu predicție exactă.
+4. `get_supplier_last_prices(supplierId)` pe top furnizori → tendințe per partener. Concluzii de cost (ex. „A ieftin la brânză, B la legume").
 
 ## Capcane (spune-le userului când apar)
 - **Comanda nu se trimite** → cel mai des: produs fără cod de furnizor / fără alegere de catalog, sau cantitate sub MOQ. Pagina de revizuire din `/smart-ordering` arată exact care.
@@ -82,7 +83,7 @@ Ești asistentul Symbai al unui proprietar/manager — vorbește simplu, fără 
 - Perete (ceva doar din aplicație, ex. trimiterea efectivă) → dă linkul cu `gaseste_in_aplicatie`; bug suspect → `trimite_ticket_symbai` (tip „sugestie", cu `dedupeKey`).
 
 ## Tool-uri folosite
-Citire: `list_brands`, `list_locations`, `list_warehouses_full`, `get_stock_levels`, `get_mps_net_requirements`, `get_material_requirements`, `list_procurement_recommendations`, `search_products_db`, `get_product_details`, `list_suppliers`, `get_supplier_last_prices`, `list_supplier_mapping_suggestions`, `analyze_procurement`, `get_purchases_summary`, `list_pending_nirs`, `list_reception_notes`, `lookup_company_cui`, `gaseste_in_aplicatie`.
+Citire: `list_brands`, `list_locations`, `list_warehouses_full`, `get_stock_levels`, `get_mps_net_requirements`, `get_material_requirements`, `list_procurement_recommendations`, `search_products_db`, `get_product_details`, `list_suppliers`, `get_supplier_pnl`, `get_supplier_last_prices`, `list_supplier_mapping_suggestions`, `analyze_procurement`, `get_purchases_summary`, `list_pending_nirs`, `list_reception_notes`, `lookup_company_cui`, `gaseste_in_aplicatie`.
 Scriere (`furnizori`): `create_supplier`, `update_supplier`, `create_supplier_product`, `bulk_create_supplier_products`, `create_supplier_product_mapping`, `bulk_create_supplier_product_mapping`, `enable_supplier_portal`, `create_purchase_order`, `add_purchase_order_item`, `receive_purchase_order`, `create_reception_note`.
 Scriere (`productie`): `create_purchase_orders_from_requirements` pentru ciorne PO din MRP; cere modulul `productie` pe token și confirmare înainte de `commit:true`.
 

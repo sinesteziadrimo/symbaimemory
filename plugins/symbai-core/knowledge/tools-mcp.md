@@ -34,17 +34,19 @@ Proprietarul poate seta din portalul Hub → Acces AI plafoane pe token. Gol = f
 
 Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate mări/elimina plafonul din Hub → Acces AI (editează tokenul), sau folosește o valoare mai mică. Plafoanele se aplică PE LÂNGĂ permisiunea de modul — sunt o a doua plasă de siguranță.
 
-**TOTAL: 982 tool-uri** — Citire 422 · Speciale 5 · SQL 3 · Scriere per modul 552 (pe 19 module).
+**TOTAL: 985 tool-uri** — Citire 425 · Speciale 5 · SQL 3 · Scriere per modul 552 (pe 19 module).
 
-## Citire (fără permisiune de modul) — 422 tool-uri
+## Citire (fără permisiune de modul) — 425 tool-uri
 
-### Vânzări, comenzi, casă & financiar — 45
+### Vânzări, comenzi, casă & financiar — 48
 - `compare_attribution_models` — Compară modelele de atribuire (last_click/first_click/linear/time_decay/position) pe canale: venit + conversii + ROAS per model. (parametri opționali: brandId, days)
 - `get_attribution_ltv_by_channel` — Valoarea pe viață (LTV) a clienților grupată după canalul de achiziție, pe o cohortă de N zile: nr. (parametri opționali: brandId, days)
 - `get_attribution_report` — Raport de atribuire marketing pe canale, pe ultimele N zile: conversii, venituri, cheltuieli (din reclame), CPA și ROAS per canal, conform unui model de atribuire ales (last_click implicit). (parametri opționali: brandId, days, model)
 - `get_cash_book_day` — Detaliile zilei de casă (deschidere/închidere, totaluri, status, înregistrările) pentru un registru la o dată. (necesită: registerId, businessDate)
 - `get_cash_register_balance` — Soldul curent al unui registru de casă (opțional la o anumită dată) — cât numerar e în casierie acum. (necesită: registerId)
 - `get_cash_register_closure_status` — Arată ce zile sunt închise/deschise/lipsă pentru un registru de casă (registru legal) — util pentru a vedea ce mai e de închis. (necesită: registerId)
+- `get_channel_pnl` — P&L de distribuție pe CANAL de clienți (ex. supermarketuri vs magazine proprii vs HoReCa): marjă reală full-cost, reconciliată. (parametri opționali: perioada, startDate, endDate, brandId, locationId)
+- `get_customer_pnl` — P&L de distribuție pe CLIENT: marjă reală full-cost pe fiecare client/supermarket/magazin, nu doar venit. (parametri opționali: perioada, startDate, endDate, brandId, locationId)
 - `get_ecommerce_order` — Detaliile unei comenzi din magazinul online: status, plată, totaluri, adresă/AWB, jaloane (plătită/expediată/livrată) și articolele comandate. (necesită: id)
 - `get_email_conversion_attribution` — Conversii si venit atribuit emailurilor din POS: comenzi + rezervari legate de click-uri email, cu funnel complet pana la converted. (parametri opționali: brandId, campaignId)
 - `get_end_of_day_report` — Rezumat consolidat de sfârșit de zi pentru o dată/locație: total brut, TVA, reduceri, bacșiș, defalcare pe metode de plată, pe ospătar și comenzi anulate. (parametri opționali: date, locationId)
@@ -60,6 +62,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `get_order_timeline` — Povestea COMPLETĂ a unei comenzi într-un singur rezultat, secționat: (1) antet (masă, ospătar, client, status, totaluri), (2) produsele comenzii (cu statusul fiecărei linii — activ/anulat/returnat/tra (necesită: orderId)
 - `get_orders_summary` — Sumar comenzi pe o perioadă — câte comenzi, ce produse și în ce cantități (agregat). (parametri opționali: dateFrom, dateTo, status, groupBy)
 - `get_subscriptions_dashboard` — KPI-urile afacerii de abonamente: MRR, ARR, ARPU, LTV, rată de churn, număr active/total, coadă de recuperare plată (dunning), defalcare pe status. (parametri opționali: brandId)
+- `get_supplier_pnl` — P&L/risc pe FURNIZOR: spend, concentrare, materiale cu sursă unică și sensibilitate la scumpire 5%/10%. (parametri opționali: perioada, startDate, endDate, brandId, locationId)
 - `get_vehicle_expenses` — Raport cheltuieli per vehicul pe interval: km parcurși, cost combustibil, RON/km, litri/100km, număr ture. (parametri opționali: brandId, locationId, from, to)
 - `jurnal_activitate` — Citește jurnalul de activitate (audit log) al aplicației — CINE a făcut CE și CÂND: anulări de comenzi, aprobări/respingeri, reduceri (discount), transferuri de produse/mese, retururi, oferit-gratis ( (parametri opționali: cauta, categorie, tipEntitate, idEntitate)
 - `list_b2b_orders` — Listează comenzile B2B (en-gros). (parametri opționali: clientId, status, deliveryDate, limit)

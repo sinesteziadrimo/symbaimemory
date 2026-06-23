@@ -145,6 +145,7 @@ Acestea sunt capabilitățile „de paritate SAP" — cele care diferențiază S
   Întoarce `totalCost`, `totalCostPerUnit`, cost/unitate pe materiale, materialele fără preț și **abaterea față de costul stocat** (`variancePct`). Flag onest în `warnings` când lipsește fluxul (manoperă=0) sau tariful.
 - Folosește la „cât mă costă să produc 1000 buc din X", „food cost teoretic", „cât e manopera", „ce marjă am la rețeta Y".
 - `get_production_cost_variance` (`batchId`) — după ce lotul are consumuri postate, compară **standard vs actual** pe material și răspunde la „de ce a ieșit lotul mai scump/mai ieftin": abatere de **preț** (materia primă a costat altfel decât standardul) vs abatere de **cantitate/randament** (s-a consumat mai mult/puțin decât rețeta pentru cantitatea reală produsă). Pozitiv = nefavorabil, negativ = favorabil. Dacă lotul nu are randament real sau consum postat, răspunsul e marcat ca parțial și trebuie explicat ca atare.
+- Pentru fabrici care vând B2B/retail, profitabilitatea nu se oprește la costul produsului: `get_customer_pnl` arată marja full-cost pe client/supermarket, `get_channel_pnl` compară canalele (supermarketuri vs magazine proprii vs HoReCa), iar `get_supplier_pnl` arată concentrarea și riscul de scumpire pe furnizori. Folosește-le când userul întreabă „ce client/canal îmi mănâncă marja" sau „ce furnizor mă expune".
 
 ### MRP multi-nivel — necesar de materii prime și auto-explodare SF (ca SAP MD01)
 Două unelte, două scopuri:
@@ -339,6 +340,7 @@ Workflow agent (MCP-first — EXISTĂ acum tool-uri dedicate de plan, nu mai e n
 | „Programează comenzile ȘI semipreparatele care nu-s pe stoc" | `schedule_production_orders` cu `explodeMultiLevel: true` (+ `commit:false` întâi pentru preview). |
 | „Cât mă costă să produc 1000 buc din X / food cost / cât e manopera" | `get_production_cost_estimate` (`recipeId`/`productName`, `quantity`, opțional `laborRatePerHour`/`machineRatePerHour`/`overheadPercent`) — material+manoperă+utilaj+overhead. |
 | „De ce a ieșit lotul X mai scump / unde am pierdut bani" | `get_production_cost_variance(batchId)` — standard vs actual pe lot: preț materie primă vs cantitate/randament. Dacă lotul e incomplet, explici că cifrele sunt parțiale. |
+| „Ce client/canal retail îmi mănâncă marja / ce furnizor e risc" | `get_customer_pnl(mode:"loss")` → `get_channel_pnl` → `get_supplier_pnl`; explică full-cost pe distribuție și margin-at-risk direcțional, nu doar venit brut. |
 | „Lista de ingrediente / declarația EU 1169 / QUID pentru etichetă" | `build_ingredient_declaration` (`recipeId`/`productId`) — ordine descrescătoare după greutate + % + alergeni. |
 | „Ce are de făcut fiecare echipă/zonă azi/mâine (dispecerizare)" | `get_production_dispatch` (`date` sau `dateFrom`/`dateTo`). |
 | „Cine poate lucra pe cuptor / pe ce utilaje e calificat Ion?" | `list_operator_equipment` cu `equipmentId` sau `employeeId`; pentru context complet `get_operator_assignments(employeeId,date)`. |

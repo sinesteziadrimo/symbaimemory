@@ -50,12 +50,12 @@ Feature-uri toggle:
 
 ## Ce vede efectiv angajatul in app
 
-- **Ziua mea / Sarcini**: feed-ul din `/api/my-tasks`, grupat pe intarziate / azi / urmatoarele / generale / finalizate azi. Deep link-uri: `symbai-staff://tasks` si `symbai-staff://task/<taskId>`. Daca sarcina cere dovada, angajatul ataseaza poza, nota, numar sau semnatura.
-- **Fabrica**: tabul **Fabrica** arata operatii active, QC/hold, imprimante, retete si scanare. Dintr-o operatie se poate intra in ecranul de rulare (`symbai-staff://operation/<batchId>`), unde operatorul lucreaza pe fluxul shop-floor.
-- **Container nou + QR**: in tabul Etichete productie, operatorul creeaza container fizic (`tray`, `box`, `crate`, `pallet`), introduce optional cantitate/unitate/conditii de pastrare, genereaza QR si printeaza eticheta.
-- **Detaliu container**: scanarea sau `symbai-staff://container/<qrCode>` arata produsul, lotul, materialele, zona, echipamentul, istoricul scanarilor si predarile in asteptare. Actiuni mobile: print, avansare etapa, split, marcare QC, accept/respinge predare.
+- **Sarcini**: profilul poate avea toggle `tasks`, dar runtime-ul curent nu mai are ecran separat `MyTasks` si nu mai expune deep-link-uri `symbai-staff://tasks` / `task/<id>`. Pentru sarcini reale foloseste skill-ul `gestioneaza-sarcini` si verificarea prin `get_my_tasks`.
+- **Fabrica**: tabul **Fabrica** are subtaburi **Azi**, **Scan**, **QC**, **Etichete**, **Retete**. Din lista de operatii operatorul poate porni/finaliza operatii si marca QC OK/blocat; scanarea QR returneaza container/lot/batch si poate porni urmatoarea operatie sau printa eticheta containerului scanat.
+- **Etichete productie**: operatorul alege o imprimanta activa si printeaza eticheta pentru ultimul container scanat sau pentru containerele vizibile din operatiile zilei. Nu promite creare container nou daca nu vezi butonul in runtime.
+- **Container / QR**: nu trimite userul la deep-link `symbai-staff://container/<qrCode>`. Pentru detalii/verificare, agentul foloseste `exec_scan_container` / `exec_get_container_info`; pentru actiunea fizica operatorul scaneaza in tabul **Scan** sau in scannerul web.
 
-Important: acestea sunt actiuni fizice in aplicatia mobila. Prin MCP poti crea/citi sarcini, productie, loturi, QC si handovers, dar nu simulezi camera, imprimanta sau split-ul fizic din chat; trimite operatorul in Symbai Staff si verifica apoi prin citire.
+Important: acestea sunt actiuni fizice in aplicatia mobila. Prin MCP poti crea/citi sarcini, productie, loturi, QC si handovers, dar nu simulezi camera sau imprimanta din chat; trimite operatorul in Symbai Staff si verifica apoi prin citire.
 
 ## Preview-ul de telefon
 
@@ -102,7 +102,7 @@ Daca userul vede in emulator un logo vechi `N`, explica scurt: cel mai probabil 
 6. Click-uieste taburile din telefon si, pentru livrator, ruleaza simularea traseu -> apel -> status -> poza/incasare -> livrata.
 7. Salveaza cu **Salveaza Aplicatie Staff**.
 8. Re-deschide dialogul si verifica: profilul implicit, badge-urile de feature, taburile si brandingul.
-9. Daca userul vrea dovada vizuala, fa screenshot la dialog si la preview-ul de telefon. Pentru fluxuri native reale (camera, print eticheta, deep link container), foloseste emulatorul Android si arata screenshot din Symbai Staff, nu doar preview-ul web.
+9. Daca userul vrea dovada vizuala, fa screenshot la dialog si la preview-ul de telefon. Pentru fluxuri native reale (camera, scan QR, print eticheta), foloseste emulatorul Android si arata screenshot din Symbai Staff, nu doar preview-ul web.
 
 ## Ce se poate prin MCP
 
@@ -110,14 +110,14 @@ In catalogul curent nu exista un tool dedicat `configure_expo_staff` / `configur
 
 Pentru orice actiune reala de livrare (asignare sofer, status comanda, incident, flota) foloseste skill-ul `gestioneaza-livrari` si tool-urile de livrari. Dialogul **In Aplicatie Staff** este preview/config de afisare, nu dispecerat operational.
 
-Pentru sarcini reale foloseste skill-ul `gestioneaza-sarcini` si tool-urile de Personal. Pentru fabrici foloseste `productie-flux` / `productie-fabrica`: MCP-ul citeste si scrie productia, dar actiunile fizice pe containere (scanare camera, print, split, advance, accept predare) se fac in Symbai Staff sau in scannerul web, apoi verifici prin `exec_scan_container` / `exec_get_container_info` / `exec_list_handovers`.
+Pentru sarcini reale foloseste skill-ul `gestioneaza-sarcini` si tool-urile de Personal. Pentru fabrici foloseste `productie-flux` / `productie-fabrica`: MCP-ul citeste si scrie productia, dar actiunile fizice pe containere (scanare camera, print) se fac in Symbai Staff sau in scannerul web, apoi verifici prin `exec_scan_container` / `exec_get_container_info` / `exec_list_handovers`.
 
 ## Raspunsuri scurte utile
 
 - "Ce vede livratorul?" -> deschide `In Aplicatie Staff`, preset `4. Livrator simplu`, arata telefonul: Livrari, ruta, suna, status, poza, incasare, marcare livrata.
 - "Vreau livrator fara CRM" -> preset `driver_basic`; verifica sa fie active doar Livrari/Rapoarte si sa nu apara Pipeline/Actiuni/Mai mult.
 - "Vreau livrator care poate vinde" -> preset `driver_sales`; are livrari + pipeline + mesaje + apeluri.
-- "Ce vede operatorul de fabrica?" -> preset `stock_kitchen` sau rol real cu productie; arata tabul Fabrica: operatii active, scanare container, QC/hold, etichete si `Container nou + QR`.
-- "Vreau sa printez eticheta unui container de pe telefon" -> in Symbai Staff, Fabrica -> Etichete productie -> `Container nou + QR` sau scaneaza containerul -> Detalii -> `Printeaza`; verifica apoi prin `exec_get_container_info`.
+- "Ce vede operatorul de fabrica?" -> preset `stock_kitchen` sau rol real cu productie; arata tabul Fabrica: Azi, Scan, QC, Etichete, Retete.
+- "Vreau sa printez eticheta unui container de pe telefon" -> in Symbai Staff, Fabrica -> Scan (scaneaza containerul) -> Etichete -> `Printeaza ultimul container scanat`; verifica apoi prin `exec_get_container_info`.
 - "De ce nu vede agentul X CRM?" -> verifica rolul real in Personal si permisiunile `crm_access`; preview-ul nu acorda permisiuni.
 - "De ce arata alt logo?" -> verifica branding/assets/prebuild; nu schimba denumirea produsului.

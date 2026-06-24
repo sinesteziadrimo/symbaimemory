@@ -1053,9 +1053,10 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `upsert_custom_website_component` — Adauga sau actualizeaza o componenta custom in Website Builder, randata pe site-ul public ca HTML + CSS scoped. (necesită: brandId)
 
 Note website 2026-06-24:
-- `set_website_footer` accepta si `description`, `paymentMethods` si `showAnpc`, nu doar contact/social/columns.
-- `update_website_navigation` aplica direct `navbarSettings` pentru stil/logo/search/login/CTA/sidebar; foloseste-l in loc de fallback DB/config pentru chrome-ul navbar.
-- `list_website_component_catalog`/`set_website_page_content` pot folosi noile config-uri native: `hero-slider.heroLayout:"diagonal-split"`, `slides[].titleAccent`, `feature-cards.style:"divided"` si `cards[].linkText`.
+- `set_website_footer` accepta si `description`, `paymentMethods`, `showAnpc` si `socialLinks` cu chei custom sigure (ex. `tripadvisor`, `whatsapp`, `booking`), nu doar contact/social/columns. Cheile fara icon dedicat se vad cu icon fallback.
+- `update_website_navigation` aplica direct `navbarSettings` pentru stil/logo/search/login/CTA/sidebar; foloseste-l in loc de fallback DB/config pentru chrome-ul navbar. Campuri noi utile: `logoUrlDark` pentru logo pe pagini light/solide, `transparent:true` pentru overlay peste hero doar pe pagini hero-first, `showCurrency` si `currencies` pentru selector valuta.
+- `list_website_component_catalog`/`set_website_page_content` pot folosi noile config-uri native: `hero-slider.heroLayout:"diagonal-split"`, `slides[].titleAccent`, `feature-cards.style:"divided"`, `cards[].linkText` si `tabbed-cards` (`tabs[]`, `cards[].tab`, `showAllTab`).
+- `set_website_theme(backgroundColor, textColor?)` se aplica si pe light mode; foloseste-l pentru fundaluri cream/warm/branded.
 
 ### emag — eMAG Marketplace — 2 tool-uri
 - `sync_emag_offers` 🔒 🌐 — Împinge prețurile și stocurile produselor către eMAG (creează/actualizează oferte). (parametri opționali: accountId, productIds, pushAll, limita)

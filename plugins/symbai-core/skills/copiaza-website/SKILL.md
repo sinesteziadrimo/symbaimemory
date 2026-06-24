@@ -116,8 +116,11 @@ Inainte sa marchezi o sectiune ca necesitand `custom-html`, verifica aceste opti
 - Hero corporate cu panou diagonal si poza: `hero-slider` cu `heroLayout:"diagonal-split"`, `backgroundColor`, `diagonalAccentColor`, `panelWidth`, dots/arrows/autoplay cand sursa are slider.
 - Titlu bicolor / rand accentuat: `slides[].titleAccent`; pastreaza `slides[].title` ca primul rand.
 - Beneficii in coloane minimaliste: `feature-cards` cu `style:"divided"` si `cards[].linkText`.
-- Footer complet de magazin: `set_website_footer` cu `description`, `paymentMethods` si `showAnpc`, pe langa contact/social/columns.
+- Carduri filtrabile: `tabbed-cards` cu `tabs[]`, `cards[].tab` si `showAllTab` pentru locatii pe regiuni, servicii sau portofolii filtrate.
+- Fundal light mode: `set_website_theme(backgroundColor, textColor?)` cand originalul are fundal cream/warm/branded; verifica desktop + mobil ca nu a ramas alb implicit.
+- Footer complet de magazin: `set_website_footer` cu `description`, `paymentMethods`, `showAnpc` si `socialLinks` custom sigure (ex. `tripadvisor`, `whatsapp`, `booking`), pe langa contact/columns.
 - Navbar/chrome: `update_website_navigation` aplica `navbarSettings` direct, inclusiv `sidebar-left`; verifica prin `get_website_page` dupa scriere.
+- Navbar transparent / logo contextual: `navbarSettings.transparent:true` pluteste peste hero doar daca pagina incepe cu hero/hero-slider; pe pagini light devine solid si poate folosi `logoUrlDark`. Pentru selector valuta seteaza `showCurrency:true` + `currencies`. Verifica vizual home + cel putin o subpagina.
 
 Acestea trebuie bifate in Poarta 4 de design: screenshot desktop + mobil pentru hero diagonal, read-back pentru footer/navbar si comparatie vizuala cu originalul.
 

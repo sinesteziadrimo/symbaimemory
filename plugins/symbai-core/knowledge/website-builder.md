@@ -107,6 +107,7 @@ Le pui prin `add_website_section`/`set_website_page_content` cu `type` + `config
 - **`announcement-bar`** — bară de anunțuri sus (mesaje rotative cu iconițe: livrare/cadou/retur).
 - **`newsletter`** — abonare la newsletter (inline).
 - **`trust-badges`**, **`feature-cards`** — garanții / avantaje (plăți securizate, livrare rapidă, retur).
+- **`tabbed-cards`** — grila de carduri cu pastile de filtrare deasupra. Foloseste-o pentru locatii pe regiuni, servicii pe categorie sau portofolii: `tabs:[{label,value}]`, `cards[].tab`, `showAllTab`, `allTabLabel`, `columns`, `imageRatio`. Nu folosi `custom-html` pentru sectiuni de tip "Our hotel locations" / regiuni.
 - **`brand-logos`** — logo-uri de branduri/parteneri.
 - **`testimonials`**, **`text-block`**, **`contact`**, **`blog-listing`** — recenzii, text liber, contact, listare articole de blog din modulul Blog.
 
@@ -222,8 +223,11 @@ Cand construiesti sau copiezi un site, foloseste intai aceste optiuni native ina
 - **Hero corporate diagonal:** `hero-slider` accepta `heroLayout:"diagonal-split"`. Foloseste-l cand sursa are poza full-bleed si panou colorat diagonal in stanga (ex. site corporate/food distribution). Campuri utile: `backgroundColor` = culoarea panoului, `diagonalAccentColor` = fasia/swoosh diagonala, `panelWidth` = latimea panoului, `autoplay/showDots/showArrows` pentru slideshow.
 - **Titlu hero bicolor:** pe fiecare slide poti trimite `titleAccent` pentru a doua linie in `accentColor`, la aceeasi scara cu titlul. E potrivit pentru headline-uri de tip doua randuri, unde originalul accentueaza un cuvant/segment.
 - **Carduri de beneficii minimaliste:** `feature-cards` accepta `style:"divided"` si `cards[].linkText`. Alege-l pentru layout-uri editoriale/minimaliste cu coloane separate vertical, titlu mare subtire si link CTA jos, fara imagine/card ridicat.
-- **Footer complet:** `set_website_footer` accepta, pe langa contact/social/columns/copyright, `description` pentru coloana de brand, `paymentMethods:["Visa","Mastercard",...]` pentru badge-uri in bara de jos si `showAnpc` pentru linkurile ANPC/SOL.
+- **Carduri filtrabile pe tab-uri:** `tabbed-cards` accepta `tabs[]`, `cards[]` cu `tab`, `showAllTab`, `allTabLabel`, `columns`, `imageRatio`. Foloseste-l pentru lanturi de hotel/locatii pe regiuni, servicii pe categorie sau portofoliu filtrat.
+- **Fundal light mode real:** `set_website_theme(backgroundColor, textColor?)` este respectat si cand `darkMode:false`; seteaza-l pentru teme cream/warm/branded, nu lasa alb implicit daca sursa are fundal colorat.
+- **Footer complet:** `set_website_footer` accepta, pe langa contact/social/columns/copyright, `description` pentru coloana de brand, `paymentMethods:["Visa","Mastercard",...]` pentru badge-uri in bara de jos si `showAnpc` pentru linkurile ANPC/SOL. `socialLinks` accepta si chei custom sigure precum `tripadvisor`, `whatsapp`, `booking`; daca nu exista icon dedicat, site-ul afiseaza icon fallback.
 - **Navbar settings sunt live:** `update_website_navigation` aplica acum `navbarSettings` direct (`style`, `logoText`, `showSearch`, `showLoginButton`, `ctaButton`, `sidebar-left`, iconite). Nu mai folosi `update_menu_display_config` doar ca sa repari chrome-ul navbar.
+- **Navbar transparent peste hero:** `navbarSettings.transparent:true` pluteste peste hero doar cand prima sectiune a paginii este hero/hero-slider; pe subpagini light devine solid si poate folosi `logoUrlDark`. Pentru magazin international trimite si `showCurrency:true`, `currencies:["RON","EUR",...]`. Daca navbar-ul pluteste peste hero, bara de incredere de deasupra se ascunde automat ca sa nu impinga layoutul.
 
 Verificare: dupa `update_website_navigation`, `set_website_footer` sau pagini cu aceste optiuni, citeste `get_website_page` si apoi fa screenshot/browser check. In raspunsul catre user spune pe scurt ce ai reprodus vizual: "hero cu panou diagonal", "titlu bicolor", "footer cu metode de plata si ANPC", nu numele campurilor JSON.
 

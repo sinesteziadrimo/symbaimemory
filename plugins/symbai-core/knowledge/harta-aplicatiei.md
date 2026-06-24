@@ -361,6 +361,12 @@
 
 - **Tablou Fabrică** (`/factory-dashboard`) — Dashboard MES read-only «Control Tower». Sus: 8 mini-KPI (Planificat/Produs/WIP tone, Yield, OEE, On-Time, Waste, FPY) + countdown refresh 15s. 11 taburi: Vedere generală, Live, Alerte, Lipsuri, Blocaje, QC, KPI, Pipeline, Trasabilitate, Livrări, Schimburi. Drill-down pe alerte/loturi.
 - **Enterprise Readiness** (`/factory-enterprise-readiness`) — Cockpit vizual pentru readiness enterprise/SAP: readiness matrix, SAP bridge flow map, EDI/ASN/SSCC desk, meat vertical, catch-weight, hardware demo adapters si plan pilot 30 zile. Este suport demo/pilot; pentru verdict real foloseste auditurile MCP live.
+- **Integrări Enterprise** (`/factory-integrations`) — Cockpit pentru adaptere ERP/MES/EDI, live/hybrid/demo signals, lipsuri de integrare si pasi de pilot.
+- **Date Master Enterprise** (`/factory-master-data`) — Cockpit pentru coduri produs, unitati, retete/BOM/routing, GTIN/SSCC si guvernanta datelor master.
+- **Calitate Enterprise** (`/factory-quality`) — Cockpit pentru QC holds, specificatii client, LIMS/COA, CAPA si eliberare loturi.
+- **Randament & Cost** (`/factory-yield-costing`) — Cockpit pentru mass balance, yield/cut-out, cost standard vs actual si reconciliere SAP/financiar.
+- **Validare & UAT** (`/factory-validation`) — Cockpit pentru scenarii UAT, load/DR, evidenta de acceptanta si go/no-go gates.
+- **Rollout Enterprise** (`/factory-rollout`) — Cockpit pentru wave plan, training, hypercare si criterii de trecere pilot -> rollout.
 - **Factory AI Chat** (`/factory-ai`) — Chat AI dedicat operațiunilor de fabrică
 - **AI Flow Builder** (`/ai-flow-builder`) — Constructor vizual fluxuri tehnologice cu AI
 - **Plan Fabrică 2D** (`/factory-floor-plan`) — Designer vizual al halei/fabricii: nivele, echipamente, zone de producție, magazii, zone de depozitare, pereți/culoare și conexiuni de flux material/personal. Legat de entități reale, cu status echipament și stoc sumar pe zone.
@@ -369,7 +375,7 @@
 - **Producție Evenimente** (`/productie-evenimente`) — Pagina PRINCIPALĂ de producție restaurant. Titlu adaptiv (Producție / Producție & Evenimente / Producție & Rețete). Taburi: Calendar & Capacitate, Loturi Producție (creezi/pornești/finalizezi loturi+evenimente), Rețete. +Operații/+Echipamente la mod restaurant_events; +Fluxuri Tehnologice la mod fabrică. Butoane: Adaugă Lot Producție, Adaugă Eveniment.
 - **Fluxuri Tehnologice** (`/fluxuri-tehnologice`) — Fluxuri tehnologice de producție — operații, dependențe, BOM, QC
 - **Loturi WIP** (`/loturi-wip`) — Loturi work-in-progress — toate loturile în producție
-- **Planificare MPS** (`/planificare-mps`) — Master Production Schedule — planificare producție pe orizont mediu/lung
+- **Planificare MPS** (`/planificare-mps`) — Master Production Schedule — planificare producție pe orizont mediu/lung; include wizard-ul „Planificare inteligentă din comandă B2B" pentru preview ATP/CTP si commit dupa confirmare.
 ## B2B
 
 - **Comenzi B2B** (`/b2b-orders`) — Management comenzi B2B — clienți firmă, contracte cadru, prețuri negociate

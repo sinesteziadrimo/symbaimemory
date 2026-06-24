@@ -58,8 +58,11 @@ La copiere fidela, nu sari la `custom-html` pentru aceste pattern-uri:
 - **Hero cu panou diagonal + poza:** mapeaza la `hero-slider` cu `heroLayout:"diagonal-split"`, `backgroundColor`, `diagonalAccentColor`, `panelWidth`, slide-uri multiple si dots/arrows daca originalul le are. Pe mobil rendererul foloseste overlay lizibil, deci verifica desktop + mobil.
 - **Headline bicolor:** daca titlul original are doua randuri cu accent vizual, foloseste `slides[].title` + `slides[].titleAccent` in loc de markup custom.
 - **Beneficii/feature-uri in coloane separate:** pentru sectiuni cu titlu mare, text scurt si link jos, foloseste `feature-cards` cu `style:"divided"` si `cards[].linkText`.
-- **Footer de e-commerce:** pastreaza descrierea brandului, metodele de plata si ANPC/SOL cu `set_website_footer(description, paymentMethods, showAnpc)`, nu ca bloc separat pe pagina.
+- **Carduri filtrabile:** pentru locatii pe regiuni, servicii pe categorie sau portofolii cu pastile de filtru, foloseste `tabbed-cards` (`tabs[]`, `cards[].tab`, `showAllTab`) in loc de `custom-html`.
+- **Fundal light mode:** daca sursa are fundal cream/warm/branded, seteaza `set_website_theme(backgroundColor, textColor?)`; rendererul il aplica si pe light mode, nu doar pe dark.
+- **Footer de e-commerce:** pastreaza descrierea brandului, metodele de plata si ANPC/SOL cu `set_website_footer(description, paymentMethods, showAnpc)`, nu ca bloc separat pe pagina. Pentru platforme sociale ne-standard trimite chei custom sigure in `socialLinks` (ex. `tripadvisor`, `whatsapp`, `booking`).
 - **Navbar real:** `update_website_navigation(..., navbarSettings:{...})` aplica acum direct stil/logo/search/login/CTA/sidebar; dupa scriere, confirma prin `get_website_page` ca `navbar` contine setarile asteptate.
+- **Navbar transparent / logo pe contexte:** pentru header transparent peste hero seteaza `navbarSettings.transparent:true`, `logoUrl` pentru overlay si `logoUrlDark` pentru pagini light/solide. Rendererul suprapune navbar-ul doar pe pagini care incep cu hero si ascunde trust bar-ul de deasupra in acel context. Pentru selector de valuta foloseste `showCurrency:true`, `currencies:["RON","EUR"]`.
 
 ## Meniu restaurant / produse importate din site
 

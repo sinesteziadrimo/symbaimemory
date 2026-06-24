@@ -74,8 +74,11 @@ Cand userul cere un site "ca X" sau vrea un homepage/landing mai premium, verifi
 - `hero-slider` + `heroLayout:"diagonal-split"` pentru hero corporate cu poza full-bleed si panou colorat diagonal in stanga. Seteaza `backgroundColor`, `diagonalAccentColor`, `panelWidth`; pastreaza slideshow-ul daca sursa are mai multe slide-uri.
 - `slides[].titleAccent` pentru titlu bicolor / al doilea rand accentuat. E mai bun decat custom HTML pentru headline-uri de brand.
 - `feature-cards` + `style:"divided"` + `cards[].linkText` pentru beneficii in coloane minimaliste cu separatoare verticale.
-- `set_website_footer(description, paymentMethods, showAnpc)` cand footerul sursei are descriere brand, badge-uri Visa/Mastercard/Maestro sau ANPC/SOL.
+- `tabbed-cards` pentru locatii/servicii/proiecte filtrate pe pastile (`tabs[]`, `cards[].tab`, `showAllTab`). Alege-l inainte de `custom-html` pentru sectiuni tip "Our locations" pe regiuni.
+- `set_website_theme(backgroundColor, textColor?)` si in light mode cand site-ul sursa are fundal cream/warm/branded; rendererul nu mai forteaza alb daca exista `backgroundColor`.
+- `set_website_footer(description, paymentMethods, showAnpc, socialLinks)` cand footerul sursei are descriere brand, badge-uri Visa/Mastercard/Maestro, ANPC/SOL sau platforme sociale custom (`tripadvisor`, `whatsapp`, `booking`).
 - `update_website_navigation(items[], navbarSettings{})` aplica direct stil/logo/search/login/CTA/sidebar. Dupa scriere, verifica read-back cu `get_website_page`; nu folosi `update_menu_display_config` doar pentru navbar.
+- `navbarSettings.transparent:true` suprapune navbar-ul peste hero doar pe pagini care incep cu hero/hero-slider; pe pagini light foloseste solid + `logoUrlDark`. Pentru magazine multi-valuta seteaza `showCurrency:true` si `currencies:["RON","EUR",...]`; verifica screenshot home + subpagina.
 
 Explica userului rezultatul in limbaj vizual ("am reprodus hero-ul cu panou diagonal si titlu bicolor", "am pus footer cu metode de plata si ANPC"), apoi arata link/screenshot cand browserul e disponibil.
 

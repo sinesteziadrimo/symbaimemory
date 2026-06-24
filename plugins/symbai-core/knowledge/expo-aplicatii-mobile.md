@@ -171,6 +171,7 @@ Pentru GP app2app:
 - Verifica in `app.json` pluginul `expo-notifications`, icon-ul si permisiunile native.
 - In `expo-mobile`, canalele Android POS sunt: `default` (fallback), `orders` (comenzi POS) si `symbai-pos-kitchen-silent` (KDS/preparat gata fara sunet). Pentru staff notifications de KDS, serverul rezolva `sound`, `channelId` si `priority` din payload; nu forta `sound:"default"` daca mesajul este silentios.
 - Push tranzactional catre personal/KDS nu se trateaza ca o campanie marketing: nu folosesti `preview_push_audience` / `send_push_campaign`, ci verifici tokenul angajatului si fluxul server `persistStaffNotification` -> `sendPushToEmployee`.
+- In PWA web/POS, runtime-ul de notificari (`pwa-notification-runtime`) gestioneaza permisiunea browserului, sunetul si notificarea cand tabul este ascuns; service worker-ul asculta `notificationclick` si focalizeaza/navigheaza PWA-ul la URL-ul din payload. Pentru buguri de tip „nu suna", „nu apare in background" sau „tap pe notificare nu deschide POS/KDS", foloseste browser-control/Chrome cu PWA instalabila sau tab ascuns si arata dovada (toast/sunet, notificare sistem, focus dupa click), nu tool-urile de campanii push.
 
 ## Conflicte frecvente
 

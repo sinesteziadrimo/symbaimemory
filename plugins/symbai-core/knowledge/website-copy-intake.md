@@ -70,6 +70,7 @@ La copiere fidela, nu sari la `custom-html` pentru aceste pattern-uri:
 - **Navbar real:** `update_website_navigation(..., navbarSettings:{...})` aplica acum direct stil/logo/search/login/CTA/sidebar. Pentru navbar solid pe fundal cream/branded seteaza `navbarBg` sau tema `backgroundColor`; pentru CTA de tip contur foloseste `ctaButton:{style:"outline"}`. Dupa scriere, confirma prin `get_website_page` ca `navbar` contine setarile asteptate.
 - **CTA solid custom:** daca originalul are buton navbar plin cu fundal/text speciale, trimite `navbarSettings:{ctaButton:{style:"solid",bgColor:"#173f35",color:"#ccff00"}}`; `bgColor` este fundalul, `color` este textul. Verifica read-back in `navbar`.
 - **Navbar transparent / logo pe contexte:** pentru header transparent peste hero seteaza `navbarSettings.transparent:true`, `logoUrl` pentru overlay si `logoUrlDark` pentru pagini light/solide. Rendererul suprapune navbar-ul doar pe pagini care incep cu hero si ascunde trust bar-ul de deasupra in acel context. Pentru selector de valuta foloseste `showCurrency:true`, `currencies:["RON","EUR"]`.
+- **Reveal-on-scroll global:** daca originalul are sectiuni care apar/aluneca la derulare, seteaza `set_website_theme(scrollReveal:true)`. E global pe blocurile editoriale, nu pe hero/navbar/footer/marquee sau pagini full-commerce; respecta `prefers-reduced-motion` si nu strica sticky/fixed. Dupa scriere, verifica vizual desktop + mobil ca sectiunile apar la scroll si nimic important nu ramane ascuns.
 
 ## Meniu restaurant / produse importate din site
 

@@ -128,8 +128,9 @@ Inainte sa marchezi o sectiune ca necesitand `custom-html`, verifica aceste opti
 - Navbar/chrome: `update_website_navigation` aplica `navbarSettings` direct, inclusiv `sidebar-left`, `navbarBg` pentru bare solide pe fundal cream/branded si `ctaButton:{style:"outline"}` / `ctaButton:{style:"outline",color:"#c9a45c"}` pentru CTA contur cu culoare default sau custom; verifica prin `get_website_page` dupa scriere.
 - CTA solid custom: pentru buton navbar plin cu fundal/text de brand, foloseste `ctaButton:{style:"solid",bgColor:"#173f35",color:"#ccff00"}` si verifica read-back in `navbar`.
 - Navbar transparent / logo contextual: `navbarSettings.transparent:true` pluteste peste hero doar daca pagina incepe cu hero/hero-slider; pe pagini light devine solid si poate folosi `logoUrlDark`. Pentru selector valuta seteaza `showCurrency:true` + `currencies`. Verifica vizual home + cel putin o subpagina.
+- Reveal-on-scroll global: daca originalul are sectiuni care apar la scroll, seteaza `set_website_theme(scrollReveal:true)`. Verifica in browser ca efectul se vede pe sectiuni editoriale si ca elementele sticky/fixed raman functionale; rendererul exclude hero/navbar/footer/marquee si respecta `prefers-reduced-motion`.
 
-Acestea trebuie bifate in Poarta 4 de design: screenshot desktop + mobil pentru hero diagonal, read-back pentru footer/navbar si comparatie vizuala cu originalul.
+Acestea trebuie bifate in Poarta 4 de design: screenshot desktop + mobil pentru hero diagonal/reveal la scroll, read-back pentru footer/navbar/tema si comparatie vizuala cu originalul.
 
 ### Faza 5 — Nu te opri până nu e gata (mod AUTONOM, OPT-IN)
 > Aceasta e modul AUTONOM — pornește-l DOAR după ce userul cere explicit „rulează tot / nu te opri / las-o să meargă". În modul IMPLICIT (vezi „Cum lucrezi cu userul"), după FIECARE sarcină mică verificată te oprești și propui următoarea. În modul autonom, fă checkpoint: după fiecare poartă care trece sau fiecare N loturi, postează o linie de progres + următoarea sarcină planificată, ca userul să poată interveni.

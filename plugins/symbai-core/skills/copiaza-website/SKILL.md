@@ -115,10 +115,11 @@ Inainte sa marchezi o sectiune ca necesitand `custom-html`, verifica aceste opti
 
 - Hero corporate cu panou diagonal si poza: `hero-slider` cu `heroLayout:"diagonal-split"`, `backgroundColor`, `diagonalAccentColor`, `panelWidth`, dots/arrows/autoplay cand sursa are slider.
 - Titlu bicolor / rand accentuat: `slides[].titleAccent`; pastreaza `slides[].title` ca primul rand. Pentru litere cu contur foloseste `titleStroke` + `titleStrokeWidth`.
-- Beneficii in coloane minimaliste: `feature-cards` cu `style:"divided"` si `cards[].linkText`; pentru titlu de sectiune aliniat stanga/dreapta sau pe doua randuri foloseste `titleAlign` si `\n` in `title`.
+- Beneficii in coloane minimaliste: `feature-cards` cu `style:"divided"`, `cards[].description` si `cards[].linkText`; pentru titlu de sectiune aliniat stanga/dreapta sau pe doua randuri foloseste `titleAlign` si `\n` in `title`.
 - Carduri filtrabile: `tabbed-cards` cu `tabs[]`, `cards[].tab` si `showAllTab` pentru locatii pe regiuni, servicii sau portofolii filtrate.
-- Ticker/marquee: `marquee` cu `items[]`, `speed`, `separator`, `direction`, culori pentru benzi derulante cu slogane repetate; nu folosi GIF/video/custom HTML.
+- Ticker/marquee: `marquee` cu `items[]`, `speed`, `separator`, `direction`, `textCase`, culori pentru benzi derulante cu slogane repetate; nu folosi GIF/video/custom HTML. Pentru branduri lowercase seteaza `textCase:"lower"`.
 - Banda App Store / Google Play: `app-download` cu `appStoreUrl`, `googlePlayUrl` sau `stores[]`, optional `image` cu telefon, pentru sectiuni de tip order-ahead, loialitate, livrare sau "download our app"; nu o recrea ca `custom-html`.
+- Meniu restaurant static: `menu-list` cu `layout:"grid"|"list"`, `items[]`/`categories[]`, pret, meta/kcal, badge-uri, tag-uri dietetice, spice si culori. Foloseste-l pentru pagini de marketing/clone; daca userul cere meniu POS live, nu-l folosi ca substitut al catalogului.
 - Fundal light mode: `set_website_theme(backgroundColor, textColor?)` cand originalul are fundal cream/warm/branded; verifica desktop + mobil ca nu a ramas alb implicit.
 - Footer complet de magazin: `set_website_footer` cu `description`, `paymentMethods`, `showAnpc` si `socialLinks` custom sigure (ex. `tripadvisor`, `whatsapp`, `booking`), pe langa contact/columns.
 - Navbar/chrome: `update_website_navigation` aplica `navbarSettings` direct, inclusiv `sidebar-left`, `navbarBg` pentru bare solide pe fundal cream/branded si `ctaButton:{style:"outline"}` / `ctaButton:{style:"outline",color:"#c9a45c"}` pentru CTA contur cu culoare default sau custom; verifica prin `get_website_page` dupa scriere.

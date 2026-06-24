@@ -72,6 +72,7 @@ La copiere fidela, nu sari la `custom-html` pentru aceste pattern-uri:
 - **CTA solid custom:** daca originalul are buton navbar plin cu fundal/text speciale, trimite `navbarSettings:{ctaButton:{style:"solid",bgColor:"#173f35",color:"#ccff00"}}`; `bgColor` este fundalul, `color` este textul. Verifica read-back in `navbar`.
 - **Navbar transparent / logo pe contexte:** pentru header transparent peste hero seteaza `navbarSettings.transparent:true`, `logoUrl` pentru overlay si `logoUrlDark` pentru pagini light/solide. Rendererul suprapune navbar-ul doar pe pagini care incep cu hero si ascunde trust bar-ul de deasupra in acel context. Pentru selector de valuta foloseste `showCurrency:true`, `currencies:["RON","EUR"]`.
 - **Reveal-on-scroll global:** daca originalul are sectiuni care apar/aluneca la derulare, seteaza `set_website_theme(scrollReveal:true)`. E global pe blocurile editoriale, nu pe hero/navbar/footer/marquee sau pagini full-commerce; respecta `prefers-reduced-motion` si nu strica sticky/fixed. Dupa scriere, verifica vizual desktop + mobil ca sectiunile apar la scroll si nimic important nu ramane ascuns.
+- **Text+imagine cu poza taiata diagonal:** daca sursa are o sectiune split in care fotografia are muchie oblica spre text, foloseste `text-image` cu `imageMask:"diagonal"`. Masca se intoarce corect dupa `imagePosition`/layout, deci nu trece la `custom-html` doar pentru efectul diagonal.
 
 ## Meniu restaurant / produse importate din site
 

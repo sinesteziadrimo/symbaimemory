@@ -43,6 +43,8 @@ Toate cele 6 tool-uri `configure_portal_*` au `brandId` obligatoriu, `locationId
 ```
 `businessType` are DOAR 5 valori: `restaurant`, `cafe`, `bar`, `qsr` (fast-food), `amusement_park` — mapează tipul real al localului pe cea mai apropiată. `requireLogin: true` doar dacă vrea fidelizare obligatorie; `requireDate` (data nașterii) e pentru parcuri/cluburi.
 
+La portal NOU, acest apel pune deja default-uri potrivite tipului de business: restaurant/cafe/bar/qsr primesc meniu, comenzi, rezervări, QR, profil, loialitate și notificări + tema albastră; `amusement_park` primește funcțiile complete de parc + violet. Pe un portal existent nu suprascrie funcțiile/tema clientului. Deci rulează `configure_portal_features` după aceea doar pentru diferențe explicite față de default.
+
 **2. Aspect — `configure_portal_appearance`**
 ```json
 {"brandId": 1, "primaryColor": "#7c2d12", "fontFamily": "Playfair Display", "borderRadius": "rounded", "buttonStyle": "filled", "cardStyle": "shadow", "navStyle": "solid"}
@@ -51,7 +53,7 @@ Rețete verificate pe tip: restaurant clasic → maro `#7c2d12`/negru `#0f172a` 
 
 **3. Texte — `configure_portal_texts`** — `welcomeTitle`, `welcomeSubtitle`, `exploreButton` („Vezi Meniul" / „Comandă Acum"), `discoverText`, `signupButton`, `signupDescription`. Scrie-le tu, personalizate pe brand, nu generice.
 
-**4. Funcționalități — `configure_portal_features`** — boolean per modul: `menu`, `orders`, `reservations`, `qrCode`, `profile`, `loyalty`, `notifications`, `events`, `chat`, `gamification`, `social`, `friends`, `messages`, `attractions`, `games`. Restaurant tipic: ON `menu, orders, reservations, qrCode, profile, loyalty`; OFF `games, attractions, gamification, social`. `attractions`/`games`/`gamification` au sens la parcuri/spa/hotel. `chat: true` doar dacă va configura și agenții de chat (pasul din aplicație).
+**4. Funcționalități — `configure_portal_features`** — folosește-l pentru ajustări față de default sau pentru portaluri existente. Boolean per modul: `menu`, `orders`, `reservations`, `qrCode`, `profile`, `loyalty`, `notifications`, `events`, `chat`, `gamification`, `social`, `friends`, `messages`, `attractions`, `games`. Restaurant tipic: ON `menu, orders, reservations, qrCode, profile, loyalty`; OFF `games, attractions, gamification, social`. `attractions`/`games`/`gamification` au sens la parcuri/spa/hotel. `chat: true` doar dacă va configura și agenții de chat (pasul din aplicație).
 
 **5. Meniul din portal — `configure_portal_menu_config`** — `showWeight`, `showAllergens`, `showDescription`, `showNutrition`, `showCategoryHeaders` (boolean), `menuHeroImage` (URL — ia unul din `browse_brand_media`, nu inventa), `dietaryFilters` (listă din: `vegetarian, vegan, gluten_free, lactose_free, nut_free, sugar_free, spicy, halal, kosher`).
 

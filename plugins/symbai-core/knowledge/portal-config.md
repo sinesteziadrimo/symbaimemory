@@ -40,7 +40,7 @@ Userul rareori știe toate opțiunile. **Nu turna tot dialogul peste el** și nu
 Toate iau `brandId` (și opțional `locationId`). Citirea merge mereu; scrierile cer modulul **Setări & Configurare** (`setari`). Fiecare `configure_portal_*` scrie DOAR câmpurile pe care le dai — restul rămân neatinse (merge server-side).
 
 - **`get_portal_config(brandId, locationId?)`** — citește TOATĂ configurarea (tip business, culori, texte, funcționalități, afișare, **config meniu**, și **config QR**: nivel + mod plată + preset). **Citește ÎNTÂI**, înainte de orice scriere.
-- **`configure_portal_general`** — tip business, nume platformă, autentificare (requireLogin/requireDate), livrare/pickup.
+- **`configure_portal_general`** — tip business, nume platformă, autentificare (requireLogin/requireDate), livrare/pickup. La PRIMA configurare a unui portal nou, tool-ul pune automat default-uri după `businessType`: restaurant/cafe/bar/qsr/hotel primesc funcțiile de ospitalitate (meniu, comenzi, rezervări, QR, profil, loialitate, notificări) și tema albastră `#2563eb`; `amusement_park`/parc păstrează setul complet de parc și tema violet `#7c3aed`. Pe un portal existent NU suprascrie funcțiile/tema alese de client.
 - **`configure_portal_appearance`** — culori (hex), font, borderRadius, buttonStyle, cardStyle, navStyle, plus **`categoryChipStyle`** (filled/outline/soft/glass/gradient/minimal) și **`categoryChipColor`** (hex; gol `""` = folosește culoarea principală).
 - **`configure_portal_texts`** — titlu/subtitlu bun venit, butoane, texte de înregistrare.
 - **`configure_portal_features`** — pornește/oprește modulele (boolean).
@@ -142,6 +142,7 @@ Important de înțeles ca să-i explici userului — comanda QR NU ajunge la cin
 ## Capcane
 
 - **Default-uri scrise peste setări existente** — trimite DOAR câmpurile pe care le schimbi. Citește cu `get_portal_config` înainte.
+- **Default-uri la portal nou** — dacă portalul nu există încă, `configure_portal_general` alege singur setul inițial după `businessType`. Nu porni/opri manual toate funcțiile doar ca să corectezi vechiul default de parc: citește după creare cu `get_portal_config`, apoi ajustează doar diferențele cerute de user.
 - **Modul pornit fără date** — pornești „Jocuri"/„Fidelitate" dar clientul vede gol. Pornește modulul ȘI populează-l.
 - **QR configurat ≠ comanda ajunge la ospătar** — config-ul QR cere datele, dar rutarea depinde de raion + tură (vezi lanțul). Spune-i userului mereu și de pasul Program Salon.
 - **Nivel QR greșit** — dacă pui `zona`/`raion` dar userul nu configurează preseturile în Program Salon, comportamentul cade pe default. Pentru simplitate, `brand`.

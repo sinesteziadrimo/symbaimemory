@@ -72,9 +72,10 @@ Logo-ul e cel mai des copiat GREȘIT. Reguli:
 Cand userul cere un site "ca X" sau vrea un homepage/landing mai premium, verifica intai catalogul si foloseste aceste optiuni native:
 
 - `hero-slider` + `heroLayout:"diagonal-split"` pentru hero corporate cu poza full-bleed si panou colorat diagonal in stanga. Seteaza `backgroundColor`, `diagonalAccentColor`, `panelWidth`; pastreaza slideshow-ul daca sursa are mai multe slide-uri.
-- `slides[].titleAccent` pentru titlu bicolor / al doilea rand accentuat. E mai bun decat custom HTML pentru headline-uri de brand.
+- `slides[].titleAccent` pentru titlu bicolor / al doilea rand accentuat; `hero-slider.titleStroke` + `titleStrokeWidth` pentru headline-uri cu litere conturate. Sunt mai bune decat custom HTML pentru headline-uri de brand.
 - `feature-cards` + `style:"divided"` + `cards[].linkText` pentru beneficii in coloane minimaliste cu separatoare verticale; foloseste `titleAlign` si `\n` in `title` pentru headline-uri de sectiune aliniate stanga/dreapta sau pe doua randuri.
 - `tabbed-cards` pentru locatii/servicii/proiecte filtrate pe pastile (`tabs[]`, `cards[].tab`, `showAllTab`). Alege-l inainte de `custom-html` pentru sectiuni tip "Our locations" pe regiuni.
+- `marquee` pentru banda ticker cu slogane/mesaje repetate (`items[]`, `speed`, `separator`, `direction`, culori). Alege-l inainte de `custom-html` pentru efecte de text derulant.
 - `set_website_theme(backgroundColor, textColor?)` si in light mode cand site-ul sursa are fundal cream/warm/branded; rendererul nu mai forteaza alb daca exista `backgroundColor`.
 - `set_website_footer(description, paymentMethods, showAnpc, socialLinks)` cand footerul sursei are descriere brand, badge-uri Visa/Mastercard/Maestro, ANPC/SOL sau platforme sociale custom (`tripadvisor`, `whatsapp`, `booking`).
 - `update_website_navigation(items[], navbarSettings{})` aplica direct stil/logo/search/login/CTA/sidebar. Include `navbarBg` pentru navbar solid pe fundal cream/branded si `ctaButton:{style:"outline"}` pentru CTA tip contur. Dupa scriere, verifica read-back cu `get_website_page`; nu folosi `update_menu_display_config` doar pentru navbar.

@@ -1054,8 +1054,10 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 
 Note website 2026-06-24:
 - `set_website_footer` accepta si `description`, `paymentMethods`, `showAnpc` si `socialLinks` cu chei custom sigure (ex. `tripadvisor`, `whatsapp`, `booking`), nu doar contact/social/columns. Cheile fara icon dedicat se vad cu icon fallback.
-- `update_website_navigation` aplica direct `navbarSettings` pentru stil/logo/search/login/CTA/sidebar; foloseste-l in loc de fallback DB/config pentru chrome-ul navbar. Campuri noi utile: `logoUrlDark` pentru logo pe pagini light/solide, `transparent:true` pentru overlay peste hero doar pe pagini hero-first, `showCurrency` si `currencies` pentru selector valuta.
+- `update_website_navigation` aplica direct `navbarSettings` pentru stil/logo/search/login/CTA/sidebar; foloseste-l in loc de fallback DB/config pentru chrome-ul navbar. Campuri noi utile: `logoUrlDark` pentru logo pe pagini light/solide, `navbarBg` pentru bara solida cream/branded, `ctaButton.style:"outline"` pentru CTA contur, `transparent:true` pentru overlay peste hero doar pe pagini hero-first, `showCurrency` si `currencies` pentru selector valuta.
 - `list_website_component_catalog`/`set_website_page_content` pot folosi noile config-uri native: `hero-slider.heroLayout:"diagonal-split"`, `slides[].titleAccent`, `feature-cards.style:"divided"`, `cards[].linkText`, `feature-cards.titleAlign` + `\n` in titlu si `tabbed-cards` (`tabs[]`, `cards[].tab`, `showAllTab`).
+- Productie/fabrica: pentru dashboard, dispatch, Gantt si Explorer, lot activ = orice status neterminal; terminale sunt doar `completed` si `cancelled`. Nu folosi whitelist manual pe `planned/in_progress`; statusuri ca `ready`, `paused`, `quality_check` raman active.
+- `get_production_cost_estimate` foloseste aceeasi estimare capacity-aware ca schedulerul pentru manopera/utilaj (setup + cicluri dupa capacitate + cleanup/queue). Nu explica costurile ca timp standard inmultit simplu cu cantitatea.
 - `set_website_theme(backgroundColor, textColor?)` se aplica si pe light mode; foloseste-l pentru fundaluri cream/warm/branded.
 
 ### emag — eMAG Marketplace — 2 tool-uri

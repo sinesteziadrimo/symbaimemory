@@ -68,6 +68,33 @@ Pentru Glovo nu spune doar "pune cheia API". Workflow-ul practic este:
 La Wolt, canalul din `/channels?tab=integrations` are setari financiare suplimentare: baza de comision (produse dupa/inainte de discount sau total dupa/inainte de discount), modul de finantare promotii (`from_order_v2`, firma 100%, Wolt 100%, split procent), procentul suportat de firma si maparea taxelor delivery/service/small-order/marketing/Wolt+. Comenzile Wolt pastreaza in metadata suma basket, fee parts, depozite, campanii aplicate si daca e Wolt+.
 
 Pentru intrebari de profitabilitate nu estima manual din UI. Foloseste `list_delivery_pnl_segments` -> `get_delivery_pnl`; citeste `platformPnl` pentru comisioane, taxe, promotii suportate de firma vs platforma, profit contributie, comenzi nelegate de POS si warninguri. Daca userul vrea dovada vizuala, deschide `/reports/pnl-livrari`; pentru setari de canal deschide `/channels?tab=integrations`.
+
+### Operare comenzi Glovo/Wolt din chat
+
+Pentru intrebari sau actiuni pe o comanda de agregator, nu incepe cu SQL si nu folosi tool-urile de dispecerat flota. Fluxul corect este:
+1. `list_channel_orders(provider,status,brandId,locationId)` ca sa gasesti `channelOrderId`.
+2. `get_channel_order(id)` ca sa vezi canalul, statusul, totalurile, `itemsJson`, metadata si timeline.
+3. Apelezi actiunea potrivita, apoi recitesti cu `get_channel_order(id)` si dai linkul `/channels?tab=orders` sau `/channels?tab=integrations`.
+
+Actiuni disponibile:
+- `delay_channel_order(id,extraMinutes)` — comunica intarzierea catre platforma unde se poate si actualizeaza ETA/timeline in Symbai.
+- `confirm_channel_preorder(id)` — confirma o precomanda la platforma (in special Wolt, unde API-ul are confirm-preorder).
+- `replace_channel_order_items(id,payload|modification,confirm:true)` — substituie produse indisponibile. Cere confirmare si foloseste payload-ul exact cerut de platforma.
+- `refund_channel_order(id,scope,items|newTotal,reason,confirm:true)` — rambursare/ajustare pe platforma. Cere confirmarea sumei inainte; tool-ul este pe modulul `plati_terminal` si respecta plafonul de refund din Hub cand suma se poate estima. Wolt suporta `refund-basket` / `refund-items`; Glovo foloseste `newTotal` prin `change_price`.
+- `mark_channel_deposits_returned(id,confirm:true)` — marcheaza garantiile SGR/depozitele ca returnate la platforma (Wolt).
+- `snooze_delivery_channel(id,minutes,confirm:true)` — pune temporar canalul offline la sursa (restaurant ocupat). Comenzile noi nu mai intra pe acel canal pana expira pauza; comenzile deja primite raman in Symbai.
+
+Backpressure important: cand un canal are limita de comenzi pe ora sau este pus pe snooze/pauza, Symbai nu arunca webhook-urile primite. Doar suspenda auto-accept si, unde API-ul permite, pune venue/store offline la sursa pana expira fereastra.
+
+### Sincronizare meniu Glovo/Wolt - detalii care schimba raspunsul agentului
+
+Full menu sync construieste meniul din meniurile asignate canalului si imbogateste payload-ul cu optiuni/extras, alergeni, etichete dietetice, restrictii, disponibilitate si setari pe canal. Pentru Wolt se trimit si `product_information.allergens` si `weekly_availability` cand exista date. Pentru Glovo, full sync-ul are limita de siguranta de 5 reusite/zi pe canal; foloseste `force:true` doar cand userul intelege ca retrimiti intreg meniul, altfel prefera update-urile mici de pret/disponibilitate.
+
+Campuri utile pe produse/canal:
+- Glovo: `custom:glovo_options`, `custom:glovo_dietary_labels`, `custom:glovo_restrictions`; canalul poate avea `settings.glovo.priceIsLineTotal` daca `price` din webhook vine ca total de linie, nu pret unitar.
+- Wolt: `custom:wolt_options`, `custom:wolt_weekly_availability`, `custom:wolt_delivery_methods`, `custom:wolt_restrictions`, `custom:wolt_*` pentru GTIN/SKU/alcool/depozit; canalul poate avea `settings.wolt.weeklyAvailability`.
+
+Daca preturile Glovo par dublate sau cantitatea schimba totalul gresit, verifica intai `settings.glovo.priceIsLineTotal` pe canal. Daca meniul Glovo este respins dupa etichete dietetice, foloseste doar valorile acceptate de enumul Glovo; o valoare necunoscuta respinge tot meniul.
 2. **Gestionezi comenzile de pe platforme**: `/deliveries` → tab Comenzi Active → accepți (sau „Acceptă Toate") → „În pregătire" → „Gata" → „Ridicată" → „Livrată"; refuzi cu motiv scris (ex. ingredient indisponibil).
 3. **Pornești livrarea cu flotă proprie**: `/deliveries/fleet` → tab Livratori → bifezi angajații curieri → tab Vehicule → adaugi vehiculele → tab Schimburi → „Deschide schimb" (livrator + vehicul + km) → definești zonele în `/deliveries/zones`.
 4. **Asignezi o comandă**: `/deliveries/dispatch` → bifezi comanda din coloana „De livrat" → alegi livratorul activ (sau „Asignează celui mai potrivit", sau tragi cardul comenzii peste livrator) → livratorul o vede instant în `/livrator`.
@@ -85,6 +112,8 @@ Pentru intrebari de profitabilitate nu estima manual din UI. Foloseste `list_del
 - `jurnal_activitate` — cine a făcut ce pe comenzi: anulări, modificări, plăți (filtrabil pe entitate `order`).
 - `list_entities` — listare rapidă de entități per brand.
 - `get_portal_config` — configurația portalului de comenzi online (inclusiv livrare/ridicare).
+- `list_channel_orders` — listeaza comenzile de pe agregatori/canale externe (Glovo/Wolt/Bolt/Tazz) si iti da `channelOrderId` pentru actiuni.
+- `get_channel_order` — detaliul unei comenzi de agregator: canal, status, totaluri, iteme, metadata si timeline; foloseste-l ca read-back dupa orice actiune.
 
 **SQL (doar-citire, dacă token-ul are toggle-ul SQL):** `list_database_tables` → `describe_database_table` → `execute_sql_query` — pentru întrebări pe care rapoartele dedicate nu le acoperă (ex. livrări eșuate pe motiv).
 
@@ -92,10 +121,17 @@ Pentru intrebari de profitabilitate nu estima manual din UI. Foloseste `list_del
 - `create_delivery_channel` — configurează un canal de livrare (platformă, brand, locație). Pentru Glovo, asta doar creeaza inregistrarea; conectarea reala cere token + Store ID-uri in `/channels?tab=integrations`, apoi trimiterea celor trei URL-uri publice catre Glovo.
 - `configure_portal_general` — pornește/oprește livrarea și ridicarea personală pe portalul de comenzi online (allowDelivery / allowPickup).
 
+**Scriere platforme livrare (cere `livrari`, cu exceptia refund-ului):**
+- `delay_channel_order`, `confirm_channel_preorder`, `replace_channel_order_items`, `mark_channel_deposits_returned`, `snooze_delivery_channel` — actiuni reale pe Glovo/Wolt si timeline Symbai. Pentru substituire, SGR si snooze cere confirmare explicita.
+- `refund_channel_order` — cere modulul `plati_terminal`, muta valoare/bani pe platforma si cere confirmarea sumei. Pentru Glovo trebuie `newTotal`; pentru Wolt foloseste `scope:"basket"` sau `scope:"items"`.
+
 ## Întrebări frecvente și capcane
 - **De ce nu văd comenzile de pe Glovo?** Verifică `/channels` → Integrări: canalul trebuie conectat și Online, iar Glovo trebuie sa aiba dispatch webhook-ul Symbai configurat. Verifica si Store Address External ID-ul, pentru ca accept/ready/pickup il trimit in header catre Glovo. Un canal **pauzat** apare cu badge roșu și motiv în `/deliveries` → tab Platforme.
 - **De ce nu pot refuza/anula Glovo din Symbai?** Este limita API-ului public Glovo Partner: Symbai trimite accept/ready/pickup, dar reject/anulare se fac in Glovo/suport Glovo si revin in Symbai prin cancellation webhook.
 - **Ce inseamna auto-accept dupa traficul din KDS?** Nu accepta orbeste. Daca este activ pe canalul Glovo, trimite catre Glovo `committedPreparationTime` calculat din coada bucatariei. Explica userului ca poate alege intre `Intra la rand` si `Prioritate Glovo`, plus ETA minim/maxim.
+- **Ce fac cand restaurantul e aglomerat pe Wolt/Glovo?** Foloseste `snooze_delivery_channel` cu confirmare: canalul este pus temporar offline la sursa si auto-accept-ul se opreste. Symbai nu pierde comenzile deja intrate; pentru dovezi reciteste `list_channel_orders`/`get_channel_order`.
+- **De ce s-a dublat totalul unei comenzi Glovo?** Unele conturi trimit `price` ca pret unitar, altele ca total de linie. Verifica setarea canalului `settings.glovo.priceIsLineTotal`.
+- **De ce imi respinge Glovo meniul complet?** Valorile necunoscute in etichetele dietetice pot respinge tot meniul. Curata `custom:glovo_dietary_labels` la valorile acceptate si evita full sync-uri repetate; limita de siguranta este 5 full sync-uri reusite/zi/canal fara `force:true`.
 - **De ce nu pot asigna comanda unui angajat?** Trebuie să fie bifat ca livrator (Flotă → Livratori) ȘI să aibă un **schimb deschis**. Lista „Alege livrator activ" arată doar livratorii cu schimb deschis.
 - **De ce livratorul apare „Offline" deși lucrează?** Statusul vine din poziția GPS trimisă de aplicația livratorului; fără poziție în ultimele 15 minute dispare din „Livratori activi". Verifică dacă are aplicația deschisă și tracking-ul pornit.
 - **Livratorii costă în plus?** Da — fiecare angajat bifat ca livrator se taxează nominal (modul Livrator, 29€/livrator) și numărul se trimite automat în Hub. Bifarea nu dă și nu ia acces la pagini.

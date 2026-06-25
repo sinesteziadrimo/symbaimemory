@@ -41,6 +41,13 @@ Pentru fiecare cerere: **(1) tool MCP** care face/citește treaba → **(2) deep
 | „ce retururi am / detaliile returului / KPI retururi" | `list_rma_requests` · `get_rma_details(id)` · `get_rma_kpi_summary` | `/ecommerce/returns` |
 | „pot returna comanda asta? / aprobă / respinge / rambursează returul" | `check_rma_eligibility` · `approve_rma` · `reject_rma` · `process_rma_refund(confirm:true)` | `/ecommerce/returns` |
 | „conectează un canal Glovo/Wolt/Bolt/Tazz" | `create_delivery_channel` (modul `setari`) | `/channels?tab=integrations` |
+| „ce comenzi am pe Glovo/Wolt / găsește comanda de platformă" | `list_channel_orders(provider,status)` → `get_channel_order(id)` | `/channels?tab=orders` |
+| „întârzie comanda Wolt/Glovo cu X minute" | `delay_channel_order(id,extraMinutes)` → `get_channel_order(id)` | `/channels?tab=orders` |
+| „confirmă precomanda Wolt" | `confirm_channel_preorder(id)` → `get_channel_order(id)` | `/channels?tab=orders` |
+| „înlocuiește produsul lipsă pe Glovo/Wolt" | `replace_channel_order_items(id,payload|modification,confirm:true)` → `get_channel_order(id)` | `/channels?tab=orders` |
+| „rambursează/ajustează comanda de platformă" | `refund_channel_order(id,scope,items|newTotal,reason,confirm:true)` (modul `plati_terminal`) → `get_channel_order(id)` | `/channels?tab=orders` |
+| „marchează garanția SGR returnată la Wolt" | `mark_channel_deposits_returned(id,confirm:true)` → `get_channel_order(id)` | `/channels?tab=orders` |
+| „pauzează Wolt/Glovo 30 min, suntem aglomerați" | `snooze_delivery_channel(id,minutes,confirm:true)` | `/channels?tab=integrations` |
 | „cât mă costă Wolt/Glovo / ce profit fac pe platforme" | `list_delivery_pnl_segments` → `get_delivery_pnl` (read-only) | `/reports/pnl-livrari` |
 | „ce agenți de vânzări am / activează-l/dezactivează-l" | `list_sales_agents` · `toggle_sales_agent` (modul `setari`) | (creare agent nou = UI) |
 
@@ -58,7 +65,11 @@ Aproape nimic din dispecerat nu cere click — dar:
 - **Schimb deschis = condiție de alocare.** Dacă `assign_orders_to_driver` refuză cu „nu are schimb deschis", nu insista — explică userului că livratorul trebuie să-și deschidă schimbul (vehicul + km) în `/deliveries/fleet`. Și că trebuie marcat livrator (`set_employee_as_driver`) dacă nu e.
 - **Livratorii costă în plus.** Fiecare angajat bifat livrator se taxează nominal (modul Livrator) și `set_employee_as_driver` declanșează sincronizarea de billing cu Hub. Spune-i userului când marchezi pe cineva.
 - **Agregatorii ≠ flota proprie.** Comenzile de pe Glovo/Wolt/Bolt/Tazz se gestionează ca platforme în `/channels` și `/deliveries` (Centru Livrări) — aduc curierii LOR. Dispeceratul (tool-urile de aici) e pentru flota TA proprie + curierii externi comandați de tine. Nu le amesteca (vezi capcanele din `livrari-comenzi-online.md`).
+- **Comenzile de platformă au propriul ciclu MCP.** Pentru Glovo/Wolt începi cu `list_channel_orders` → `get_channel_order`, apoi folosești `delay_channel_order`, `confirm_channel_preorder`, `replace_channel_order_items`, `mark_channel_deposits_returned` sau `snooze_delivery_channel` după caz. După orice scriere recitești `get_channel_order` și dai linkul `/channels?tab=orders` sau `/channels?tab=integrations`.
+- **Refund-ul pe platformă nu este retur RMA.** `refund_channel_order` cere modulul `plati_terminal`, confirmarea explicită a sumei și respectă plafonul de refund din Hub. Pentru Glovo trebuie `newTotal`; pentru Wolt alegi `scope:"basket"` sau `scope:"items"`.
+- **Snooze/pauză nu șterge comenzile.** Dacă userul spune „suntem aglomerați", `snooze_delivery_channel` pune canalul offline la sursă pentru perioada cerută și oprește auto-accept-ul; comenzile deja primite rămân în Symbai.
 - **Profitul pe platforme nu se estimează din comisionul vizibil.** Pentru Wolt/Glovo/Bolt/Tazz folosește `get_delivery_pnl` și citește `platformPnl`: comisioane, taxe, promoții suportate de firmă vs platformă, profit contribuție, comenzi nelegate și warninguri. La Wolt, setările financiare sunt în `/channels?tab=integrations` pe canal: baza de comision, finanțarea promoțiilor și maparea taxelor.
+- **Meniu platforme: full sync rar, update mic când se poate.** Glovo full sync are limită de siguranță 5 reușite/zi/canal fără `force:true`. Dacă totalurile Glovo par greșite, verifică `settings.glovo.priceIsLineTotal`. Pentru Wolt, meniul poate trimite alergeni și `weekly_availability` din datele produselor/canalului.
 - **Confirmă prin re-citire, arată prin screenshot.** După o scriere (alocare, zonă, vehicul), tool-ul a întors `success` = e salvat — confirmă cu `list_*`/`get_*`, nu cu pixelul; și fă screenshot la pagină ca să-i arăți userului (spune-i să dea refresh dacă nu vede). Vezi `condu-chrome.md` regulile c și f.
 - **Motivul de eșec e standardizat** — `mark_delivery_failed` cere un `reason` din lista fixă (client absent, adresă greșită, refuzată etc.); tool-ul îți spune valorile valide dacă greșești.
 - **Ștergerea de entități întregi nu merge prin conexiune** — dezactivează (zonă `active:false`, vehicul `status:"inactive"`) sau ghidează userul să șteargă din aplicație.
@@ -66,8 +77,8 @@ Aproape nimic din dispecerat nu cere click — dar:
 
 ## Permisiuni (modul pe token)
 - **Citirile** (toate `list_*` de dispecerat/flotă/zone/alerte/AWB/RMA, `get_dispatch_analytics`, `get_vehicle_expenses`, `suggest_driver_for_order`, `check_rma_eligibility`) **nu cer permisiune de modul** — merg mereu (token = tenantul, read complet).
-- **Scrierile de livrare** (alocări, marcări, comandă rapidă, zone, vehicule, livrator, alerte, curieri externi, AWB, aprobă/respinge RMA) cer modulul **`Livrări`** (`livrari`) pe token.
-- **`process_rma_refund`** cere modulul **`Plăți Terminal`** (mută bani, e o acțiune de plăți). Are și plafon de refund din Hub.
+- **Scrierile de livrare** (alocări, marcări, comandă rapidă, zone, vehicule, livrator, alerte, curieri externi, AWB, aprobă/respinge RMA, delay/preorder/substituire/SGR/snooze pe platforme) cer modulul **`Livrări`** (`livrari`) pe token.
+- **`process_rma_refund`** și **`refund_channel_order`** cer modulul **`Plăți Terminal`** (mută bani/valoare, sunt acțiuni de plăți). Au și plafon de refund din Hub când suma se poate estima.
 - **`create_delivery_channel`, `list_sales_agents`, `toggle_sales_agent`** sunt sub modulul **`Setări & Configurare`** (`setari`), nu `livrari`.
 - „Permisiune insuficientă" pe un tool → portal Hub → **Acces AI** → bifează modulul respectiv pe token. (Creare agent vânzări = doar din UI.)
 

@@ -19,11 +19,11 @@ Fiecare apel e înregistrat în jurnalul de activitate (auditabil de proprietar)
 - **Pattern scriere → verificare**: confirmarea finală o dai pe baza unui tool de citire, nu a interfeței. O scriere repetată „ca să se prindă" creează duplicate.
 - **Date lipsă = întrebări, nu invenții**: la importuri nu inventa prețuri/gramaje/alergeni; cere sursa userului.
 
-## ⚠ Confirmare obligatorie (`confirm: true`) — 51 tool-uri 🔒
+## ⚠ Confirmare obligatorie (`confirm: true`) — 55 tool-uri 🔒
 
 Tool-urile marcate 🔒 cheltuie bani, trimit în masă, sunt externe sau ireversibile. La PRIMUL apel fără `confirm: true` întorc un mesaj de confirmare cu detaliile (sumă/nr. destinatari) și NU execută nimic. Fluxul corect: arăți utilizatorului ce se va întâmpla → ceri OK → reapelezi cu `confirm: true`. NU trimite `confirm: true` din prima fără acordul explicit al utilizatorului.
 
-Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `apply_quarterly_marketing_plan`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_push_campaign`, `send_whatsapp_media`, `send_whatsapp_message`, `set_campaign_budget`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
+Tool-uri cu confirm: `activate_email_flow`, `anonymize_guest`, `apply_quarterly_marketing_plan`, `approve_inventory_adjustment`, `boost_post`, `bulk_set_product_allergens`, `cancel_awb`, `create_calls_ad`, `create_event_ad`, `create_inventory_document`, `create_messages_ad`, `create_nir_from_invoice`, `create_page_likes_ad`, `create_traffic_ad`, `delete_menu_category`, `delete_pnl_snapshot`, `delete_tag`, `delete_tag_routing`, `delete_tag_routing_rule`, `dispatch_review_invitations_for_order`, `enroll_customers_in_email_sequence`, `forget_customer_gdpr`, `gbp_create_post`, `gbp_reply_review`, `generate_daily_consumption`, `gp_refund_transaction`, `mark_channel_deposits_returned`, `post_inventory_document`, `process_rma_refund`, `publish_social_post`, `push_notify_customers`, `push_notify_staff`, `receive_purchase_order`, `refund_channel_order`, `replace_channel_order_items`, `reply_to_conversation`, `resume_ad_campaign`, `run_crm_playbook`, `run_marketing_automation`, `run_smart_followups`, `schedule_email_campaign`, `score_sales_deals`, `send_email_campaign`, `send_email_campaign_predictive`, `send_magic_login_link`, `send_push_campaign`, `send_whatsapp_media`, `send_whatsapp_message`, `set_campaign_budget`, `snooze_delivery_channel`, `submit_efactura_anaf`, `sync_emag_offers`, `sync_retail_reviews`, `update_ecommerce_order_status`, `update_lot_status`.
 
 ## ⚠ Plafoane (limite) per token — opționale, setate din Hub
 
@@ -34,17 +34,18 @@ Proprietarul poate seta din portalul Hub → Acces AI plafoane pe token. Gol = f
 
 Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate mări/elimina plafonul din Hub → Acces AI (editează tokenul), sau folosește o valoare mai mică. Plafoanele se aplică PE LÂNGĂ permisiunea de modul — sunt o a doua plasă de siguranță.
 
-**TOTAL: 996 tool-uri** — Citire 432 · Speciale 5 · SQL 3 · Scriere per modul 556 (pe 19 module).
+**TOTAL: 1004 tool-uri** — Citire 434 · Speciale 5 · SQL 3 · Scriere per modul 562 (pe 19 module).
 
-## Citire (fără permisiune de modul) — 432 tool-uri
+## Citire (fără permisiune de modul) — 434 tool-uri
 
-### Vânzări, comenzi, casă & financiar — 45
+### Vânzări, comenzi, casă & financiar — 47
 - `compare_attribution_models` — Compară modelele de atribuire (last_click/first_click/linear/time_decay/position) pe canale: venit + conversii + ROAS per model. (parametri opționali: brandId, days)
 - `get_attribution_ltv_by_channel` — Valoarea pe viață (LTV) a clienților grupată după canalul de achiziție, pe o cohortă de N zile: nr. (parametri opționali: brandId, days)
 - `get_attribution_report` — Raport de atribuire marketing pe canale, pe ultimele N zile: conversii, venituri, cheltuieli (din reclame), CPA și ROAS per canal, conform unui model de atribuire ales (last_click implicit). (parametri opționali: brandId, days, model)
 - `get_cash_book_day` — Detaliile zilei de casă (deschidere/închidere, totaluri, status, înregistrările) pentru un registru la o dată. (necesită: registerId, businessDate)
 - `get_cash_register_balance` — Soldul curent al unui registru de casă (opțional la o anumită dată) — cât numerar e în casierie acum. (necesită: registerId)
 - `get_cash_register_closure_status` — Arată ce zile sunt închise/deschise/lipsă pentru un registru de casă (registru legal) — util pentru a vedea ce mai e de închis. (necesită: registerId)
+- `get_channel_order` — Detaliile unei comenzi de agregator/canal extern: canal, status, totaluri, itemsJson, metadata si timeline. (necesită: id)
 - `get_ecommerce_order` — Detaliile unei comenzi din magazinul online: status, plată, totaluri, adresă/AWB, jaloane (plătită/expediată/livrată) și articolele comandate. (necesită: id)
 - `get_email_conversion_attribution` — Conversii si venit atribuit emailurilor din POS: comenzi + rezervari legate de click-uri email, cu funnel complet pana la converted. (parametri opționali: brandId, campaignId)
 - `get_end_of_day_report` — Rezumat consolidat de sfârșit de zi pentru o dată/locație: total brut, TVA, reduceri, bacșiș, defalcare pe metode de plată, pe ospătar și comenzi anulate. (parametri opționali: date, locationId)
@@ -66,6 +67,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `list_cash_book_entries` — Listează operațiunile dintr-un registru de casă (încasări, plăți, depuneri/ridicări bancă) pe o perioadă. (parametri opționali: registerId, dateFrom, dateTo, entryType)
 - `list_cash_pending_operations` — Listează operațiunile de numerar netrecute încă în registrul de casă pentru o zi (ture de închis, tranzacții financiare). (necesită: registerId, businessDate)
 - `list_cash_registers` — Listează registrele de casă (case de marcat / casierii) cu monedă, locație și starea activă. (parametri opționali: brandId, locationId, active)
+- `list_channel_orders` — Listeaza comenzile venite de pe agregatori/canale externe (Glovo/Wolt/Bolt/Tazz): provider, canal, status, total, client, preorder si ETA. (parametri opționali: brandId, locationId, provider, status)
 - `list_dispatch_orders` — Tabloul dispecerului de livrare: comenzile pe coloane (pregătire bucătărie / gata de livrare / alocat / în livrare). (parametri opționali: brandId, locationId, status, driverId)
 - `list_ecommerce_orders` — Listează comenzile din magazinul online (ecommerce). (parametri opționali: brandId, status, paymentStatus, customerId)
 - `list_emag_orders` — Listează comenzile eMAG importate în sistem: id eMAG, comanda internă legată, status eMAG, dacă factura a fost încărcată și dacă a fost confirmată. (parametri opționali: accountId, limita)
@@ -496,7 +498,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `describe_database_table` — PAS 2 din workflow eficient de citire BD — OBLIGATORIU înainte de SELECT * pe tabel necunoscut. (necesită: tableName)
 - `execute_sql_query` — PAS 3 (final) din workflow eficient de citire BD. (necesită: query, explanation)
 
-## Scriere per modul — 556 tool-uri (gated de writeModules pe token)
+## Scriere per modul — 562 tool-uri (gated de writeModules pe token)
 
 ### produse_meniu — Produse & Meniuri — 63 tool-uri
 - `add_menu_item` — Adaugă un produs într-un meniu cu preț de vânzare. (necesită: menuId, productId, price)
@@ -865,7 +867,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `configure_portal_appearance` — Configureaza aspectul vizual al portalului: culori (principal, secundar, accent, fundal, text), font, stil butoane, carduri, navigare, border radius. (necesită: brandId)
 - `configure_portal_display` — Configureaza ce tab-uri, sectiuni home si sectiuni profil sunt vizibile pe portal. (necesită: brandId)
 - `configure_portal_features` — Activeaza/dezactiveaza module si functionalitati ale portalului: meniu, comenzi, rezervari, gamificare, social, chat AI, notificari, QR code, profil, prieteni, mesaje etc. (necesită: brandId)
-- `configure_portal_general` — Configureaza setarile generale ale portalului: tip business (restaurant/cafe/bar/qsr/amusement_park), nume platforma, autentificare, livrare/pickup. La crearea unui portal nou aplica default-uri dupa businessType (ospitalitate: meniu/comenzi/rezervari/QR/profil/loialitate/notificari + tema albastra; parc: set complet + violet) fara sa suprascrie portalurile existente. (necesită: brandId)
+- `configure_portal_general` — Configureaza setarile generale ale portalului: tip business (restaurant/cafe/bar/qsr/amusement_park), nume platforma, autentificare, livrare/pickup. (necesită: brandId)
 - `configure_portal_menu_config` — Configureaza setarile meniului din portal: filtre dietetice, afisare gramaj, alergeni, descrieri, nutritie, header-uri categorii, imagine hero. (necesită: brandId)
 - `configure_portal_qr` — Configureaza self-service-ul QR de la masa (Nivel Configurare QR): nivelul (brand/zona/raion), modul de plata online de la masa si presetul activ de date cerute la scanare. (necesită: brandId)
 - `configure_portal_texts` — Configureaza textele afisate pe portal: titlu bun venit, subtitlu, buton explorare, text inregistrare. (necesită: brandId)
@@ -1011,24 +1013,29 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `sync_sales_pipeline_template` — Sincronizează (reconciliază) etapele pipeline-ului principal de vânzări al unui brand cu un set de etape-șablon, IDEMPOTENT și fără pierderi de date. (necesită: stages)
 - `update_pipeline_stage` — Modifică o etapă existentă de pipeline (redenumire, culoare, ordine, probabilitate, marcaj câștigat/pierdut). (necesită: stageId)
 
-### livrari — Livrări & Flotă — 21 tool-uri
+### livrari — Livrări & Flotă — 26 tool-uri
 - `acknowledge_delivery_alert` — Confirmă (acknowledge) o alertă de livrare. (necesită: id)
 - `approve_rma` — Aprobă o cerere de retur (RMA) aflată în „pending”, opțional cu metodă de rambursare și notă. (necesită: id)
 - `assign_orders_to_driver` — Alocă una sau mai multe comenzi unui livrator. (necesită: orderIds, driverId)
 - `batch_assign_orders` — Grupează mai multe comenzi pe același livrator (batching), trecându-le în „alocat”. (necesită: orderIds, driverId)
 - `cancel_awb` 🔒 🌐 — ATENȚIE — apel extern: anulează un AWB la curier (dacă nu e deja livrat). (necesită: id)
+- `confirm_channel_preorder` 🌐 — Confirma o precomanda pe platforma (unde providerul suporta confirm-preorder, ex. (necesită: id)
 - `create_courier_account` — Configurează un cont de curier e-commerce (provider + credențiale + serviciu implicit). (necesită: provider, name)
 - `create_delivery_zone` — Creează o zonă de livrare pentru o locație (oraș/județ, taxă, prag livrare gratuită, comandă minimă, oră cutoff, opțional contur geografic cu anti-suprapunere). (necesită: city, county)
 - `create_quick_delivery_order` — Creează rapid o comandă de livrare luată la telefon (client, adresă, total, articole opționale). (necesită: customerName, deliveryAddress)
 - `create_vehicle` — Adaugă un vehicul în flotă (număr de înmatriculare, tip, capacitate comenzi). (necesită: licensePlate)
+- `delay_channel_order` 🌐 — Comunica o intarziere pentru o comanda de platforma (Glovo/Wolt) si actualizeaza ETA/timeline in Symbai. (necesită: id)
 - `dispatch_to_external_courier` 🌐 — ATENȚIE — costă bani: trimite efectiv comanda unui curier extern la cerere (Glovo/Uber Direct/Bolt Food), plasând o livrare REALĂ și trecând comanda „în livrare”. (necesită: orderId, provider)
+- `mark_channel_deposits_returned` 🔒 🌐 — Marcheaza la platforma ca garantiile SGR/depozitele unei comenzi au fost returnate (Wolt deposits-returned) si noteaza in timeline. (necesită: id)
 - `mark_delivery_failed` — Marchează o livrare ca eșuată cu motiv standardizat și notă opțională. (necesită: orderId, reason)
 - `mark_order_ready_for_delivery` — Marchează o comandă ca „gata de livrare” (apare pe ecranul dispecerului). (necesită: orderId)
 - `quote_external_couriers` 🌐 — Cere oferte (preț + ETA) de la curierii externi la cerere (Glovo / Uber Direct / Bolt Food) pentru o comandă. (necesită: orderId)
 - `reject_rma` — Respinge o cerere de retur (RMA) cu motiv. (necesită: id, rejectionReason)
+- `replace_channel_order_items` 🔒 🌐 — ATENTIE: modifica o comanda reala de platforma prin substituire/inlocuire produse (Glovo replace_products / Wolt replace-items). (necesită: id)
 - `resolve_delivery_alert` — Marchează o alertă de livrare ca rezolvată. (necesită: id)
 - `retry_failed_delivery` — Repune o livrare eșuată în circuit: imediat „gata de livrare” sau reprogramată la o dată/oră. (necesită: orderId)
 - `set_employee_as_driver` — Marchează/demarchează un angajat ca livrator (sursa de adevăr pentru alocare + billing modul curier). (necesită: employeeId, isDriver)
+- `snooze_delivery_channel` 🔒 🌐 — ATENTIE: pune temporar canalul Glovo/Wolt offline la sursa pentru un numar de minute (restaurant ocupat / slammed). (necesită: id)
 - `track_awb` 🌐 — ATENȚIE — apel extern: interoghează starea live a unui AWB la curier și actualizează statusul expedierii (și comanda dacă e livrată). (necesită: id)
 - `unassign_orders` — Retrage alocarea unor comenzi de la livrator și le readuce la „gata de livrare”. (necesită: orderIds)
 - `update_delivery_zone` — Modifică o zonă de livrare existentă (taxe, praguri, ore, contur, activare). (necesită: id)
@@ -1080,9 +1087,10 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `cancel_unpaid_order` — Anulează o comandă DESCHISĂ și NEPLĂTITĂ care NU a fost trimisă la bucătărie (anulează și produsele + bonurile de bucătărie aferente). (necesită: orderId)
 - `respond_operation_request` — Aprobă SAU respinge o cerere de aprobare de la ospătar (retur, din partea casei/comp, discount, client, retipărire bon, confirmare plată, decizie storno). (necesită: requestId, action, approvedBy)
 
-### plati_terminal — Plăți Terminal (refund card) — 2 tool-uri
+### plati_terminal — Plăți Terminal (refund card) — 3 tool-uri
 - `gp_refund_transaction` 🔒 🌐 — BANI ÎN AFARĂ (refund/void pe card prin GlobalPayments) — operațiune de manager, confirmă EXPLICIT cu utilizatorul suma și tranzacția înainte de a apela. (necesită: transactionId)
 - `process_rma_refund` 🔒 🌐 — ATENȚIE — MUTĂ BANI REALI: procesează rambursarea unui retur (Viva / transfer bancar / manual / credit magazin). (necesită: id)
+- `refund_channel_order` 🔒 🌐 — ATENTIE - MUTA BANI/valoare pe platforma: ramburseaza total/partial o comanda Wolt sau ajusteaza totalul Glovo (newTotal). (necesită: id)
 
 ### hotel — Hotel PMS — 6 tool-uri
 - `create_hotel_reservation` — Creează o rezervare de cazare nouă. (necesită: roomTypeId, checkInDate, checkOutDate)

@@ -72,7 +72,7 @@ Din `/reports/pnl`, butonul **„Salvează P&L"** îngheață raportul pe perioa
 
 Export PDF / Excel atât pentru raportul live cât și pentru snapshot.
 
-## P&L pe produs și P&L pe livrări
+## P&L pe produs, P&L pe livrari si P&L pe zile
 
 **P&L pe produs/SKU** vine din raportul live `/reports/pnl` și este reconciliat cu P&L-ul total. Prin MCP, folosește `get_product_pnl(perioada, mode, limit, brandId?, locationId?)`. Explică-l managerial: venit net, cost direct, alocări de manoperă/overhead, profit net, produse pe pierdere, produse fără cost și concentrarea profitului. Când un produs apare roșu, verifică `warnings`, `methodology` și `data.config`: ponderea de alocare sau pragul poate fi setare de business, nu bug.
 

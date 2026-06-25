@@ -18,6 +18,8 @@ Scop: răspunzi clar și RAPID la „ce se întâmplă / ce s-a întâmplat / ce
 
 Pentru istoricul complet al unei comenzi anume de pe masă, treci la `get_order_timeline` cu orderId-ul returnat aici.
 
+**Dacă userul vrea să scoată clientul de pe masă**: în POS Mobile, chip-ul clientului are acum buton `X` / „fără client". Acțiunea golește `customerId`/numele clientului pe comenzile active ale mesei și resetează discountul la 0, ca să nu rămână reducerea clientului vechi. Dacă nu există tool MCP dedicat pe tenant, deschide POS-ul prin browser/Chrome logat și arată butonul; apoi verifică prin `get_table_status` / `get_order_timeline`.
+
 ### 2. „Ce a făcut ospătarul X?" → `get_employee_activity`
 `get_employee_activity(employeeName: "Ion", date: "2026-06-16")` — `date` e opțional (implicit azi). Întoarce consolidat: bonuri finalizate, cât a vândut, bacșiș, bon mediu, mese lucrate, prima/ultima activitate, PLUS cererile lui de aprobare grupate pe tip (retururi/discounturi/casă/transferuri) și cele rămase în așteptare. Dacă numele se potrivește cu mai mulți angajați, tool-ul îți cere numele complet.
 - Pentru cronologia minut-cu-minut (ce produs a adăugat/șters, la ce oră) → `jurnal_activitate(cauta: "Ion", perioada: "azi")`.

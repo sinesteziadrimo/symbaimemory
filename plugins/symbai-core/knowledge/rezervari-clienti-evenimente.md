@@ -119,7 +119,7 @@ Modulul acoperă tot ce ține de relația cu clienții: rezervări de masă și 
 - **De ce nu apare pagina Cvent?** → E vizibilă doar cu integrarea Cvent activată în setările CRM și cu credențiale configurate.
 - **De ce clientul nu poate rezerva online un grup de 15 persoane, dar eu pot din POS?** → Limitele min/max persoane se aplică rezervărilor online; personalul poate depăși limitele din POS.
 - **Calendarul pare gol / lipsesc rezervări** → Verifică filtrele globale de brand și locație din partea de sus a paginii.
-- **De ce nu pot șterge un client prin AI?** → Nu există tool-uri MCP de ștergere de entități; ștergerile se fac din aplicație. Pentru duplicate folosește fuziunea de clienți (păstrează istoricul, cu audit).
+- **De ce nu pot șterge definitiv un client?** → Pentru clienți/POS/portal, fluxul corect este GDPR: anonimizare + dezactivare, cu istoricul financiar păstrat fără PII. Prin AI folosește `forget_customer_gdpr` cu confirmare explicită; pentru duplicate folosește fuziunea de clienți (păstrează istoricul, cu audit).
 - **„/customers" și „/portal-customers" sunt pagini diferite?** → Nu, e aceeași pagină de clienți, accesibilă pe ambele rute.
 - **Clientul zice că linkul de recenzie nu merge** → Linkurile de recenzie post-eveniment pot expira și acceptă o singură trimitere; dacă recenzia a fost deja trimisă, pagina o confirmă.
 - **De ce nu primește clientul email/SMS de la playbooks?** → GDPR: opt-out-ul per canal (email/SMS/WhatsApp) se verifică înainte de orice trimitere; verifică consimțămintele clientului.

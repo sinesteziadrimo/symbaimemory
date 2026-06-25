@@ -733,7 +733,7 @@ Dacă un tool întoarce „Plafon depășit", spune-i utilizatorului că poate m
 - `create_waitlist_entry` — Adaugă un client pe lista de așteptare (walk-in fără rezervare) (necesită: guestName, partySize)
 - `evaluate_loyalty_drop_alerts` — Evaluează alertele de scădere a fidelizării (oaspeți inactivi, tier-uri în scădere) pentru toate locațiile cu alerte activate.
 - `expire_loyalty_points` — Rulează manual job-ul de expirare a punctelor de fidelitate ajunse la termen (global).
-- `forget_customer_gdpr` 🔒 — GDPR dreptul la ștergere (Articol 17) pentru un CLIENT retail: anonimizează PII, curăță jurnalul de comunicări și revocă tot marketingul. (necesită: customerId)
+- `forget_customer_gdpr` 🔒 — GDPR dreptul la ștergere (Articol 17) pentru un CLIENT retail: anonimizează PII, dezactivează profilul/accesul, curăță legăturile tranzitorii și revocă marketingul; istoricul fiscal rămâne fără PII. (necesită: customerId)
 - `merge_guests` — Unifică profiluri de oaspeți duplicate într-unul singur (primaryId): repointează puncte, istoric, rezervări și folio. (necesită: primaryId, mergedIds)
 - `recompute_guest_loyalty` — Recalculează statisticile (vizite, sume) și tier-ul unui oaspete după modificări de date. (necesită: guestProfileId)
 - `recompute_loyalty_rfm` — Recalculează segmentele RFM (recency/frequency/monetary) pentru toți oaspeții unei locații. (parametri opționali: brandId, locationId)

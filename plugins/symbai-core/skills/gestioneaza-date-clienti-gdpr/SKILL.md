@@ -52,7 +52,7 @@ Afli dacă e client retail sau oaspete hotel → `export_customer_gdpr_data(cust
 **2. „Cererea de a fi uitat" (dreptul la ștergere — Art. 17). ⚠ IREVERSIBIL — cere confirmare.**
 - Întâi **explică-i userului** distincția: **anonimizare** (scoate datele personale — nume/telefon/email/adresă — dar PĂSTREAZĂ tranzacțiile/agregatele pentru evidența fiscală) vs **ștergere completă**. Pentru un client cu istoric de vânzări/facturi, anonimizarea e alegerea corectă (rapoartele fiscale rămân corecte fără PII).
 - Confirmă **cine** e clientul și **că userul vrea sigur** să continue. Abia apoi:
-  - retail → `forget_customer_gdpr(customerId, confirm:true)` (anonimizează PII, curăță jurnalul de comunicări, revocă tot marketingul; comenzile fiscale + fidelitatea agregat rămân).
+  - retail → `forget_customer_gdpr(customerId, confirm:true)` (anonimizează PII, dezactivează profilul, curăță accesul/tranzitoriile și revocă marketingul; comenzile fiscale + agregatele rămân fără date personale).
   - oaspete hotel → `anonymize_guest(guestProfileId, confirm:true)` (anonimizează PII, păstrează agregatele fiscale).
 - **Nu rula niciodată „de test".** Fără `confirm:true` tool-ul nu execută — e protecția intenționată. Dacă userul n-a confirmat explicit, OPREȘTE-TE și întreabă.
 
@@ -69,13 +69,14 @@ Afli dacă e client retail sau oaspete hotel → `export_customer_gdpr_data(cust
 ## Cele puține cazuri care cer un click
 
 Aproape totul aici merge prin MCP. Apelezi la Chrome activ (`claude-in-chrome`, click pe ELEMENT nu pe pixel — vezi `condu-chrome.md`) doar pentru:
-- **ștergerea unei entități întregi** dacă userul chiar vrea eliminarea totală (nu anonimizare) — asta NU se face prin conexiune ca operație obișnuită; îndrumă-l să șteargă din `/customers` (sau fă-o tu prin Chrome dacă e logat și ți-o cere explicit).
+- **confirmare vizuală după anonimizare/dezactivare** — deschide `/customers` sau `/portal-customers` ca să arăți că profilul nu mai apare ca activ. Nu promite hard delete pentru clienți/conturi portal: aplicația păstrează istoricul financiar fără PII și curăță sesiunile/asignările tranzitorii.
 - editarea fină a unui formular de consimțământ public / setări de colectare care n-au tool dedicat.
 - legarea unui membru de grup la un client din portal când nu cunoști `portalUserId` (îl găsești în pagina clientului).
 
 ## Reguli (cele care contează)
 
 - **Ireversibilul cere confirmare EXPLICITĂ.** `forget_customer_gdpr` și `anonymize_guest` șterg PII pentru totdeauna. Nu le rula niciodată din proprie inițiativă, „de test", sau pe ID greșit. `confirm:true` e o barieră intenționată — respect-o. Confirmă identitatea + intenția cu userul întâi.
+- **Client portal/POS = anonimizare + dezactivare, nu hard delete.** După „ștergere", profilul nu mai poate autentifica prin portal, nu mai apare în selectorul POS/CRM ca activ, iar istoricul fiscal rămâne păstrat fără PII. Pentru cereri de eliminare totală peste retenția legală, trimite spre suport/juridic, nu SQL/click-uri riscante.
 - **Retail vs hotel — tool-ul potrivit.** `*_customer_*` = client POS (`customerId`); `*_guest_*` = oaspete hotel (`guestProfileId` + brand/locație). Greșirea tool-ului = export/ștergere pe profilul nepotrivit.
 - **Citește înainte de a fuziona.** `merge_guests` unește doi clienți SPECIFICI; confirmă cu `find_duplicate_guests` + userul că sunt aceeași persoană.
 - **Consimțământul e per canal**, nu global — verifică pe canalul cerut (`check_marketing_allowed` / `list_gdpr_consent_log`).
@@ -94,4 +95,4 @@ Citirile (export, jurnal consimțăminte, găsire duplicate, preview segment, li
 - Trimiteri de marketing care respectă opt-out → `knowledge/email-marketing.md` + skill-ul `gestioneaza-comunicare`; reactivare clienți → `knowledge/crm-automatizari-playbooks.md` + skill-ul `gestioneaza-crm`.
 - Cum conduci Chrome (deep-link, screenshot = livrabil, click pe element doar la nevoie) → `knowledge/condu-chrome.md`.
 - Navigare către orice pagină → skill-ul `gaseste-pagina` / tool-ul `gaseste_in_aplicatie`.
-- Ceva ce nu se poate prin conexiune (ex. ștergere totală de entitate) → ghidează în app + `trimite_ticket_symbai` (sugestie).
+- Cerere de eliminare totală peste fluxul GDPR standard → `trimite_ticket_symbai` / suport juridic; nu încerca ștergere manuală prin app/SQL.

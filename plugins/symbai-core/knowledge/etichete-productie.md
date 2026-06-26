@@ -46,8 +46,24 @@ Le pui pe etichetă din butonul „Câmp dinamic" din editor (sau le scrii direc
 - **PDF** — pentru coli A4 cu etichete autocolante sau pentru a verifica/arhiva. Butonul „Descarcă PDF" din fereastra de printare. Nu necesită imprimantă specială.
 - **Configurare** (o dată, în Setări → Imprimante → „Imprimantă Etichete"): limbajul (ZPL/PDF), rezoluția (203/300/600 DPI — 203 e standardul) și, opțional, dimensiunea fizică a etichetei (dacă o lași goală, se ia din șablon).
 
+## Fabrică: eticheta pe o OPERAȚIE din flux + printare de la tableta de stație
+
+La fabrici (producție pe flux tehnologic), eticheta nu se leagă doar de rețetă — se leagă de o **operație din flux** (de regulă „Ambalare") și se printează de pe **Tableta de Stație**, nu doar dintr-un buton pe lot:
+
+- **Șablon implicit pe operație** — în editorul de flux (Producție → Fluxuri → editezi operația → tab „QC & Etichetă") alegi: **Șablon etichetă** (un material grafic tip „Etichetă"), **Nr. copii** și **Print automat la finalizare**. Astfel, la acea operație sistemul știe exact ce etichetă să scoată.
+- **Unde se lipește** — câmpul „Unde se lipește eticheta" (palet/cutie/ladă/tavă/produs/pungă/butoi/sticlă) apare ca instrucțiune pe tabletă: „Lipește eticheta pe: palet".
+- **Etichetare obligatorie** — dacă bifezi „Etichetare obligatorie", finalizarea operației e blocată până se printează eticheta (nu poți „uita" de etichetă).
+- **De pe tabletă** (Producție → Tabletă Stație): imprimanta de etichete se alege o dată în **⚙ Setări → „Imprimantă Etichete"** (+ opțional „Print automat la finalizare"). Pe fiecare operație apare butonul **„ETICHETĂ"** → alegi câte copii → printezi. Sau, cu „Print automat", iese singur la finalizare.
+
+### Multe copii deodată (Zebra scoate rapid)
+La un lot gata poți printa sute/mii de etichete **dintr-o singură comandă** — imprimanta termică le repetă singură (o comandă, nu mii de joburi), deci e instant. Plafon 9999. Pe tabletă ai butoane rapide: **„Cât lotul (N)"** (o etichetă pe fiecare unitate produsă), **„4 (palet)"** și 50/100/500.
+
+### Etichetă de palet cu QR mare
+Pentru palet: desenează în Materiale Grafice un șablon de etichetă cu un **QR/cod de bare MARE** (legat de `{{lot}}`), alege-l ca șablon pe operația de ambalare și pune **copii = 4** (câte una pe fiecare față a paletului → ușor de identificat din orice parte). Sau o singură etichetă mare, cum preferi.
+
 ## Tool-uri MCP utile (ce poți face direct pentru user)
-- **`print_designed_label({ brandId, recipeId? / batchId? / productId?, designId?, printerId?, copies?, output? })`** — printează eticheta. Dacă NU dai `designId`, alege automat eticheta implicită legată de rețetă/produs (sau cea implicită pe brand). `output` poate fi `auto` (ZPL la imprimantă), `pdf` (întoarce PDF) sau lași gol. Pentru un lot, dă `batchId` — completează singur lotul/data/valabilitatea.
+- **`print_designed_label({ brandId, recipeId? / batchId? / productId?, designId?, printerId?, copies?, output? })`** — printează eticheta. Dacă NU dai `designId`, alege automat eticheta implicită legată de rețetă/produs (sau cea implicită pe brand). `output` poate fi `auto` (ZPL la imprimantă), `pdf` (întoarce PDF) sau lași gol. Pentru un lot, dă `batchId` — completează singur lotul/data/valabilitatea. `copies` 1-9999 (ex. 4 = un palet, sau câte unități are lotul).
+- **`configure_operation_completion({ operationId, labelTemplateId?, labelCount?, autoPrintLabels?, completionRequiresLabel?, labelApplicationTarget? })`** (fabrică) — leagă un șablon de etichetă de o OPERAȚIE din flux: ce design (`labelTemplateId` = id din `list_material_designs type:'label'`), câte copii implicit, print automat la finalizare, etichetare obligatorie și unde se lipește. Apoi operatorul printează de pe tableta de stație.
 - `list_printers({ brandId?, locationId? })` — vezi imprimantele configurate (tip, IP, stare LIVE). Pentru etichete cauți tipul „Etichete"; `status:"online"` înseamnă că poate tipări acum, `offline`/`unassigned` înseamnă că trebuie rezolvat PC-ul/Print Agentul sau folosit PDF.
 - `list_material_designs({ brandId, type:'label' })` — șabloanele de etichetă existente.
 - `list_material_templates()` + `create_material_from_template(...)` + tool-urile de editare — pentru a DESENA/ajusta eticheta (vezi `materiale-grafice.md`, modul declarativ, fără clickuri).
@@ -56,7 +72,9 @@ Le pui pe etichetă din butonul „Câmp dinamic" din editor (sau le scrii direc
 ## Cheatsheet: ce-ți cere userul → ce faci
 - „Fă-mi o etichetă pentru semipreparate / cu alergeni și valabilitate" → desenezi un material de tip Etichetă (vezi `materiale-grafice.md`): pui `{{denumire}}`, `{{lot}}`, `{{dataProductiei}}`, „Valabil: {{termenValabilitate}}", „Alergeni: {{alergeni}}" (bold) și un cod de bare cu `{{lot}}`. Apoi îi spui cum o leagă de rețetă.
 - „Printează etichetele pentru lotul gata / pentru ciorbă" → `print_designed_label({ brandId, batchId })` (sau `recipeId`). Dacă nu există etichetă legată, întâi întrebi/ajuți să aleagă un șablon.
-- „Vreau X copii" → `copies` în `print_designed_label`.
+- „Vreau X copii" / „o mie de etichete" / „cât lotul" → `copies` în `print_designed_label` (1-9999; Zebra le scoate dintr-o singură comandă).
+- „Etichetă de palet cu QR mare, una pe fiecare față" → un șablon cu QR mare (Materiale Grafice) + `copies:4`. Pe fabrică: leagă-l de operația de ambalare cu `configure_operation_completion({ operationId, labelTemplateId, labelCount:4, labelApplicationTarget:'pallet' })`.
+- „Pune eticheta X pe operația de ambalare / să iasă automat la finalizare" (fabrică) → `configure_operation_completion({ operationId, labelTemplateId, autoPrintLabels:true })`; pentru a obliga eticheta înainte de finalizare adaugă `completionRequiresLabel:true`.
 - „Dă-mi un PDF cu eticheta" → `print_designed_label({ ..., output:'pdf' })`.
 - „Setează eticheta asta ca implicită pentru rețeta Y" → din Materiale Grafice, pe etichetă, „Setează ca etichetă implicită" (UI). (Asistentul ghidează userul — legarea se face din aplicație.)
 - „Nu am imprimantă de etichete / nu iese pe Zebra" → verifici cu `list_printers` (există una de tip Etichete, pe rețea, cu IP și `status:"online"`?). Dacă lipsește sau e `offline`/`unassigned`, ghidezi: Setări → Imprimante → adaugă/leagă „Imprimantă Etichete" și verifică PC-ul cu Print Agent. Vezi `echipamente-kds-imprimante.md`.
